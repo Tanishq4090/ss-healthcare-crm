@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 189 94% 95%;
+    --foreground: 216 18% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 18% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 18% 12%;
+    --primary: 172 92% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 198 96% 35%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 188 41% 91%;
+    --muted-foreground: 213 22% 40%;
+    --accent: 217 91% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 352 76% 56%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 191 51% 83%;
+    --input: 191 51% 83%;
+    --ring: 172 92% 35%;
+    --radius: 1rem;
+    --sidebar-background: 204 17% 97%;
+    --sidebar-foreground: 216 18% 12%;
+    --sidebar-primary: 172 92% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 186 74% 94%;
+    --sidebar-accent-foreground: 172 92% 35%;
+    --sidebar-border: 191 51% 83%;
+    --sidebar-ring: 172 92% 35%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-foreground antialiased;
+    background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 18%),
+      radial-gradient(circle at bottom left, rgba(21, 119, 232, 0.12), transparent 20%),
+      linear-gradient(180deg, #f7fcff 0%, #effaf6 100%);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    letter-spacing: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: 0;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+}
+
+@layer components {
+  .clinical-canvas {
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 18%),
+      radial-gradient(circle at 18% 22%, rgba(15, 111, 168, 0.12), transparent 18%),
+      linear-gradient(180deg, #f7fdff 0%, #eefaf6 100%);
+  }
+
+  .clinical-surface {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(16, 185, 129, 0.16);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 24px 60px rgba(8, 68, 87, 0.09), 0 4px 18px rgba(15, 23, 42, 0.05);
+    backdrop-filter: blur(20px);
+  }
+
+  .clinical-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), transparent 34%),
+      radial-gradient(circle at top left, rgba(16, 185, 129, 0.08), transparent 28%);
+  }
+
+  .clinical-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .clinical-header {
+    border: 1px solid rgba(16, 185, 129, 0.14);
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 18px 42px rgba(9, 69, 89, 0.08);
+    backdrop-filter: blur(22px);
+  }
+
+  .medical-mark {
+    position: relative;
+  }
+
+  .medical-mark::before,
+  .medical-mark::after {
+    content: "";
+    position: absolute;
+    background: rgba(16, 185, 129, 0.14);
+    border-radius: 999px;
+  }
+
+  .medical-mark::before {
+    width: 56%;
+    height: 2px;
+    left: 22%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .medical-mark::after {
+    width: 2px;
+    height: 56%;
+    left: 50%;
+    top: 22%;
+    transform: translateX(-50%);
+  }
+
+  .field-control {
+    @apply h-12 rounded-3xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-700 shadow-sm transition-all placeholder:text-slate-400;
+  }
+
+  .field-control:hover {
+    border-color: rgba(16, 185, 129, 0.32);
+  }
+
+  .field-control:focus {
+    border-color: rgba(16, 185, 129, 0.54);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-3xl px-4 py-2.5 text-sm font-semibold text-white transition-all;
+    background: linear-gradient(135deg, #0ea286, #1577d3);
+    box-shadow: 0 16px 32px rgba(14, 162, 134, 0.22);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(0.98);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 34px rgba(14, 162, 134, 0.26);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all;
+  }
+
+  .btn-secondary:hover {
+    @apply border-cyan-200 text-slate-900;
+    background: rgba(236, 253, 250, 0.92);
+    transform: translateY(-1px);
+  }
+
+  .segmented-control {
+    @apply flex items-center rounded-3xl border border-slate-200 bg-white/90 p-1 shadow-sm;
+  }
+
+  .segmented-item {
+    @apply rounded-2xl px-3 py-2 text-sm font-semibold text-slate-500 transition-all;
+  }
+
+  .segmented-item-active {
+    @apply bg-cyan-50 text-cyan-900 shadow-sm;
+  }
+
+  .table-shell {
+    @apply clinical-surface overflow-hidden;
+  }
+
+  .table-heading {
+    @apply bg-slate-50/80 text-left text-xs font-bold uppercase text-slate-500;
+    letter-spacing: 0.06em;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold;
+  }
+
+  .subtle-link {
+    @apply text-sm font-semibold text-cyan-700 transition-colors hover:text-cyan-900;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.45);
+    opacity: 0.42;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+
+.animate-count-up {
+  animation: count-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.35s ease-out forwards;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.36);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 145, 178, 0.45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
