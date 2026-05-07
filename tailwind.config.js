@@ -10,6 +10,16 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        brand: {
+          // Brand palette (99 Care logo)
+          blue: '#1AA6A8',
+          'blue-light': '#E6F7F7',
+          teal: '#0E7C7E',
+          'teal-light': '#EAFBFB',
+          green: '#16A34A',
+          gray: '#F9FAFB',
+          dark: '#0F172A',
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -48,37 +58,6 @@ module.exports = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        cyan: {
-          50: "#EAFAF7",
-          100: "#CCF4EE",
-          200: "#98E6DA",
-          300: "#5FD3C2",
-          400: "#31BDA7",
-          500: "#14947D",
-          600: "#0F7965",
-          700: "#125F54",
-          800: "#134948",
-          900: "#103B3C",
-        },
-        brand: {
-          50: "#ECF9F7",
-          100: "#CBF0E9",
-          200: "#97E2D5",
-          300: "#55D0B9",
-          400: "#1CA68F",
-          500: "#0E8B76",
-          600: "#0C6F5F",
-          700: "#0F5A4C",
-          800: "#12473F",
-          900: "#0F3734",
-        },
-        stage: {
-          newlead: "#3B82F6",
-          inquiry: "#8B5CF6",
-          discussion: "#F59E0B",
-          quotation: "#EC4899",
-          closed: "#10B981",
-        },
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
@@ -89,8 +68,6 @@ module.exports = {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        soft: "0 18px 46px rgba(15, 64, 84, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04)",
-        glow: "0 18px 36px rgba(8, 145, 178, 0.18)",
       },
       keyframes: {
         "accordion-down": {
@@ -105,17 +82,11 @@ module.exports = {
           "0%,70%,100%": { opacity: "1" },
           "20%,50%": { opacity: "0" },
         },
-        "pulse-ring": {
-          "0%": { transform: "scale(1)", opacity: "1" },
-          "50%": { transform: "scale(1.4)", opacity: "0.5" },
-          "100%": { transform: "scale(1)", opacity: "1" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
-        "pulse-ring": "pulse-ring 2s infinite ease-in-out",
       },
     },
   },
