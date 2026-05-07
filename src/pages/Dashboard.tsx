@@ -21,6 +21,8 @@ import {
   YAxis,
 } from 'recharts';
 import { IconFrame, PageShell, SectionHeader, Surface, TrendPill } from '@/components/AppPrimitives';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 const mrrData = [
   { month: 'Jan', value: 3000 },
@@ -109,13 +111,34 @@ function KPICard({
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const firstName = user?.name?.split(' ')[0] || 'Admin';
+
+  const [stats, setStats] = useState({ leads: 0, workers: 0, calls: 0, mrr: 0 });
+
+  useEffect(() => {
+    async function fetchStats() {
+      const [leadsRes, workersRes, callsRes] = await Promise.allSettled([
+        supabase.from('crm_leads').select('id', { count: 'exact', head: true }),
+        supabase.from('employees').select('id', { count: 'exact', head: true }),
+        supabase.from('crm_call_logs').select('id', { count: 'exact', head: true }),
+      ]);
+      setStats({
+        leads:   leadsRes.status === 'fulfilled' ? (leadsRes.value.count ?? 0) : 0,
+        workers: workersRes.status === 'fulfilled' ? (workersRes.value.count ?? 0) : 0,
+        calls:   callsRes.status === 'fulfilled' ? (callsRes.value.count ?? 0) : 0,
+        mrr:     0,
+      });
+    }
+    fetchStats();
+  }, []);
   return (
     <PageShell>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_0.6fr]">
         <Surface className="bg-gradient-to-br from-brand-50 via-white to-cyan-50/80 border border-brand-100/50">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-brand-900/70">Good Morning, Alyona</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.32em]" style={{color:'#00A859'}}>Good Morning, {firstName}</p>
               <h2 className="mt-3 text-3xl font-extrabold text-slate-950">Your care dashboard is ready.</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
                 Monitor patient pipelines, revenue signals, and on-time operations from one intelligent workspace.
@@ -148,10 +171,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-4">
-        <KPICard label="Active Leads" value={5} trend="+8%" trendUp icon={TrendingUp} tone="cyan" />
-        <KPICard label="Worker Deployments" value={1} trend="+15%" trendUp icon={Users} tone="emerald" />
-        <KPICard label="Platform MRR" value={12000} prefix="₹" trend="+22.4%" trendUp icon={Activity} tone="blue" />
-        <KPICard label="Voice Calls" value={48} trend="+12%" trendUp icon={Phone} tone="amber" />
+        <KPICard label="Active Leads"       value={stats.leads}   trend="+8%"   trendUp icon={TrendingUp} tone="cyan" />
+        <KPICard label="Worker Deployments"  value={stats.workers} trend="+15%"  trendUp icon={Users}      tone="emerald" />
+        <KPICard label="Platform MRR"        value={stats.mrr}     prefix="₹" trend="+22.4%" trendUp icon={Activity} tone="blue" />
+        <KPICard label="Voice Calls"         value={stats.calls}   trend="+12%"  trendUp icon={Phone}      tone="amber" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">

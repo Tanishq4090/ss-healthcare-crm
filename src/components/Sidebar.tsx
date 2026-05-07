@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router';
+import { NavLink, useLocation, useNavigate } from 'react-router';
 import {
   BellRing,
   Bot,
@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -35,6 +36,13 @@ export default function Sidebar({
   onMobileClose?: () => void;
 }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   const handleToggle = () => {
     onCollapseChange?.(!collapsed);
@@ -61,12 +69,12 @@ export default function Sidebar({
         )}
       >
         <div className={cn('flex h-[84px] items-center border-b border-slate-100 px-4', collapsed ? 'lg:justify-center' : 'gap-3')}>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl ring-1" style={{background:'rgba(0,168,89,0.10)', ringColor:'rgba(0,168,89,0.2)'}}>
             <img src="/logo.png" alt="SS Health Care" className="h-8 w-8 object-contain" />
           </div>
           <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
             <span className="block truncate text-sm font-extrabold text-slate-950">SS Health Care</span>
-            <span className="mt-1 inline-flex rounded-full bg-cyan-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-900">
+            <span className="mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{background:'rgba(0,168,89,0.10)',color:'#004C8C'}}>
               Healthcare CRM
             </span>
           </div>
@@ -82,9 +90,9 @@ export default function Sidebar({
         </button>
 
         <div className={cn('px-4 py-4', collapsed && 'lg:px-3')}>
-          <div className={cn('rounded-lg border border-cyan-100 bg-cyan-50/70 p-3', collapsed && 'lg:flex lg:justify-center lg:p-2')}>
+          <div className={cn('rounded-lg p-3', collapsed && 'lg:flex lg:justify-center lg:p-2')} style={{border:'1px solid rgba(0,168,89,0.18)',background:'rgba(0,168,89,0.07)'}}>
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-cyan-700 shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm" style={{color:'#00A859'}}>
                 <BellRing className="h-4 w-4" />
               </div>
               <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
@@ -108,11 +116,12 @@ export default function Sidebar({
                   'group mb-1 flex items-center rounded-lg border border-transparent px-3 py-3 text-sm font-semibold transition-all',
                   collapsed ? 'lg:justify-center lg:px-2' : 'gap-3',
                   isActive
-                    ? 'border-brand-100 bg-brand-50 text-brand-900 shadow-sm'
+                    ? 'shadow-sm'
                     : 'text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-900'
                 )}
+              style={isActive ? {border:'1px solid rgba(0,168,89,0.22)',background:'rgba(0,168,89,0.08)',color:'#003d70'} : {}}
               >
-                <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-brand-700' : 'text-slate-400 group-hover:text-brand-700')} />
+                <Icon className={cn('h-5 w-5 shrink-0')} style={{color: isActive ? '#00A859' : undefined}} />
                 <span className={cn('truncate', collapsed && 'lg:hidden')}>{item.label}</span>
               </NavLink>
             );
@@ -122,19 +131,20 @@ export default function Sidebar({
         <div className="mx-4 border-t border-slate-100" />
 
         <div className={cn('p-4', collapsed && 'lg:px-3')}>
-          <div className={cn('flex items-center gap-3 rounded-2xl bg-brand-50/80 p-3', collapsed && 'lg:justify-center lg:p-2')}>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-brand-600 to-brand-400 text-white shadow-soft">
+          <div className={cn('flex items-center gap-3 rounded-2xl p-3', collapsed && 'lg:justify-center lg:p-2')} style={{background:'rgba(0,168,89,0.07)'}}>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl text-white shadow-sm" style={{background:'linear-gradient(135deg,#00A859,#004C8C)'}}>
               <Stethoscope className="h-4 w-4" />
             </div>
             <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
-              <span className="block truncate text-sm font-bold text-slate-950">System Admin</span>
-              <span className="text-xs text-slate-500">Admin</span>
+              <span className="block truncate text-sm font-bold text-slate-950">{user?.name || 'System Admin'}</span>
+              <span className="text-xs text-slate-500">{user?.role === 'admin' ? 'Admin' : 'Staff'}</span>
             </div>
           </div>
           <button
             type="button"
+            onClick={handleLogout}
             className={cn(
-              'mt-3 flex w-full items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-400 transition-all hover:bg-slate-50 hover:text-slate-700',
+              'mt-3 flex w-full items-center rounded-lg px-3 py-2 text-sm font-semibold text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600',
               collapsed ? 'justify-center gap-0 lg:px-2' : 'gap-2'
             )}
           >

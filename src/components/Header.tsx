@@ -36,7 +36,7 @@ export default function Header({
           <Menu className="h-5 w-5" />
         </button>
         <div className="min-w-0">
-          <p className="text-xs uppercase tracking-[0.3em] text-cyan-900/70">SS Health Care</p>
+          <p className="text-xs uppercase tracking-[0.3em]" style={{color:'#00A859'}}>SS Health Care</p>
           <h1 className="truncate text-xl font-extrabold text-slate-950 sm:text-2xl">{pageInfo.title}</h1>
           <p className="mt-1 hidden text-sm text-slate-500 sm:block">{pageInfo.subtitle}</p>
         </div>
@@ -54,7 +54,7 @@ export default function Header({
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="rounded-full bg-cyan-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-900">
+        <span className="rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{background:'rgba(0,168,89,0.10)',color:'#004C8C'}}>
           Live
         </span>
         <button type="button" className="btn-secondary hidden items-center gap-2 sm:inline-flex">
