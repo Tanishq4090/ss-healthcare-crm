@@ -1,0 +1,57 @@
+:root {
+  --ss-green: #00A859;
+  --ss-blue: #004C8C;
+  --ss-green-dark: #007A43;
+  --ss-blue-dark: #003866;
+  --ss-soft-green: #F0FFF8;
+  --ss-soft-blue: #EEF6FF;
+}
+
+.ss-brand-gradient,
+[data-brand='ss-healthcare'] .brand-gradient {
+  background: linear-gradient(135deg, var(--ss-green), var(--ss-blue));
+}
+
+.ss-brand-text,
+[data-brand='ss-healthcare'] .brand-text {
+  color: var(--ss-green);
+}
+
+.ss-brand-border,
+[data-brand='ss-healthcare'] .brand-border {
+  border-color: rgba(0, 168, 89, 0.25);
+}
+
+.ss-brand-surface {
+  border: 1px solid rgba(0, 168, 89, 0.16);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 24px 60px rgba(0, 76, 140, 0.08), 0 6px 24px rgba(0, 168, 89, 0.06);
+}
+
+.ss-id-card * {
+  font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Safety override for cloned SS Health Care colors. */
+.text-\[\#1aa6a8\],
+.text-\[\#14b8a6\] {
+  color: var(--ss-green) !important;
+}
+
+.bg-primary,
+.bg-teal-600,
+.bg-cyan-600 {
+  background-color: var(--ss-green) !important;
+}
+
+.text-primary,
+.text-teal-600,
+.text-cyan-600 {
+  color: var(--ss-green) !important;
+}
+
+.ring-primary,
+.border-primary {
+  --tw-ring-color: rgba(0, 168, 89, 0.35) !important;
+  border-color: rgba(0, 168, 89, 0.35) !important;
+}

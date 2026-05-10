@@ -126,7 +126,7 @@ const crmConfig = {
   companyIntro: {
     gujarati: "99 કેર હેલ્પીંગ હેન્ડ છેલ્લા પાંચ વર્ષથી સુરતમાં કામ કરી રહી છે...",
     hindi: "99 केयर हेल्पिंग हैंड पिछले पांच वर्षों से सूरत में काम कर रहा है...",
-    english: "99 Care Helping Hand has been working in Surat for the last five years..."
+    english: "SS Health Care Helping Hand has been working in Surat for the last five years..."
   },
   faqs: [
     { q: "What is your leave policy?", a: "If a caregiver takes 1 day leave, no replacement is provided. For >1 day, we arrange replacement." },

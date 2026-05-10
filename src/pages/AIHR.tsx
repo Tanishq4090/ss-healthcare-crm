@@ -1,175 +1,229 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  AlertCircle, Bot, Briefcase, Calendar, CheckCircle2,
-  CreditCard, DollarSign, Download, Filter, IdCard,
-  Phone, Plus, RefreshCw, Search, UserX, X
-} from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BadgeIndianRupee, Briefcase, CreditCard, IdCard, Plus, RefreshCw, Search, Upload, UserPlus, X } from 'lucide-react';
 import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
+import StaffIDCard from '@/components/StaffIDCard';
+import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
 import { supabase } from '@/lib/supabase';
+import { SS_HEALTHCARE_SERVICES } from '@/config/ssHealthcareServices';
 
-/* ─── Types ─────────────────────────────────────────────── */
-interface Employee {
+type Employee = StaffIDCardEmployee & {
   id: string;
-  username: string;
-  full_name: string;
-  role: string;
-  position: string;
-  department: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  experience?: string;
-  gender?: string;
-  shift_hours?: number;
-  join_date?: string;
-  photo_url?: string;
-  accesses?: string[];
-}
-
-const statusStyles: Record<string, string> = {
-  Active:     'bg-emerald-50 text-emerald-700 border-emerald-100',
-  'On Leave': 'bg-amber-50 text-amber-700 border-amber-100',
-  Terminated: 'bg-rose-50 text-rose-700 border-rose-100',
+  email?: string | null;
+  aadhaar?: string | null;
+  daily_rate?: number | null;
+  created_at?: string;
 };
 
-const DEPARTMENTS = ['General', 'Nursing', 'ICU', 'Home Care', 'Rehab', 'Pediatric', 'Administration'];
-const POSITIONS   = ['Registered Nurse', 'Home Care Attendant', 'ICU Care Specialist',
-                     'Physiotherapist', 'Ward Boy', 'Caregiver', 'Doctor', 'Administrator'];
+type ServiceOption = { id: string; name: string; category?: string };
 
-/* ─── ID Card Component ──────────────────────────────────── */
-function IDCardModal({ employee, onClose }: { employee: Employee; onClose: () => void }) {
-  const initials = employee.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-3xl bg-white shadow-2xl">
-        {/* Card header */}
-        <div className="relative rounded-t-3xl p-6 text-white" style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
-          <button onClick={onClose} className="absolute right-4 top-4 rounded-full bg-white/20 p-1.5 hover:bg-white/30">
-            <X className="h-4 w-4" />
-          </button>
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 text-2xl font-extrabold">
-              {employee.photo_url
-                ? <img src={employee.photo_url} alt={employee.full_name} className="h-full w-full rounded-2xl object-cover" />
-                : initials}
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest opacity-80">SS Health Care</p>
-              <h3 className="text-lg font-extrabold">{employee.full_name}</h3>
-              <p className="text-sm opacity-80">{employee.position}</p>
-            </div>
-          </div>
-        </div>
-        {/* Card body */}
-        <div className="space-y-3 p-6">
-          {[
-            { label: 'Employee ID', value: employee.username.toUpperCase() },
-            { label: 'Department',  value: employee.department },
-            { label: 'Phone',       value: employee.phone || '—' },
-            { label: 'Gender',      value: employee.gender || '—' },
-            { label: 'Experience',  value: employee.experience || '—' },
-            { label: 'Shift',       value: employee.shift_hours ? `${employee.shift_hours} hrs/day` : '8 hrs/day' },
-            { label: 'Joining',     value: employee.join_date ? new Date(employee.join_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—' },
-          ].map(row => (
-            <div key={row.label} className="flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-500">{row.label}</span>
-              <span className="font-semibold text-slate-900">{row.value}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
-          <button onClick={onClose} className="btn-secondary flex-1">Close</button>
-          <button
-            onClick={() => window.print()}
-            className="btn-primary flex-1 flex items-center justify-center gap-2"
-          >
-            <Download className="h-4 w-4" /> Download
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+const genderOptions = ['', 'Male', 'Female', 'Other'];
+const paymentSchemes = ['Daily Rate', 'Monthly', 'Hourly', 'Per Visit'];
 
-/* ─── Add Worker Modal ───────────────────────────────────── */
-function AddWorkerModal({ onClose, onAdded }: { onClose: () => void; onAdded: () => void }) {
+function AddEmployeeModal({
+  services,
+  onClose,
+  onCreated,
+}: {
+  services: ServiceOption[];
+  onClose: () => void;
+  onCreated: (employee: Employee) => void;
+}) {
   const [form, setForm] = useState({
-    full_name: '', username: '', phone: '', email: '', gender: '',
-    position: POSITIONS[0], department: DEPARTMENTS[0],
-    experience: '', shift_hours: '8', address: '',
+    full_name: '',
+    job_title: '',
+    gender: '',
+    phone: '',
+    email: '',
+    aadhaar: '',
+    date_of_birth: '',
+    residential_address: '',
+    experience: '',
+    payment_scheme: 'Daily Rate',
+    daily_rate: '0',
   });
+  const [skills, setSkills] = useState<string[]>([]);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [docFile, setDocFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError]   = useState('');
+  const [error, setError] = useState('');
 
-  const set = (field: string, val: string) => setForm(f => ({ ...f, [field]: val }));
+  const set = (key: string, value: string) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.full_name.trim() || !form.username.trim()) { setError('Name and username are required.'); return; }
-    setSaving(true); setError('');
-    const { error: err } = await supabase.from('employees').insert({
-      ...form,
-      shift_hours: Number(form.shift_hours) || 8,
-      role: 'user',
-      accesses: ['hr'],
-      join_date: new Date().toISOString().split('T')[0],
-    });
-    setSaving(false);
-    if (err) { setError(err.message); return; }
-    onAdded();
-    onClose();
+  const toggleSkill = (name: string) => {
+    setSkills((prev) => (prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]));
   };
 
-  const Field = ({ label, name, type = 'text', placeholder = '' }: { label: string; name: string; type?: string; placeholder?: string }) => (
-    <div>
-      <label className="mb-1 block text-xs font-semibold uppercase tracking-widest text-slate-500">{label}</label>
-      <input
-        type={type}
-        value={(form as Record<string, string>)[name]}
-        onChange={e => set(name, e.target.value)}
-        placeholder={placeholder}
-        className="field-control w-full"
-      />
-    </div>
-  );
+  const uploadFile = async (file: File, folder: string) => {
+    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = `${folder}/${Date.now()}-${cleanName}`;
+    const { error } = await supabase.storage.from('staff-assets').upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from('staff-assets').getPublicUrl(path);
+    return { path, publicUrl: data.publicUrl };
+  };
 
-  const Select = ({ label, name, options }: { label: string; name: string; options: string[] }) => (
-    <div>
-      <label className="mb-1 block text-xs font-semibold uppercase tracking-widest text-slate-500">{label}</label>
-      <select value={(form as Record<string, string>)[name]} onChange={e => set(name, e.target.value)} className="field-control w-full">
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
-    </div>
-  );
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.full_name.trim()) return setError('Full name is required.');
+    if (!form.job_title.trim()) return setError('Job title is required.');
+
+    setSaving(true);
+    setError('');
+
+    try {
+      let photo_url = '';
+      const idDocs: Array<Record<string, string>> = [];
+
+      if (photoFile) {
+        const uploaded = await uploadFile(photoFile, 'staff-photos');
+        photo_url = uploaded.publicUrl;
+      }
+
+      if (docFile) {
+        const uploaded = await uploadFile(docFile, 'staff-documents');
+        idDocs.push({ name: docFile.name, path: uploaded.path, url: uploaded.publicUrl });
+      }
+
+      const username = form.full_name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || `staff_${Date.now()}`;
+
+      const { data, error: insertError } = await supabase
+        .from('employees')
+        .insert({
+          username,
+          full_name: form.full_name.trim(),
+          job_title: form.job_title.trim(),
+          position: form.job_title.trim(),
+          gender: form.gender || null,
+          phone: form.phone || null,
+          email: form.email || null,
+          aadhaar: form.aadhaar || null,
+          date_of_birth: form.date_of_birth || null,
+          residential_address: form.residential_address || null,
+          address: form.residential_address || null,
+          experience: form.experience || null,
+          payment_scheme: form.payment_scheme,
+          daily_rate: Number(form.daily_rate) || 0,
+          service_skills: skills,
+          id_documents: idDocs,
+          photo_url,
+          role: 'user',
+          accesses: ['hr'],
+          status: 'active',
+        })
+        .select('*')
+        .single();
+
+      if (insertError) throw insertError;
+      onCreated(data as Employee);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create employee.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-          <div>
-            <h3 className="text-lg font-extrabold text-slate-950">Add Worker</h3>
-            <p className="text-sm text-slate-500">New employee to SS Health Care workforce</p>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div className="my-6 w-full max-w-3xl rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200">
+        <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-3xl border-b border-slate-100 bg-white/95 px-7 py-5 backdrop-blur">
+          <div className="flex items-center gap-3">
+            <UserPlus className="h-5 w-5 text-teal-600" />
+            <h3 className="text-2xl font-black text-slate-950">Add New Employee</h3>
           </div>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
         </div>
-        <form onSubmit={handleSubmit} className="max-h-[70vh] overflow-y-auto p-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Full Name *"    name="full_name"   placeholder="Priya Sharma" />
-            <Field label="Username *"     name="username"    placeholder="priya_sharma" />
-            <Field label="Phone"          name="phone"       placeholder="+91 98765 43210" />
-            <Field label="Email"          name="email"       type="email" placeholder="priya@example.com" />
-            <Select label="Position"      name="position"    options={POSITIONS} />
-            <Select label="Department"    name="department"  options={DEPARTMENTS} />
-            <Select label="Gender"        name="gender"      options={['', 'Male', 'Female', 'Other']} />
-            <Field label="Experience"     name="experience"  placeholder="2 years" />
-            <Field label="Shift (hrs/day)" name="shift_hours" type="number" placeholder="8" />
-            <Field label="Address"        name="address"     placeholder="City, State" />
+
+        <form onSubmit={handleCreate} className="space-y-6 p-7">
+          <label className="block cursor-pointer rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-6 py-8 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
+            <Upload className="mx-auto h-9 w-9 text-slate-300" />
+            <p className="mt-3 text-lg text-slate-500">Drag & drop or <span className="font-bold text-teal-600">click to upload</span></p>
+            <p className="mt-1 text-sm text-slate-400">Staff photo — JPEG, PNG, WebP · max 5 MB</p>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} />
+            {photoFile && <p className="mt-3 text-sm font-bold text-teal-700">Selected: {photoFile.name}</p>}
+          </label>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Full Name <span className="text-rose-500">*</span></label>
+              <input className="field-control w-full" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} placeholder="e.g. Anita Sharma" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Job Title <span className="text-rose-500">*</span></label>
+              <input className="field-control w-full" value={form.job_title} onChange={(e) => set('job_title', e.target.value)} placeholder="e.g. Registered Nurse" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Gender</label>
+              <select className="field-control w-full" value={form.gender} onChange={(e) => set('gender', e.target.value)}>
+                {genderOptions.map((g) => <option key={g} value={g}>{g || 'Select Gender'}</option>)}
+              </select>
+            </div>
           </div>
-          {error && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
-          <div className="mt-6 flex gap-3">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
-            <button type="submit" disabled={saving} className="btn-primary flex-1">
-              {saving ? 'Saving…' : 'Add Worker'}
+
+          <div>
+            <label className="mb-3 block text-sm font-semibold text-slate-700">Services & Skills</label>
+            <div className="flex flex-wrap gap-2">
+              {services.map((service) => (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => toggleSkill(service.name)}
+                  className={`rounded-full border px-4 py-2 text-sm font-bold transition ${skills.includes(service.name) ? 'border-teal-300 bg-teal-50 text-teal-700' : 'border-slate-200 bg-white text-slate-500 hover:border-teal-200'}`}
+                >
+                  {service.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Phone</label>
+              <input className="field-control w-full" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="98765 43210" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Aadhaar</label>
+              <input className="field-control w-full" value={form.aadhaar} onChange={(e) => set('aadhaar', e.target.value)} placeholder="0000 0000 0000" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Date of Birth</label>
+              <input type="date" className="field-control w-full" value={form.date_of_birth} onChange={(e) => set('date_of_birth', e.target.value)} />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Residential Address</label>
+              <input className="field-control w-full" value={form.residential_address} onChange={(e) => set('residential_address', e.target.value)} placeholder="Full Address" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">Experience</label>
+              <input className="field-control w-full" value={form.experience} onChange={(e) => set('experience', e.target.value)} placeholder="e.g. 5 Years" />
+            </div>
+          </div>
+
+          <label className="block cursor-pointer rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-6 py-7 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
+            <Upload className="mx-auto h-7 w-7 text-slate-300" />
+            <p className="mt-3 text-sm text-slate-500">Click to upload Aadhaar, PAN, or other proofs</p>
+            <input type="file" className="hidden" onChange={(e) => setDocFile(e.target.files?.[0] || null)} />
+            {docFile && <p className="mt-3 text-sm font-bold text-teal-700">Selected: {docFile.name}</p>}
+          </label>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-wider text-slate-700">Payment Scheme</label>
+              <select className="field-control w-full" value={form.payment_scheme} onChange={(e) => set('payment_scheme', e.target.value)}>
+                {paymentSchemes.map((scheme) => <option key={scheme} value={scheme}>{scheme}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-wider text-slate-700">Daily Rate (₹)</label>
+              <input className="field-control w-full" value={form.daily_rate} onChange={(e) => set('daily_rate', e.target.value)} placeholder="0" />
+            </div>
+          </div>
+
+          {error && <p className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
+
+          <div className="sticky bottom-0 -mx-7 -mb-7 flex justify-end gap-3 rounded-b-3xl border-t border-slate-100 bg-white/95 px-7 py-5 backdrop-blur">
+            <button type="button" onClick={onClose} className="btn-secondary px-8">Cancel</button>
+            <button type="submit" disabled={saving} className="btn-primary px-8">
+              <UserPlus className="h-4 w-4" /> {saving ? 'Creating…' : 'Create Employee'}
             </button>
           </div>
         </form>
@@ -178,13 +232,13 @@ function AddWorkerModal({ onClose, onAdded }: { onClose: () => void; onAdded: ()
   );
 }
 
-/* ─── Main HR Page ───────────────────────────────────────── */
 export default function AIHR() {
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [search,    setSearch]    = useState('');
-  const [showAdd,   setShowAdd]   = useState(false);
-  const [idCard,    setIdCard]    = useState<Employee | null>(null);
+  const [services, setServices] = useState<ServiceOption[]>(SS_HEALTHCARE_SERVICES);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [showAdd, setShowAdd] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<Employee | null>(null);
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
@@ -193,206 +247,110 @@ export default function AIHR() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
+  const fetchServices = useCallback(async () => {
+    const { data } = await supabase.from('service_catalog').select('id, name, category').eq('active', true).order('display_order');
+    if (data?.length) setServices(data as ServiceOption[]);
+  }, []);
 
-  const filtered = employees.filter(e =>
-    e.full_name.toLowerCase().includes(search.toLowerCase()) ||
-    e.position?.toLowerCase().includes(search.toLowerCase()) ||
-    e.department?.toLowerCase().includes(search.toLowerCase()) ||
-    e.phone?.includes(search)
-  );
+  useEffect(() => { fetchEmployees(); fetchServices(); }, [fetchEmployees, fetchServices]);
 
-  const active     = employees.filter(e => e.role !== 'terminated').length;
-  const readyCount = employees.filter(e => e.role === 'user').length;
+  const filtered = useMemo(() => employees.filter((e) => {
+    const term = search.toLowerCase();
+    return [e.full_name, e.username, e.job_title, e.position, e.phone, e.employee_code].some((v) => String(v || '').toLowerCase().includes(term));
+  }), [employees, search]);
+
+  const activeCount = employees.filter((e) => (e.status || 'active') === 'active').length;
 
   return (
     <PageShell>
-      {showAdd && <AddWorkerModal onClose={() => setShowAdd(false)} onAdded={fetchEmployees} />}
-      {idCard   && <IDCardModal  employee={idCard} onClose={() => setIdCard(null)} />}
-
-      {/* Header */}
-      <Surface style={{ borderColor: 'rgba(0,168,89,0.12)' }}
-        className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#00A859' }}>Workforce intelligence</p>
-            <h2 className="mt-1 text-2xl font-extrabold text-slate-950">AI HR Deployment Centre</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-              Manage workers, generate ID cards, and process payroll — all in one place.
-            </p>
+      {showAdd && <AddEmployeeModal services={services} onClose={() => setShowAdd(false)} onCreated={(emp) => { setShowAdd(false); setSelectedCard(emp); fetchEmployees(); }} />}
+      {selectedCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-3xl rounded-3xl bg-white p-7 shadow-2xl">
+            <StaffIDCard employee={selectedCard} onClose={() => setSelectedCard(null)} />
           </div>
+        </div>
+      )}
+
+      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <SectionHeader
+            eyebrow="Workforce intelligence"
+            title="AI HR Deployment Centre"
+            description="Add staff, generate SS Healthcare ID cards, assign services, and prepare staff profiles for client verification."
+            action={<IconFrame icon={Briefcase} tone="emerald" />}
+          />
           <div className="grid grid-cols-3 gap-3 text-center">
-            {[
-              { value: String(active),     label: 'Total Workers' },
-              { value: String(readyCount), label: 'Active Staff' },
-              { value: String(employees.filter(e => !e.join_date || new Date(e.join_date) > new Date(Date.now() - 30*86400000)).length), label: 'New this month' },
-            ].map(item => (
-              <div key={item.label} className="rounded-xl border border-white/80 bg-white/75 px-4 py-3 shadow-sm">
-                <p className="text-xl font-extrabold text-slate-950">{item.value}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{item.label}</p>
-              </div>
-            ))}
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{employees.length}</p><p className="text-xs font-bold text-slate-400">Total Staff</p></div>
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{activeCount}</p><p className="text-xs font-bold text-slate-400">Active</p></div>
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{services.length}</p><p className="text-xs font-bold text-slate-400">Services</p></div>
           </div>
         </div>
       </Surface>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.7fr_0.8fr]">
-        {/* Workers Table */}
-        <div className="space-y-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-sm">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input type="text" placeholder="Search workers..." value={search}
-                onChange={e => setSearch(e.target.value)} className="field-control w-full pl-10 pr-4" />
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button type="button" onClick={fetchEmployees} className="btn-secondary">
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-              <button type="button" onClick={() => setShowAdd(true)} className="btn-primary">
-                <Plus className="h-4 w-4" /> Add Worker
-              </button>
-            </div>
-          </div>
-
-          <div className="table-shell">
-            <div className="clinical-content overflow-x-auto">
-              {loading ? (
-                <div className="flex h-40 items-center justify-center gap-2 text-slate-400">
-                  <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#00A859' }} />
-                  <span className="text-sm">Loading workers…</span>
-                </div>
-              ) : (
-                <table className="w-full min-w-[760px]">
-                  <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="table-heading px-6 py-4">Worker</th>
-                      <th className="table-heading px-6 py-4">Position</th>
-                      <th className="table-heading px-6 py-4">Department</th>
-                      <th className="table-heading px-6 py-4">Phone</th>
-                      <th className="table-heading px-6 py-4">Status</th>
-                      <th className="table-heading px-6 py-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.length === 0 && (
-                      <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">
-                        No workers found. Add your first worker above.
-                      </td></tr>
-                    )}
-                    {filtered.map(emp => {
-                      const initials = emp.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-                      const status = emp.role === 'admin' ? 'Active' : 'Active';
-                      return (
-                        <tr key={emp.id} className="border-b border-slate-100/80 transition-colors hover:bg-green-50/30">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-extrabold text-white shadow-sm"
-                                style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
-                                {initials}
-                              </div>
-                              <div>
-                                <p className="text-sm font-bold text-slate-950">{emp.full_name}</p>
-                                <p className="text-xs text-slate-400">@{emp.username}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-sm font-medium text-slate-600">{emp.position || '—'}</td>
-                          <td className="px-6 py-4 text-sm font-medium text-slate-600">{emp.department || '—'}</td>
-                          <td className="px-6 py-4">
-                            <a href={`tel:${emp.phone}`} className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-green-700">
-                              <Phone className="h-3.5 w-3.5 text-slate-400" />{emp.phone || '—'}
-                            </a>
-                          </td>
-                          <td className="px-6 py-4">
-                            <StatusBadge className={statusStyles[status]}>
-                              <CheckCircle2 className="h-3.5 w-3.5" />{status}
-                            </StatusBadge>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <button
-                              type="button"
-                              onClick={() => setIdCard(emp)}
-                              title="View ID Card"
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-green-200 hover:text-green-700"
-                            >
-                              <IdCard className="h-3.5 w-3.5" /> ID Card
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-sm">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input className="field-control w-full pl-10" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff, code, service..." />
         </div>
-
-        {/* Sidebar panels */}
-        <div className="space-y-5">
-          <Surface style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-            <SectionHeader
-              title="AI Auto-Deploy"
-              description="Match available workers to open care requests automatically."
-              action={<IconFrame icon={Bot} tone="cyan" className="h-10 w-10" />}
-            />
-            <button type="button" className="btn-primary mt-5 w-full">Review & Deploy</button>
-          </Surface>
-
-          <Surface style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-            <SectionHeader
-              title="Process Payroll"
-              description="Auto-payroll is prepared for the active workforce."
-              action={<IconFrame icon={DollarSign} tone="emerald" className="h-10 w-10" />}
-            />
-            <div className="mt-5 flex items-center justify-between rounded-xl p-4" style={{ background: 'rgba(0,168,89,0.07)' }}>
-              <span className="text-sm font-semibold text-slate-600">Active workers</span>
-              <span className="text-2xl font-extrabold text-slate-950">{active}</span>
-            </div>
-            <button type="button" className="btn-primary mt-4 w-full">Run Auto-Payroll</button>
-          </Surface>
-
-          <Surface style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-            <SectionHeader
-              title="Quick Add"
-              description="Add a new care worker to your roster."
-              action={<IconFrame icon={Briefcase} tone="amber" className="h-10 w-10" />}
-            />
-            <button type="button" onClick={() => setShowAdd(true)} className="btn-primary mt-5 w-full">
-              <Plus className="h-4 w-4" /> Add New Worker
-            </button>
-          </Surface>
-
-          <Surface style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-            <SectionHeader
-              title="ID Cards"
-              description="Click any worker's ID Card button to view and download."
-              action={<IconFrame icon={CreditCard} tone="blue" className="h-10 w-10" />}
-            />
-            <div className="mt-4 space-y-2">
-              {filtered.slice(0, 4).map(emp => (
-                <button key={emp.id} type="button" onClick={() => setIdCard(emp)}
-                  className="flex w-full items-center gap-3 rounded-xl border border-slate-100 bg-white/80 px-3 py-2.5 text-left transition-all hover:border-green-200 hover:bg-green-50/50">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-extrabold text-white"
-                    style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
-                    {emp.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-950">{emp.full_name}</p>
-                    <p className="truncate text-xs text-slate-400">{emp.position}</p>
-                  </div>
-                  <IdCard className="h-4 w-4 shrink-0 text-slate-300" />
-                </button>
-              ))}
-              {filtered.length === 0 && (
-                <p className="text-center text-xs text-slate-400 py-3">No workers yet</p>
-              )}
-            </div>
-          </Surface>
+        <div className="flex gap-3">
+          <button onClick={fetchEmployees} className="btn-secondary"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh</button>
+          <button onClick={() => setShowAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> Add Employee</button>
         </div>
       </div>
+
+      <div className="table-shell">
+        <div className="clinical-content overflow-x-auto">
+          <table className="w-full min-w-[980px]">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="table-heading px-6 py-4">Employee</th>
+                <th className="table-heading px-6 py-4">Role</th>
+                <th className="table-heading px-6 py-4">Services</th>
+                <th className="table-heading px-6 py-4">Rate</th>
+                <th className="table-heading px-6 py-4">Status</th>
+                <th className="table-heading px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((emp) => (
+                <tr key={emp.id} className="border-b border-slate-100 hover:bg-teal-50/30">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-teal-700 to-blue-700 text-sm font-black text-white">
+                        {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-950">{emp.full_name}</p>
+                        <p className="text-xs font-bold text-teal-700">{emp.employee_code}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-semibold text-slate-600">{emp.job_title || emp.position || 'Care Specialist'}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex max-w-md flex-wrap gap-1.5">
+                      {(emp.service_skills || []).slice(0, 3).map((skill) => <span key={skill} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-500">{skill}</span>)}
+                      {(emp.service_skills || []).length > 3 && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">+{(emp.service_skills || []).length - 3}</span>}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-bold text-slate-700"><BadgeIndianRupee className="mr-1 inline h-3.5 w-3.5" />{Number(emp.daily_rate || 0).toLocaleString()}</td>
+                  <td className="px-6 py-4"><StatusBadge className="border-emerald-100 bg-emerald-50 text-emerald-700">Active</StatusBadge></td>
+                  <td className="px-6 py-4 text-right">
+                    <button onClick={() => setSelectedCard(emp)} className="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-white px-3 py-2 text-xs font-black text-teal-700 shadow-sm hover:bg-teal-50">
+                      <IdCard className="h-4 w-4" /> ID Card
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {!filtered.length && !loading && <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">No staff found.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <Surface>
+        <SectionHeader title="ID Card Workflow" description="When staff is assigned from AI CRM, the generated staff ID card link is included in the Staff Assigned WhatsApp template." action={<IconFrame icon={CreditCard} tone="blue" />} />
+      </Surface>
     </PageShell>
   );
 }

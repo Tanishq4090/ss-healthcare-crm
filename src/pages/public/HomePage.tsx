@@ -44,7 +44,7 @@ export default function HomePage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="99 Care — Home Healthcare Services in Surat | 24/7 Nursing & Caretaker"
+        title="SS Health Care — Home Healthcare Services in Surat | 24/7 Nursing & Caretaker"
         description="Professional home healthcare in Surat. Expert nurses, caretakers, wound care, maternity & newborn care — background verified, available 24/7. Call +91 9016 116 564."
         canonical="https://99care.org"
       />
@@ -290,7 +290,7 @@ export default function HomePage() {
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center md:text-left mb-20 max-w-2xl">
             <AnimateOnScroll variants={fadeUp} delay={0.1}>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight">Why Families Trust<br/>99 Care</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight">Why Families Trust<br/>SS Health Care</h2>
             </AnimateOnScroll>
           </div>
 
@@ -385,7 +385,7 @@ export default function HomePage() {
             <motion.div variants={staggerItem} className="flex flex-col">
               <span className="text-6xl text-brand-blue opacity-20 font-serif leading-none h-8">&ldquo;</span>
               <p className="text-lg text-gray-700 dark:text-gray-300 font-medium leading-relaxed mb-6 flex-1 mt-4">
-                The physiotherapy service from 99 Care has been exceptional. My recovery process was smooth and the staff was extremely punctual and professional every single day.
+                The physiotherapy service from SS Health Care has been exceptional. My recovery process was smooth and the staff was extremely punctual and professional every single day.
               </p>
               <div>
                 <h4 className="font-bold text-gray-900 dark:text-white">Pranav Katariya</h4>
@@ -396,7 +396,7 @@ export default function HomePage() {
             <motion.div variants={staggerItem} className="flex flex-col">
               <span className="text-6xl text-brand-blue opacity-20 font-serif leading-none h-8">&ldquo;</span>
               <p className="text-lg text-gray-700 dark:text-gray-300 font-medium leading-relaxed mb-6 flex-1 mt-4">
-                Finding reliable care for my disabled family member was stressful until we found 99 Care. The caretaker is compassionate and highly skilled. It brought peace to our home.
+                Finding reliable care for my disabled family member was stressful until we found SS Health Care. The caretaker is compassionate and highly skilled. It brought peace to our home.
               </p>
               <div>
                 <h4 className="font-bold text-gray-900 dark:text-white">HR. Mahima Gayakwad</h4>

@@ -102,8 +102,8 @@ export function EmployeeIDCard({
               position: 'relative', flexShrink: 0,
             }}>
               <img
-                src="/99care-logo.svg"
-                alt="99Care"
+                src="/logo.png"
+                alt="SS Health Care"
                 style={{ 
                   width: 24, height: 24, 
                   position: 'absolute', top: '50%', left: '50%', 
@@ -113,7 +113,7 @@ export function EmployeeIDCard({
               />
             </div>
             <div>
-              <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, lineHeight: 1, margin: 0 }}>99Care</p>
+              <p style={{ color: '#fff', fontWeight: 800, fontSize: 14, lineHeight: 1, margin: 0 }}>SS Health Care</p>
               <p style={{ color: 'rgba(240,253,253,0.8)', fontSize: 8, marginTop: 2, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, margin: '2px 0 0' }}>Employee Identification</p>
             </div>
           </div>

@@ -10,7 +10,7 @@ export function GoogleMap() {
       style={{ height: '320px' }}
     >
       <iframe
-        title="99 Care Office Location"
+        title="SS Health Care Office Location"
         width="100%"
         height="100%"
         style={{ border: 0 }}

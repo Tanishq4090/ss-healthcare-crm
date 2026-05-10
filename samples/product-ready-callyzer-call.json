@@ -1,0 +1,20 @@
+{
+  "id": "demo-live-call-001",
+  "callId": "demo-live-call-001",
+  "employeeName": "Rina Staff",
+  "employeeNumber": "+919876543210",
+  "number": "+919999888877",
+  "callType": "incoming",
+  "duration": 184,
+  "callTime": "2026-05-11T10:30:00+05:30",
+  "note": "Customer asked for old age care support in Adajan, Surat.",
+  "recordingURL": "",
+  "summary": "Caller needs a daytime caretaker for father in Adajan from next week.",
+  "intent": "Old age care inquiry",
+  "leadData": {
+    "name": "Mehul Patel",
+    "serviceType": "Old Age Care",
+    "location": "Adajan, Surat",
+    "urgency": "medium"
+  }
+}

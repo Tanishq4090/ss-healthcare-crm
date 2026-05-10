@@ -42,7 +42,7 @@ serve(async (req: any) => {
         const dutyLink = `${appUrl}/duty/${workerId}`;
 
         // Create the message text
-        const messageBody = `Hello ${workerName}! 👋\n\nYou have been successfully confirmed for your new assignment with 99 Care.\n\nHere is your personal daily Duty & Attendance Tracker link:\n${dutyLink}\n\nPlease click this link every day when you arrive and leave the facility to log your hours.`;
+        const messageBody = `Hello ${workerName}! 👋\n\nYou have been successfully confirmed for your new assignment with SS Health Care.\n\nHere is your personal daily Duty & Attendance Tracker link:\n${dutyLink}\n\nPlease click this link every day when you arrive and leave the facility to log your hours.`;
 
         // Prepare the request to Twilio API
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;

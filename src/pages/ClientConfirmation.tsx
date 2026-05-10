@@ -105,7 +105,7 @@ export default function ClientConfirmation() {
                         <CheckSquare className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900 mb-2">Confirm Your Staff Allocation</h1>
-                    <p className="text-slate-600 text-lg">Please review the profile of your assigned healthcare professional from 99 Care.</p>
+                    <p className="text-slate-600 text-lg">Please review the profile of your assigned healthcare professional from SS Health Care.</p>
                 </div>
 
                 {/* Profile Card */}
@@ -192,7 +192,7 @@ export default function ClientConfirmation() {
                 {/* Footer link */}
                 <div className="text-center mt-8">
                     <p className="text-sm text-slate-500">
-                        Secure Staff Allocation Platform by <span className="font-semibold text-slate-700">99 Care</span>
+                        Secure Staff Allocation Platform by <span className="font-semibold text-slate-700">SS Health Care</span>
                     </p>
                 </div>
             </div>

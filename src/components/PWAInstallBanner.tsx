@@ -62,13 +62,13 @@ export function PWAInstallBanner() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-brand-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <img 
-                  src="https://99care.org/wp-content/uploads/2024/01/99care-logo.svg" 
-                  alt="99 Care" 
+                  src="https://99care.org/wp-content/uploads/2024/01/logo.png" 
+                  alt="SS Health Care" 
                   className="w-8 h-8"
                 />
               </div>
               <div className="text-left">
-                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Add 99 Care to home screen</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Add SS Health Care to home screen</h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Quick access to book appointments anytime</p>
               </div>
             </div>

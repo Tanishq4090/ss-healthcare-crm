@@ -58,7 +58,7 @@ export default function ServicesPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="Home Healthcare Services in Surat | 99 Care"
+        title="Home Healthcare Services in Surat | SS Health Care"
         description="Browse all home healthcare services: nursing, wound care, injection at home, maternity care, newborn care, old age care, and caretaker services in Surat."
         canonical="https://99care.org/services"
       />

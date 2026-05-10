@@ -1,8 +1,8 @@
-# 99 Care CRM — Technical Handoff for Antigravity
+# SS Health Care CRM — Technical Handoff for Antigravity
 
 ## What this system is
 
-A WhatsApp-first CRM for 99 Care, a home healthcare agency in Surat.
+A WhatsApp-first CRM for SS Health Care, a home healthcare agency in Surat.
 Clients inquire via WhatsApp → AI bot collects details → staff gets assigned →
 deposit collected → service runs → monthly billing auto-generated.
 
@@ -215,7 +215,7 @@ SELECT cron.schedule(
 
 ---
 
-## Business rules (from 99 Care's terms doc)
+## Business rules (from SS Health Care's terms doc)
 
 - Deposit: ₹15,000 before service starts
 - 10-hour shift rate: ₹850/day (full month) · ₹1,050/day (incomplete month)
@@ -233,4 +233,4 @@ These rules are encoded in the WhatsApp bot quotes and invoice generation logic.
 
 Project owner: Tanishq  
 GitHub: https://github.com/Tanishq4090/HealthCare  
-99 Care WhatsApp: +91 9016116564
+SS Health Care WhatsApp: +91 9016116564

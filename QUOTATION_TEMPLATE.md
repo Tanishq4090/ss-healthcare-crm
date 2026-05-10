@@ -13,7 +13,7 @@ date: "2026-03-03"
 **Attn:** [Client Point of Contact Name]
 
 ### **1. Executive Summary**
-This quotation outlines the investment required to license, deploy, and integrate the **Automated AI Full-Cycle CRM & Dispatch System**. This end-to-end solution provides an AI-driven inbound pipeline, dynamic staff/HR allocation modules, automated billing, and a dedicated Voice AI call manager dashboard.
+This quotation outlines the investment required to license, deploy, and integrate the **Automated AI Full-Cycle CRM & Dispatch System**. This end-to-end solution provides an AI-driven inbound pipeline, dynamic staff/HR allocation modules, automated billing, and a dedicated Callyzer Calls call manager dashboard.
 
 ### **2. Development & Licensing Schedule (One-Time Cost)**
 
@@ -23,7 +23,7 @@ This quotation outlines the investment required to license, deploy, and integrat
 | **Module 1: AI CRM Hub** | Automated pipeline progression, instant chat/inbound lead parsing, Quotation & Folio auto-dispatch workflows. | *Included* |
 | **Module 2: Client & HR Master** | Client directory, worker allocation matrix, automated client portfolio sharing, and live attendance tracking UI. | *Included* |
 | **Module 3: Finance & Billing** | Security deposit tracker, attendance-gated bill generation, invoice preparation UI. | *Included* |
-| **Module 4: Voice AI Dashboard** | Integration of inbound/outbound web-calling, call log repository with AI-generated audio transcripts, summaries, and instant CRM-lead creation. | *Included* |
+| **Module 4: Callyzer Calls Dashboard** | Integration of inbound/outbound web-calling, call log repository with AI-generated audio transcripts, summaries, and instant CRM-lead creation. | *Included* |
 | **Training & Handover** | 2 Hours of administrative training & handover of documentation. | *Included* |
 | --- | --- | --- |
 | **TOTAL INITIAL INVESTMENT** | **(Exclusive of applicable taxes)** | **₹ 60,000.00** |

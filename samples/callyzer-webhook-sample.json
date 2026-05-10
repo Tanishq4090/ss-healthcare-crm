@@ -1,0 +1,12 @@
+{
+  "id": "callyzer-demo-001",
+  "employeeName": "Rina Staff",
+  "employeeNumber": "+919876543210",
+  "number": "+919999888877",
+  "callerName": "Mehul Patel",
+  "callType": "Incoming",
+  "callTime": "2026-05-08T10:30:00+05:30",
+  "duration": "00:03:42",
+  "status": "completed",
+  "note": "Customer asked for old age care in Adajan from tomorrow morning"
+}

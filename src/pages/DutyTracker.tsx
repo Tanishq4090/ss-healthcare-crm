@@ -278,7 +278,7 @@ export default function DutyTracker() {
                 {/* Footer link */}
                 <div className="text-center pb-8 pt-4">
                     <p className="text-sm text-slate-400">
-                        Powered by <span className="font-semibold">99 Care</span> CRM
+                        Powered by <span className="font-semibold">SS Health Care</span> CRM
                     </p>
                 </div>
             </div>

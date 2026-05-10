@@ -1,0 +1,19 @@
+{
+  "id": "callyzer-demo-001",
+  "number": "+919999888877",
+  "employeeName": "Rina Staff",
+  "employeeNumber": "+919876543210",
+  "callType": "Incoming",
+  "status": "completed",
+  "callTime": "2026-05-11T10:30:00+05:30",
+  "duration": 244,
+  "recordingURL": "",
+  "customerName": "Mehul Patel",
+  "service": "Old Age Care",
+  "location": "Adajan, Surat",
+  "urgency": "Soon",
+  "summary": "Caller asked for old age care for father in Adajan. Needs daytime caregiver from next week. Budget discussion pending.",
+  "intent": "Old Age Care",
+  "transcript": "Employee: Namaste, SS Health Care. Caller: We need a caregiver for my father in Adajan from next week. Employee: Day or night service? Caller: Daytime care only.",
+  "note": "Qualified family inquiry. Follow up with quotation and staff availability."
+}

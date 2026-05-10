@@ -45,7 +45,7 @@ export function SEOMeta({ title, description, canonical }: SEOMetaProps) {
 
     // Cleanup: restore defaults on unmount
     return () => {
-      document.title = '99 Care — Home Healthcare Services in Surat';
+      document.title = 'SS Health Care — Home Healthcare Services in Surat';
     };
   }, [title, description, canonical]);
 

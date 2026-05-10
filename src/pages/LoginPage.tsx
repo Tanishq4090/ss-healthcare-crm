@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Eye, EyeOff, Stethoscope, Lock, User } from 'lucide-react'
 
 const ADMIN_USERNAME = 'admin'
-const ADMIN_PASSWORD = 'password123'
+const ADMIN_PASSWORD = 'secure_demo_pass_2026'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -165,7 +165,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="mt-8 text-center text-xs text-slate-400">
-            SS Health Care AI CRM &nbsp;·&nbsp; Powered by Supabase + ElevenLabs
+            SS Health Care AI CRM &nbsp;·&nbsp; Powered by Supabase + Callyzer
           </p>
         </div>
       </div>

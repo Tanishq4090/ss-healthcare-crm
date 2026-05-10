@@ -3,12 +3,15 @@ import {
   BellRing,
   Bot,
   Briefcase,
+  CalendarCheck,
   ChevronLeft,
   ChevronRight,
   Landmark,
   LayoutDashboard,
   LogOut,
+  PhoneCall,
   ShieldCheck,
+  Server,
   Stethoscope,
   Users,
 } from 'lucide-react';
@@ -16,13 +19,21 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/ai-crm', label: 'AI CRM', icon: Bot },
-  { path: '/clients', label: 'Clients', icon: Users },
-  { path: '/ai-hr', label: 'AI HR', icon: Briefcase },
-  { path: '/finance', label: 'Finance', icon: Landmark },
-  { path: '/access-control', label: 'Access Control', icon: ShieldCheck },
+  { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { path: '/admin/crm', label: 'AI CRM', icon: Bot },
+  { path: '/admin/calls', label: 'Callyzer Calls', icon: PhoneCall },
+  { path: '/admin/clients', label: 'Clients', icon: Users },
+  { path: '/admin/hr', label: 'AI HR', icon: Briefcase },
+  { path: '/admin/attendance', label: 'Attendance', icon: CalendarCheck },
+  { path: '/admin/billing', label: 'Finance', icon: Landmark },
+  { path: '/admin/settings', label: 'Access Control', icon: ShieldCheck },
+  { path: '/admin/system', label: 'System Status', icon: Server },
 ];
+
+function isActivePath(pathname: string, path: string, exact?: boolean) {
+  if (exact) return pathname === path;
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
 
 export default function Sidebar({
   collapsed,
@@ -42,10 +53,6 @@ export default function Sidebar({
   const handleLogout = async () => {
     await logout();
     navigate('/login', { replace: true });
-  };
-
-  const handleToggle = () => {
-    onCollapseChange?.(!collapsed);
   };
 
   return (
@@ -69,20 +76,20 @@ export default function Sidebar({
         )}
       >
         <div className={cn('flex h-[84px] items-center border-b border-slate-100 px-4', collapsed ? 'lg:justify-center' : 'gap-3')}>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl ring-1" style={{background:'rgba(0,168,89,0.10)', ringColor:'rgba(0,168,89,0.2)'}}>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl ring-1" style={{ background: 'rgba(0,168,89,0.10)', '--tw-ring-color': 'rgba(0,168,89,0.2)' } as React.CSSProperties}>
             <img src="/logo.png" alt="SS Health Care" className="h-8 w-8 object-contain" />
           </div>
           <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
             <span className="block truncate text-sm font-extrabold text-slate-950">SS Health Care</span>
-            <span className="mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{background:'rgba(0,168,89,0.10)',color:'#004C8C'}}>
-              Healthcare CRM
+            <span className="mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ background: 'rgba(0,168,89,0.10)', color: '#004C8C' }}>
+              Operations CRM
             </span>
           </div>
         </div>
 
         <button
           type="button"
-          onClick={handleToggle}
+          onClick={() => onCollapseChange?.(!collapsed)}
           className="absolute -right-3 top-[84px] hidden h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:text-cyan-700 lg:flex"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -90,14 +97,14 @@ export default function Sidebar({
         </button>
 
         <div className={cn('px-4 py-4', collapsed && 'lg:px-3')}>
-          <div className={cn('rounded-lg p-3', collapsed && 'lg:flex lg:justify-center lg:p-2')} style={{border:'1px solid rgba(0,168,89,0.18)',background:'rgba(0,168,89,0.07)'}}>
+          <div className={cn('rounded-lg p-3', collapsed && 'lg:flex lg:justify-center lg:p-2')} style={{ border: '1px solid rgba(0,168,89,0.18)', background: 'rgba(0,168,89,0.07)' }}>
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm" style={{color:'#00A859'}}>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm" style={{ color: '#00A859' }}>
                 <BellRing className="h-4 w-4" />
               </div>
               <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
                 <p className="truncate text-xs font-bold text-slate-800">Care Ops Live</p>
-                <p className="truncate text-[11px] text-slate-500">AI triage and workforce sync</p>
+                <p className="truncate text-[11px] text-slate-500">Callyzer, CRM and workforce sync</p>
               </div>
             </div>
           </div>
@@ -105,7 +112,7 @@ export default function Sidebar({
 
         <nav className={cn('flex-1 overflow-y-auto px-3 pb-4', collapsed && 'lg:px-2')}>
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = isActivePath(location.pathname, item.path, item.exact);
             const Icon = item.icon;
             return (
               <NavLink
@@ -115,13 +122,11 @@ export default function Sidebar({
                 className={cn(
                   'group mb-1 flex items-center rounded-lg border border-transparent px-3 py-3 text-sm font-semibold transition-all',
                   collapsed ? 'lg:justify-center lg:px-2' : 'gap-3',
-                  isActive
-                    ? 'shadow-sm'
-                    : 'text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-900'
+                  isActive ? 'shadow-sm' : 'text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-900'
                 )}
-              style={isActive ? {border:'1px solid rgba(0,168,89,0.22)',background:'rgba(0,168,89,0.08)',color:'#003d70'} : {}}
+                style={isActive ? { border: '1px solid rgba(0,168,89,0.22)', background: 'rgba(0,168,89,0.08)', color: '#003d70' } : {}}
               >
-                <Icon className={cn('h-5 w-5 shrink-0')} style={{color: isActive ? '#00A859' : undefined}} />
+                <Icon className="h-5 w-5 shrink-0" style={{ color: isActive ? '#00A859' : undefined }} />
                 <span className={cn('truncate', collapsed && 'lg:hidden')}>{item.label}</span>
               </NavLink>
             );
@@ -131,8 +136,8 @@ export default function Sidebar({
         <div className="mx-4 border-t border-slate-100" />
 
         <div className={cn('p-4', collapsed && 'lg:px-3')}>
-          <div className={cn('flex items-center gap-3 rounded-2xl p-3', collapsed && 'lg:justify-center lg:p-2')} style={{background:'rgba(0,168,89,0.07)'}}>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl text-white shadow-sm" style={{background:'linear-gradient(135deg,#00A859,#004C8C)'}}>
+          <div className={cn('flex items-center gap-3 rounded-2xl p-3', collapsed && 'lg:justify-center lg:p-2')} style={{ background: 'rgba(0,168,89,0.07)' }}>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl text-white shadow-sm" style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
               <Stethoscope className="h-4 w-4" />
             </div>
             <div className={cn('min-w-0', collapsed && 'lg:hidden')}>

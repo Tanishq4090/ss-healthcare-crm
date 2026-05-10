@@ -10,8 +10,8 @@ export default function Footer() {
           {/* Col 1: Brand & Social */}
           <div>
             <img 
-              src="/99care-logo.svg" 
-              alt="99 Care Logo" 
+              src="/logo.png" 
+              alt="SS Health Care Logo" 
               className="h-16 mb-6 drop-shadow-[0_2px_12px_rgba(255,255,255,0.2)] dark:brightness-110" 
             />
             <p className="text-gray-400 text-sm leading-relaxed mb-8 pr-4">

@@ -56,7 +56,7 @@ export function WhatsAppWidget() {
       {
         id: Date.now(),
         from: 'bot',
-        text: `Hi ${userName.trim()}! 👋 I'm the 99 Care assistant. How can I help you today?`,
+        text: `Hi ${userName.trim()}! 👋 I'm the SS Health Care assistant. How can I help you today?`,
         time: getTime(),
       }
     ]);
@@ -145,7 +145,7 @@ export function WhatsAppWidget() {
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#075E54]" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm leading-tight">99 Care</h4>
+                  <h4 className="font-bold text-sm leading-tight">SS Health Care</h4>
                   <p className="text-[10px] text-green-100">Typically replies within minutes</p>
                 </div>
               </div>

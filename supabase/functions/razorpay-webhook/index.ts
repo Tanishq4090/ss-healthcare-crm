@@ -227,7 +227,7 @@ async function processPayment(p: {
   if (p.whatsappNumber) {
     const typeLabel = p.invoiceType === "deposit" ? "Security deposit" : `Invoice ${p.invoiceNumber}`;
     const message =
-      `✅ *Payment Received — 99 Care*\n\n` +
+      `✅ *Payment Received — SS Health Care*\n\n` +
       `Hi ${p.clientName || "there"},\n\n` +
       `${typeLabel}: *${fmt(p.amount)}* received.\n` +
       `Payment ID: ${p.paymentId}\n` +
@@ -236,7 +236,7 @@ async function processPayment(p: {
         ? `Your caregiver will be assigned shortly. We'll confirm the start date soon. 🙏`
         : `Thank you for the payment! 🙏`
       ) +
-      `\n\n— 99 Care | +91 9016116564`;
+      `\n\n— SS Health Care | +91 9016116564`;
 
     await sendWhatsApp(p.whatsappNumber, message, p.leadId, p.clientId);
   }

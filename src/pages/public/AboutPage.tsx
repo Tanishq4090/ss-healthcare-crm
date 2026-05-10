@@ -11,8 +11,8 @@ export default function AboutPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="About 99 Care | Trusted Home Healthcare in Surat"
-        description="Learn about 99 Care's mission to bring verified, compassionate healthcare to Surat homes. Meet our team and discover our commitment to quality care."
+        title="About SS Health Care | Trusted Home Healthcare in Surat"
+        description="Learn about SS Health Care's mission to bring verified, compassionate healthcare to Surat homes. Meet our team and discover our commitment to quality care."
         canonical="https://99care.org/about"
       />
       <div className="w-full">
@@ -45,7 +45,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <AnimateOnScroll variants={slideLeft}>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight">Welcome to 99 Care</h2>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight">Welcome to SS Health Care</h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
                 We understand that home is where healing happens best. That's why we bring expert medical care directly to you. Our team of certified nurses, experienced physiotherapists, and dedicated caretakers are passionate about improving your quality of life without the stress of hospital visits.
               </p>
@@ -78,7 +78,7 @@ export default function AboutPage() {
               <div className="aspect-video bg-gray-100 dark:bg-slate-900 rounded-2xl overflow-hidden relative shadow-sm border border-gray-100 dark:border-slate-800">
                 <img 
                   src="/images/about-us.jpg" 
-                  alt="99 Care Team"
+                  alt="SS Health Care Team"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/5 to-transparent"></div>
@@ -98,7 +98,7 @@ export default function AboutPage() {
           
           <div className="text-left space-y-6 text-gray-600 dark:text-gray-400 leading-relaxed text-lg font-light">
             <p>
-              99Care was founded with a strong desire to redefine the manner in which care services are delivered in order to give high-quality, professional, and personalized care directly to our patients’ homes. It started out from a really simplistic idea — healing happens best in the comfort of one’s own space. Since our establishment, we have been working extensively with an objective to cater to all the specific needs of families and people with reliable healthcare solutions.
+              SS Health Care was founded with a strong desire to redefine the manner in which care services are delivered in order to give high-quality, professional, and personalized care directly to our patients’ homes. It started out from a really simplistic idea — healing happens best in the comfort of one’s own space. Since our establishment, we have been working extensively with an objective to cater to all the specific needs of families and people with reliable healthcare solutions.
             </p>
             
             <h3 className="text-xl font-bold text-gray-900 dark:text-white pt-6">Expanding with Intention</h3>
@@ -108,7 +108,7 @@ export default function AboutPage() {
             
             <h3 className="text-xl font-bold text-gray-900 dark:text-white pt-6">Bringing About Change</h3>
             <p>
-              With pride, 99Care serves as a reliable healthcare partner for multiple families today. Continuing into the future, we still hold tight to our core values, innovating and raising the bar for home health services.
+              With pride, SS Health Care serves as a reliable healthcare partner for multiple families today. Continuing into the future, we still hold tight to our core values, innovating and raising the bar for home health services.
             </p>
           </div>
         </div>

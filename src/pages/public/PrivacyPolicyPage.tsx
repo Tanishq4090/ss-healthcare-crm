@@ -9,8 +9,8 @@ export default function PrivacyPolicyPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="Privacy Policy | 99 Care Home Healthcare"
-        description="Read our privacy policy to understand how 99 Care handles your personal information with respect and care."
+        title="Privacy Policy | SS Health Care Home Healthcare"
+        description="Read our privacy policy to understand how SS Health Care handles your personal information with respect and care."
         canonical="https://99care.org/privacy"
       />
       <div className="w-full">

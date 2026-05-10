@@ -41,14 +41,14 @@ export const sendBookingConfirmation = async (payload, isDevMode) => {
   
   const message =
     `✅ *Appointment Confirmed!*\n\n` +
-    `Hi ${name}, your 99 Care appointment is booked! Here are your details:\n\n` +
+    `Hi ${name}, your SS Health Care appointment is booked! Here are your details:\n\n` +
     `📅 *Date:* ${date}\n` +
     `⏰ *Time:* ${time}\n` +
     `🏥 *Service:* ${serviceName}\n` +
     `📍 *Location:* ${location}\n\n` +
     `Our team will call you within 2 hours to confirm.\n\n` +
     `For help: *+91 9016 116 564*\n` +
-    `_99 Care — Helping Hands_ 💙`;
+    `_SS Health Care — Helping Hands_ 💙`;
 
   await sendWhatsAppMessage(phone, message, isDevMode);
   return message;

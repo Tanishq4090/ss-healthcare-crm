@@ -135,7 +135,7 @@ export default function ServiceDetailPage() {
                 </div>
 
                 <div className="mt-8 px-6 pt-8 border-t border-gray-200 dark:border-slate-800">
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6 text-center">Why Trust 99 Care</h4>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6 text-center">Why Trust SS Health Care</h4>
                   <div className="space-y-6">
                     {service.whyUs.map((point, idx) => (
                       <div key={idx} className="flex gap-3">

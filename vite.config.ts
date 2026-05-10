@@ -10,14 +10,14 @@ export default defineConfig(({ mode }) => {
   const appModeRaw = process.env.VITE_APP_MODE ?? env.VITE_APP_MODE;
   const appMode = appModeRaw === 'os' ? 'os' : 'public';
 
-  const themeColor = '#1aa6a8'; // 99 Care logo teal
+  const themeColor = '#1aa6a8'; // SS Health Care logo teal
 
   const pwaManifest =
     appMode === 'os'
       ? {
-          name: '99Care OS — Private Portal',
-          short_name: '99Care OS',
-          description: 'Private client operations portal for 99Care',
+          name: 'SS Health Care Admin OS — Private Portal',
+          short_name: 'SS Health Care Admin OS',
+          description: 'Private client operations portal for SS Health Care',
           theme_color: themeColor,
           background_color: '#ffffff',
           display: 'standalone',
@@ -29,12 +29,12 @@ export default defineConfig(({ mode }) => {
             { src: '/99care-favicon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
           ],
           shortcuts: [
-            { name: 'Open Dashboard', url: '/admin', description: 'Go to 99Care OS dashboard' },
+            { name: 'Open Dashboard', url: '/admin', description: 'Go to SS Health Care Admin OS dashboard' },
           ],
         }
       : {
-          name: '99 Care — Home Healthcare Services',
-          short_name: '99 Care',
+          name: 'SS Health Care — Home Healthcare Services',
+          short_name: 'SS Health Care',
           description: 'Professional home healthcare services in Surat, Gujarat',
           theme_color: themeColor,
           background_color: '#ffffff',
@@ -44,13 +44,13 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           icons: [
             {
-              src: 'https://99care.org/wp-content/uploads/2024/01/99care-logo.svg',
+              src: 'https://99care.org/wp-content/uploads/2024/01/logo.png',
               sizes: '192x192',
               type: 'image/svg+xml',
               purpose: 'any maskable',
             },
             {
-              src: 'https://99care.org/wp-content/uploads/2024/01/99care-logo.svg',
+              src: 'https://99care.org/wp-content/uploads/2024/01/logo.png',
               sizes: '512x512',
               type: 'image/svg+xml',
               purpose: 'any maskable',
@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => {
           shortcuts: [
             { name: 'Book Appointment', url: '/appointment', description: 'Book a home healthcare appointment' },
             { name: 'Our Services', url: '/services', description: 'View all healthcare services' },
-            { name: 'Contact Us', url: '/contact', description: 'Get in touch with 99 Care' },
+            { name: 'Contact Us', url: '/contact', description: 'Get in touch with SS Health Care' },
           ],
         };
 

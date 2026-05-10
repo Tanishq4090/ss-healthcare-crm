@@ -31,7 +31,7 @@ serve(async (req) => {
         subject: `New Contact Form Submission from ${name}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-            <h2 style="color: #285fe2;">New Contact Form Submission — 99 Care Website</h2>
+            <h2 style="color: #285fe2;">New Contact Form Submission — SS Health Care Website</h2>
             <p style="margin-bottom: 10px;"><strong>Name:</strong> ${name}</p>
             <p style="margin-bottom: 10px;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
             <p style="margin-bottom: 10px;"><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>

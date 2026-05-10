@@ -99,8 +99,8 @@ export default function TermsPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="Terms & Conditions | 99 Care Home Healthcare"
-        description="Review the terms and conditions for using 99 Care services and our website."
+        title="Terms & Conditions | SS Health Care Home Healthcare"
+        description="Review the terms and conditions for using SS Health Care services and our website."
         canonical="https://99care.org/terms"
       />
       <div className="w-full">

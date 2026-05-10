@@ -109,7 +109,7 @@ export default function AppointmentPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="Book Home Healthcare Appointment | 99 Care Surat"
+        title="Book Home Healthcare Appointment | SS Health Care Surat"
         description="Book a professional nurse, caretaker or home healthcare service in Surat. Fill in your details and our team will confirm within 2 hours. Available 24/7."
         canonical="https://99care.org/appointment"
       />

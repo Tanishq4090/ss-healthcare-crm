@@ -197,7 +197,7 @@ serve(async (req) => {
 
             // Send warm confirmation
             const locationStr = [area, city, state, country].filter(Boolean).join(', ');
-            const confirmMsg = `Thank you ${name.split(' ')[0]}! 🙏😊\n\nWe've received your enquiry:\n✅ Service: ${service}\n📍 Area: ${locationStr}\n⏱️ Shift: ${shiftType}\n👤 Care for: ${careFor}\n\nOur 99 Care team will prepare your personalised quotation and share it on this number shortly. We're excited to serve you! ✨`;
+            const confirmMsg = `Thank you ${name.split(' ')[0]}! 🙏😊\n\nWe've received your enquiry:\n✅ Service: ${service}\n📍 Area: ${locationStr}\n⏱️ Shift: ${shiftType}\n👤 Care for: ${careFor}\n\nOur SS Health Care team will prepare your personalised quotation and share it on this number shortly. We're excited to serve you! ✨`;
 
             if (META_SYSTEM_TOKEN && META_PHONE_ID) {
                 await fetch(`https://graph.facebook.com/v20.0/${META_PHONE_ID}/messages`, {
@@ -340,7 +340,7 @@ serve(async (req) => {
                     type: "interactive",
                     interactive: {
                         type: "flow",
-                        header: { type: "text", text: "Welcome to 99 Care! 👋" },
+                        header: { type: "text", text: "Welcome to SS Health Care! 👋" },
                         body: { text: "Namaste! 🙏 I'm Khushi. To get the best care for your loved ones, please fill in a few quick details and our team will prepare your personalised quotation right away!" },
                         footer: { text: "Trusted by families across Surat" },
                         action: {
@@ -380,7 +380,7 @@ serve(async (req) => {
                 return new Response('EVENT_RECEIVED', { status: 200 });
             } else {
                 // Fallback: structured text prompt (if FLOW_ID not yet set)
-                const fallbackMsg = `Namaste! 🙏 I'm Khushi from 99 Care Home Healthcare Services, Surat.\n\nPlease reply with your details in this format:\n\n*Name | Service | City & Area | Shift (10hr/24hr) | Care for*\n\nExample:\nRajesh Patel | Old Age Care | Surat, Vesu | 10hr | Mother\n\nWe'll prepare your quotation right away! 😊✨`;
+                const fallbackMsg = `Namaste! 🙏 I'm Khushi from SS Health Care Home Healthcare Services, Surat.\n\nPlease reply with your details in this format:\n\n*Name | Service | City & Area | Shift (10hr/24hr) | Care for*\n\nExample:\nRajesh Patel | Old Age Care | Surat, Vesu | 10hr | Mother\n\nWe'll prepare your quotation right away! 😊✨`;
                 if (META_SYSTEM_TOKEN && META_PHONE_ID) {
                     await fetch(`https://graph.facebook.com/v20.0/${META_PHONE_ID}/messages`, {
                         method: 'POST',
@@ -402,22 +402,22 @@ serve(async (req) => {
         // NOTE: We never update the pipeline stage here — the CRM team does that manually.
         const STAGE_SCRIPTS: Record<string, string> = {
             'In Discussion':
-                `Thank you for your inquiry! 🙏 Our 99 Care team is already preparing your personalised quotation and will share it on this number shortly. Feel free to ask any other questions! 😊✨`,
+                `Thank you for your inquiry! 🙏 Our SS Health Care team is already preparing your personalised quotation and will share it on this number shortly. Feel free to ask any other questions! 😊✨`,
 
             'Quotation Sent': 
-                `Thank you! 🙏 Our 99 Care team will send you the consent form link on this number shortly. Please keep an eye out for it — we're excited to get started! ✨`,
+                `Thank you! 🙏 Our SS Health Care team will send you the consent form link on this number shortly. Please keep an eye out for it — we're excited to get started! ✨`,
 
             'Form Submitted':
-                `Thank you for filling the consent form! 🙏 Our 99 Care team is now identifying the best suited care professional for your needs and will be in touch with you very shortly. 😊`,
+                `Thank you for filling the consent form! 🙏 Our SS Health Care team is now identifying the best suited care professional for your needs and will be in touch with you very shortly. 😊`,
 
             'Staff Assigned':
-                `Your care professional has been arranged! 🙏 Our 99 Care team will contact you shortly to confirm the start date and deposit details. We're almost there! 😊✨`,
+                `Your care professional has been arranged! 🙏 Our SS Health Care team will contact you shortly to confirm the start date and deposit details. We're almost there! 😊✨`,
 
             'Deposit Pending':
-                `Thank you! 🙏 Once the deposit is confirmed, your service will begin. Our 99 Care team will guide you through the final steps — please don't hesitate to reach out if you have any questions. 😊`,
+                `Thank you! 🙏 Once the deposit is confirmed, your service will begin. Our SS Health Care team will guide you through the final steps — please don't hesitate to reach out if you have any questions. 😊`,
 
             'Monthly Billing':
-                `Thank you for your message! 🙏 Our 99 Care team has noted your query and will get back to you shortly. We appreciate your trust in us! 😊`,
+                `Thank you for your message! 🙏 Our SS Health Care team has noted your query and will get back to you shortly. We appreciate your trust in us! 😊`,
         };
 
         const leadStage = earlyLead?.pipeline_stage || '';
@@ -432,7 +432,7 @@ serve(async (req) => {
             // Loop prevention: if we already sent THIS EXACT script, send a short follow-up instead
             if (lastAssistantMsg?.content === scriptedReply) {
                 console.log(`[Stage Script] Already sent "${leadStage}" script. Sending follow-up.`);
-                replyToSend = `We appreciate your patience! 🙏 Our 99 Care team is actively working on your request. If you need immediate help, please call us directly. We're always here for you! 😊`;
+                replyToSend = `We appreciate your patience! 🙏 Our SS Health Care team is actively working on your request. If you need immediate help, please call us directly. We're always here for you! 😊`;
             } else {
                 console.log(`[Stage Script] Stage: "${leadStage}" — sending scripted reply.`);
             }
@@ -479,7 +479,7 @@ serve(async (req) => {
 
             if (callTranscripts && callTranscripts.length > 0) {
                 const leadName = leadRecord?.name?.split('—')[0]?.trim() || 'there';
-                const quotationMsg = `Namaste ${leadName} ji! 🙏\n\nWe already have your details from our recent call. Our 99 Care team is preparing your personalised quotation and will share it on this number shortly.\n\nFeel free to ask any questions in the meantime. We're always here for you! 😊✨`;
+                const quotationMsg = `Namaste ${leadName} ji! 🙏\n\nWe already have your details from our recent call. Our SS Health Care team is preparing your personalised quotation and will share it on this number shortly.\n\nFeel free to ask any questions in the meantime. We're always here for you! 😊✨`;
 
                 if (META_SYSTEM_TOKEN && META_PHONE_ID) {
                     await fetch(`https://graph.facebook.com/v20.0/${META_PHONE_ID}/messages`, {
@@ -510,20 +510,20 @@ serve(async (req) => {
         }
 
         // --- 10. GROQ AI FOR ONGOING CONVERSATION ---
-        const systemPrompt = `You are Khushi, a warm and professional WhatsApp AI assistant for 99 Care Home Healthcare Services, Surat.
+        const systemPrompt = `You are Khushi, a warm and professional WhatsApp AI assistant for SS Health Care Home Healthcare Services, Surat.
 The lead has already submitted their intake form or is in an ongoing conversation.
 
 RULES (follow strictly):
-- Always refer to the business as "99 Care team".
-- NEVER use the phrase "will be in touch shortly" or "get back to you shortly" — instead, specify that the "99 Care team is preparing your quotation" or "verifying your form."
+- Always refer to the business as "SS Health Care team".
+- NEVER use the phrase "will be in touch shortly" or "get back to you shortly" — instead, specify that the "SS Health Care team is preparing your quotation" or "verifying your form."
 - Keep ALL replies to 2-3 lines maximum.
 - Use 1-2 emojis per message. Match the user's language (Hindi/Gujarati/English).
 - NEVER quote prices. NEVER ask for information already collected.
 - If the user's message is a GOODBYE or FAREWELL (e.g. "bye", "take care", "good night", "you too"), respond with EXACTLY: {"replyToUser": null, "pipelineStageUpdate": null}
 - If the user's message is a POSITIVE REPLY or acknowledgment (e.g. "yes", "okay", "done", "sure", "proceed", "haan", "bilkul"):
-    * If their CRM stage is "In Discussion": Always reply: "Thank you! 🙏 Our 99 Care team is already preparing your personalised quotation and will share it here shortly. 😊✨"
-    * If their CRM stage is "Form Submitted": Reply: "Thank you! 🙏 Our 99 Care team will verify your form and assign the best suited staff shortly. 😊"
-    * Otherwise: Say thank you and that the 99 Care team will get back to them soon.
+    * If their CRM stage is "In Discussion": Always reply: "Thank you! 🙏 Our SS Health Care team is already preparing your personalised quotation and will share it here shortly. 😊✨"
+    * If their CRM stage is "Form Submitted": Reply: "Thank you! 🙏 Our SS Health Care team will verify your form and assign the best suited staff shortly. 😊"
+    * Otherwise: Say thank you and that the SS Health Care team will get back to them soon.
 - NEVER ask follow-up questions if the lead's details are already collected.
 
 Context: ${leadDataContext}
@@ -542,7 +542,7 @@ Respond ONLY as valid JSON: {"replyToUser": "string or null", "pipelineStageUpda
             body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages, max_tokens: 300, temperature: 0.2 })
         });
 
-        let aiReplyMsg = "Namaste! 🙏 Our 99 Care team will get back to you shortly!";
+        let aiReplyMsg = "Namaste! 🙏 Our SS Health Care team will get back to you shortly!";
         if (!groqRes.ok) {
             const errBody = await groqRes.text();
             console.error(`[Groq Error] ${groqRes.status}: ${errBody}`);

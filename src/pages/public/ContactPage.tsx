@@ -89,8 +89,8 @@ export default function ContactPage() {
   return (
     <PageTransition>
       <SEOMeta
-        title="Contact 99 Care | Home Healthcare in Surat — +91 9016 116 564"
-        description="Contact 99 Care Surat for home nursing, caretaker, and healthcare services. Call, WhatsApp, or fill out the form. We respond within 2 hours."
+        title="Contact SS Health Care | Home Healthcare in Surat — +91 9016 116 564"
+        description="Contact SS Health Care Surat for home nursing, caretaker, and healthcare services. Call, WhatsApp, or fill out the form. We respond within 2 hours."
         canonical="https://99care.org/contact"
       />
       <div className="w-full bg-brand-gray dark:bg-slate-950 min-h-screen pb-32">
@@ -205,7 +205,7 @@ export default function ContactPage() {
             <AnimateOnScroll variants={slideRight} delay={0.2} className="lg:col-span-5">
               <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[2rem] border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300 sticky top-32 space-y-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 tracking-tight">99 Care</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 tracking-tight">SS Health Care</h2>
                   
                   <div className="flex flex-col gap-6 text-gray-600 dark:text-gray-400">
                     <div className="flex items-start gap-4">

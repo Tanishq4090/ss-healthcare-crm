@@ -16,7 +16,7 @@ export const blogs: BlogPost[] = [
     slug: 'advantages-of-home-health-care',
     title: 'Knowing the Advantages of Home Health Care',
     date: 'January 15, 2024',
-    author: '99 Care Team',
+    author: 'SS Health Care Team',
     readTime: '4 min read',
     image: '/images/blog/advantages-home-care.jpg',
     excerpt:
@@ -50,40 +50,40 @@ export const blogs: BlogPost[] = [
       },
       {
         paragraph:
-          'At 99 Care, we have seen firsthand how home healthcare transforms the recovery experience for our patients in Surat and the surrounding areas. If you are considering home-based care for yourself or a loved one, we invite you to speak with our team. We are here to help you make the best decision for your family\'s health and well-being.',
+          'At SS Health Care, we have seen firsthand how home healthcare transforms the recovery experience for our patients in Surat and the surrounding areas. If you are considering home-based care for yourself or a loved one, we invite you to speak with our team. We are here to help you make the best decision for your family\'s health and well-being.',
       },
     ],
   },
   {
     slug: 'reliable-home-health-care-99-care',
-    title: "Reliable Home Health Care by 99 Care: Why It's the Best Choice for Your Loved Ones",
+    title: "Reliable Home Health Care by SS Health Care: Why It's the Best Choice for Your Loved Ones",
     date: 'June 10, 2025',
-    author: '99 Care Team',
+    author: 'SS Health Care Team',
     readTime: '5 min read',
     image: '/images/blog/reliable-care.png',
     excerpt:
-      'Discover why families across Surat trust 99 Care for professional, compassionate home healthcare. From verified nurses to 24/7 support — here is what sets us apart.',
-    tags: ['99 Care', 'Home Care', 'Surat Healthcare'],
+      'Discover why families across Surat trust SS Health Care for professional, compassionate home healthcare. From verified nurses to 24/7 support — here is what sets us apart.',
+    tags: ['SS Health Care', 'Home Care', 'Surat Healthcare'],
     relatedSlugs: ['advantages-of-home-health-care', 'home-health-care-tips-for-seniors'],
     content: [
       {
         paragraph:
-          'Choosing a home healthcare provider is one of the most important decisions a family can make. You are not just selecting a service — you are inviting someone into your home, into your most private and intimate space, and trusting them with the health and well-being of the person you love most. At 99 Care, we understand the weight of that trust, and we have built every aspect of our service around earning and protecting it.',
+          'Choosing a home healthcare provider is one of the most important decisions a family can make. You are not just selecting a service — you are inviting someone into your home, into your most private and intimate space, and trusting them with the health and well-being of the person you love most. At SS Health Care, we understand the weight of that trust, and we have built every aspect of our service around earning and protecting it.',
       },
       {
         heading: 'Background-Verified Caregivers',
         paragraph:
-          'Every single caregiver and nurse at 99 Care undergoes a thorough background verification process before they ever step into a patient\'s home. We check identity documents, previous employment history, and conduct reference verification. This is not optional — it is a non-negotiable standard we have set for ourselves because we believe your family deserves nothing less than complete confidence in the people caring for them.',
+          'Every single caregiver and nurse at SS Health Care undergoes a thorough background verification process before they ever step into a patient\'s home. We check identity documents, previous employment history, and conduct reference verification. This is not optional — it is a non-negotiable standard we have set for ourselves because we believe your family deserves nothing less than complete confidence in the people caring for them.',
       },
       {
         heading: 'Trained and Regularly Oriented Staff',
         paragraph:
-          'Healthcare is not static — best practices evolve, new techniques emerge, and patient needs are always changing. That is why 99 Care invests in regular training and orientation sessions for all our caregivers. Whether it is updated wound care protocols, new respiratory therapy guidelines, or improved communication techniques for elderly patients with cognitive decline — our team stays current so our patients receive the best possible care.',
+          'Healthcare is not static — best practices evolve, new techniques emerge, and patient needs are always changing. That is why SS Health Care invests in regular training and orientation sessions for all our caregivers. Whether it is updated wound care protocols, new respiratory therapy guidelines, or improved communication techniques for elderly patients with cognitive decline — our team stays current so our patients receive the best possible care.',
       },
       {
         heading: '24/7 Phone Support — Always There When You Need Us',
         paragraph:
-          'Medical situations do not follow a 9-to-5 schedule. A wound might look concerning at midnight. A patient might have an unexpected reaction to medication on a Sunday morning. A new mother might have urgent breastfeeding questions at 3 AM. At 99 Care, our support line is available 24 hours a day, 7 days a week — because we believe that accessible support is not a luxury, it is a fundamental part of responsible healthcare.',
+          'Medical situations do not follow a 9-to-5 schedule. A wound might look concerning at midnight. A patient might have an unexpected reaction to medication on a Sunday morning. A new mother might have urgent breastfeeding questions at 3 AM. At SS Health Care, our support line is available 24 hours a day, 7 days a week — because we believe that accessible support is not a luxury, it is a fundamental part of responsible healthcare.',
       },
       {
         heading: 'A Vast Network Built on Experience',
@@ -92,7 +92,7 @@ export const blogs: BlogPost[] = [
       },
       {
         paragraph:
-          'When you choose 99 Care, you are choosing a team that genuinely cares about outcomes — not just for your loved one\'s physical health but for the peace of mind and well-being of your entire family. We are proud to be Surat\'s trusted home healthcare partner, and we look forward to serving you.',
+          'When you choose SS Health Care, you are choosing a team that genuinely cares about outcomes — not just for your loved one\'s physical health but for the peace of mind and well-being of your entire family. We are proud to be Surat\'s trusted home healthcare partner, and we look forward to serving you.',
       },
     ],
   },
@@ -100,7 +100,7 @@ export const blogs: BlogPost[] = [
     slug: 'get-house-ready-for-baby',
     title: 'How to Get Your House Ready for a Baby: Crucial Advice for Expectant Parents',
     date: 'July 20, 2024',
-    author: '99 Care Team',
+    author: 'SS Health Care Team',
     readTime: '6 min read',
     image: '/images/blog/ready-for-baby.png',
     excerpt:
@@ -130,16 +130,16 @@ export const blogs: BlogPost[] = [
       {
         heading: 'Prepare for Post-Delivery Recovery',
         paragraph:
-          'This is something many expectant parents overlook — but the mother\'s recovery space is just as important as the baby\'s nursery. Create a comfortable nursing corner with a supportive chair, a side table for water and snacks, and easy access to burp cloths and extra clothes. If you are planning to have a home caretaker from 99 Care during the post-natal period, communicate their role to all family members in advance so everyone works together seamlessly.',
+          'This is something many expectant parents overlook — but the mother\'s recovery space is just as important as the baby\'s nursery. Create a comfortable nursing corner with a supportive chair, a side table for water and snacks, and easy access to burp cloths and extra clothes. If you are planning to have a home caretaker from SS Health Care during the post-natal period, communicate their role to all family members in advance so everyone works together seamlessly.',
       },
       {
         heading: 'Build Your Support System',
         paragraph:
-          'No parent is meant to do this alone. Before the baby arrives, identify your support network — family members who can help, a trusted pediatrician, and professional caretaker support if needed. At 99 Care, our newborn care and maternity care services are designed to give new parents the professional backup they need during the first critical weeks, so you can focus on bonding with your baby while we handle the rest.',
+          'No parent is meant to do this alone. Before the baby arrives, identify your support network — family members who can help, a trusted pediatrician, and professional caretaker support if needed. At SS Health Care, our newborn care and maternity care services are designed to give new parents the professional backup they need during the first critical weeks, so you can focus on bonding with your baby while we handle the rest.',
       },
       {
         paragraph:
-          'The most important thing to remember is that no home is ever perfectly ready — and that is completely normal. What matters most is love, attentiveness, and the willingness to ask for help when you need it. Congratulations on your upcoming arrival, and know that the 99 Care team is here to support you every step of the way.',
+          'The most important thing to remember is that no home is ever perfectly ready — and that is completely normal. What matters most is love, attentiveness, and the willingness to ask for help when you need it. Congratulations on your upcoming arrival, and know that the SS Health Care team is here to support you every step of the way.',
       },
     ],
   },
@@ -147,7 +147,7 @@ export const blogs: BlogPost[] = [
     slug: 'home-health-care-tips-for-seniors',
     title: 'Top 5 Tips for Effective Home Health Care for Seniors',
     date: 'January 28, 2024',
-    author: '99 Care Team',
+    author: 'SS Health Care Team',
     readTime: '3 min read',
     image: '/images/blog/advantages-home-care.jpg',
     excerpt:
@@ -182,11 +182,11 @@ export const blogs: BlogPost[] = [
       {
         heading: '5. Partner with Professional Home Healthcare',
         paragraph:
-          'Family love is irreplaceable — but professional expertise makes a critical difference in health outcomes. For complex medical needs like wound care, medication management, physiotherapy, or nursing support, partnering with a trusted home healthcare provider like 99 Care ensures your loved one receives clinical-grade care without the disruption and stress of frequent hospital visits. Our team works alongside families to provide seamless, comprehensive support that keeps seniors healthy, comfortable, and dignified at home.',
+          'Family love is irreplaceable — but professional expertise makes a critical difference in health outcomes. For complex medical needs like wound care, medication management, physiotherapy, or nursing support, partnering with a trusted home healthcare provider like SS Health Care ensures your loved one receives clinical-grade care without the disruption and stress of frequent hospital visits. Our team works alongside families to provide seamless, comprehensive support that keeps seniors healthy, comfortable, and dignified at home.',
       },
       {
         paragraph:
-          'Caring for an elderly loved one is one of the most profound acts of love a family can undertake. With the right environment, routines, and professional support, home-based senior care can be a deeply rewarding experience for everyone involved. If you would like to learn more about how 99 Care can support your family, do not hesitate to reach out to us.',
+          'Caring for an elderly loved one is one of the most profound acts of love a family can undertake. With the right environment, routines, and professional support, home-based senior care can be a deeply rewarding experience for everyone involved. If you would like to learn more about how SS Health Care can support your family, do not hesitate to reach out to us.',
       },
     ],
   },

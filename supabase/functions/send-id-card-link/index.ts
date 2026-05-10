@@ -42,7 +42,7 @@ serve(async (req: Request) => {
     // ── Send via WhatsApp Template: staff_assignment ───────────────
     // Template body (submit this to Meta as a Utility template):
     //
-    //   "Namaste! 🙏 A care professional has been assigned to you by 99 Care.
+    //   "Namaste! 🙏 A care professional has been assigned to you by SS Health Care.
     //
     //    👤 Name: {{1}}
     //    💼 Role: {{2}}
@@ -50,7 +50,7 @@ serve(async (req: Request) => {
     //    🔗 View Verified ID Card: {{3}}
     //
     //    Please verify their identity upon arrival. Link valid for 30 days.
-    //    — 99 Care Team"
+    //    — SS Health Care Team"
     //
     // Template Name: staff_assignment  |  Category: Utility
     // ─────────────────────────────────────────────────────────────
@@ -89,13 +89,13 @@ serve(async (req: Request) => {
     if (!metaResponse.ok) {
       console.warn(`[send-id-card-link] Template 'staff_assignment' failed — trying free-text fallback.`);
       const fallbackBody =
-        `99 Care — Staff Assignment\n\n` +
+        `SS Health Care — Staff Assignment\n\n` +
         `Namaste! 🙏 A care professional has been assigned to you.\n\n` +
         `👤 Name: ${employeeName}\n` +
         `💼 Role: ${jobTitle}\n\n` +
         `🔗 View Verified ID Card:\n${shareableUrl}\n\n` +
         `Please verify their identity upon arrival. This link is valid for 30 days.\n` +
-        `— 99 Care Team`;
+        `— SS Health Care Team`;
 
       metaResponse = await fetch(metaUrl, {
         method: 'POST',
