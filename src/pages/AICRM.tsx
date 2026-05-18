@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Briefcase, Calendar, CheckCircle2, CreditCard, FileText, IdCard, MessageCircle, Phone, RefreshCw, Send, UserCheck, X } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Bot, Briefcase, Calendar, CheckCircle2, ChevronDown, ChevronRight, CreditCard, FileText, IdCard, MessageCircle, Phone, PhoneCall, Plus, RefreshCw, Send, Star, UserCheck, X } from 'lucide-react';
 import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
-import { CRM_PIPELINE_STAGES, CRM_STAGE_LABELS, normalizeCrmStage } from '@/config/crmStages';
+import { CRM_PIPELINE_STAGES, CRM_PIPELINE_VIEW_STAGES, CRM_CLIENT_VIEW_STAGES, CRM_STAGE_LABELS, normalizeCrmStage } from '@/config/crmStages';
+import { fetchCallInquiries, markCallAsAddedToPipeline, formatCallDuration, isCallConvertible, type CallInquiry } from '@/lib/domain/callLeads';
 import { absoluteStaffIdUrl, buildStaffAssignedMessage, logTemplateMessage, toWhatsAppPhone } from '@/lib/staffIdentity';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -396,21 +398,32 @@ function LeadDetailsDrawer({
 }
 
 export default function AICRM() {
+  const navigate = useNavigate();
+  const [crmTab, setCrmTab] = useState<'pipeline' | 'clients' | 'automations' | 'call-leads'>('pipeline');
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [callInquiries, setCallInquiries] = useState<CallInquiry[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [assignmentLead, setAssignmentLead] = useState<Lead | null>(null);
   const [historyLead, setHistoryLead] = useState<Lead | null>(null);
   const [detailsLead, setDetailsLead] = useState<Lead | null>(null);
+  const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    CRM_PIPELINE_STAGES.forEach((s) => { init[s.id] = true; });
+    return init;
+  });
+  const toggleStage = (id: string) => setExpandedStages((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [leadRes, empRes] = await Promise.all([
+    const [leadRes, empRes, callData] = await Promise.all([
       supabase.from('crm_leads').select('*').order('created_at', { ascending: false }),
       supabase.from('employees').select('*').order('created_at', { ascending: false }),
+      fetchCallInquiries(),
     ]);
     setLeads((leadRes.data || []) as Lead[]);
     setEmployees(((empRes.data || []) as Employee[]).filter((employee) => ['available', 'active', 'assigned'].includes(String(employee.availability_status || 'available'))));
+    setCallInquiries(callData);
     setLoading(false);
   }, []);
 
@@ -450,7 +463,7 @@ export default function AICRM() {
   const totalValue = leads.reduce((sum, lead) => sum + leadValue(lead), 0);
 
   return (
-    <PageShell>
+    <div className="p-4 sm:p-6 lg:p-8 h-full flex flex-col">
       {assignmentLead && <StaffAssignmentModal lead={assignmentLead} employees={employees} onClose={() => setAssignmentLead(null)} onAssigned={fetchData} />}
       {historyLead && <WhatsAppHistoryDrawer lead={historyLead} onClose={() => setHistoryLead(null)} />}
       {detailsLead && (
@@ -463,93 +476,228 @@ export default function AICRM() {
         />
       )}
 
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <SectionHeader
-            eyebrow="Operations pipeline"
-            title="CRM Pipeline Orchestration"
-            description="Move inquiries through the full SS Health Care operating pipeline, assign staff, and send client template messages with staff ID card links."
-            action={<IconFrame icon={Briefcase} tone="cyan" />}
-          />
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{leads.length}</p><p className="text-xs font-bold text-slate-400">Leads</p></div>
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">Rs {totalValue.toLocaleString()}</p><p className="text-xs font-bold text-slate-400">Pipeline</p></div>
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{employees.length}</p><p className="text-xs font-bold text-slate-400">Available Staff</p></div>
-          </div>
+      {/* Page header – exact 99Care match */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI CRM Center</h1>
+          <p className="text-slate-500 mt-1">Manage leads, pipelines, and WhatsApp communication workflows.</p>
         </div>
-      </Surface>
 
-      <div className="flex items-center justify-between">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-bold text-slate-700 shadow-sm" style={{ borderColor: 'rgba(0,168,89,0.2)' }}>
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Live Supabase Pipeline
+        {/* Module Tabs – 99Care: Pipeline | Clients | AI Auto | Voice AI */}
+        <div className="flex items-center p-1 bg-slate-100 rounded-lg shrink-0">
+          {([['pipeline','Pipeline'],['clients','Clients'],['automations','AI Auto'],['call-leads','Call Leads']] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setCrmTab(key)} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${crmTab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+              {label}
+            </button>
+          ))}
         </div>
-        <button onClick={fetchData} className="btn-secondary"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh</button>
       </div>
 
-      <div className="no-scrollbar flex gap-4 overflow-x-auto pb-4">
-        {CRM_PIPELINE_STAGES.map((stage) => (
-          <div key={stage.id} className="w-[326px] shrink-0">
-            <div className="mb-3 flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2 shadow-sm">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
-                <span className="truncate text-sm font-black text-slate-700">{stage.label}</span>
+      {/* Live sync bar + action buttons */}
+      {(crmTab === 'pipeline' || crmTab === 'clients') && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" /> Live Sync Active
+          </div>
+          <div className="flex gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style={{ background: '#00A859' }}>
+              <Plus className="h-4 w-4" /> Add Lead
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
+              Export CSV
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Tab content */}
+      {(crmTab === 'pipeline' || crmTab === 'clients') && (
+        <div className="flex-1 overflow-y-auto space-y-3 pb-4">
+          {(crmTab === 'pipeline' ? CRM_PIPELINE_VIEW_STAGES : CRM_CLIENT_VIEW_STAGES).map((stage) => {
+            const stageLeads = grouped[stage.id] || [];
+            const isOpen = expandedStages[stage.id];
+            return (
+              <div key={stage.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <button onClick={() => toggleStage(stage.id)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    {isOpen ? <ChevronDown className="h-4 w-4 text-slate-400" /> : <ChevronRight className="h-4 w-4 text-slate-400" />}
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
+                    <h3 className="font-semibold text-slate-900">{stage.label}</h3>
+                  </div>
+                  <span className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                    {stageLeads.length}
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="border-t border-slate-100">
+                    {stageLeads.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-slate-400">No leads in this stage</div>
+                    ) : (
+                      <div className="flex gap-4 p-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                        {stageLeads.map((lead) => (
+                          <div key={lead.id} onClick={() => setDetailsLead(lead)} className="w-[300px] shrink-0 bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-bold text-slate-900 group-hover:text-[#00A859] transition-colors">{leadName(lead)}</h4>
+                              <select value={normalizeCrmStage(lead.stage)} onChange={(event) => { event.stopPropagation(); updateStage(lead, event.target.value); }} onClick={(e) => e.stopPropagation()} className="text-xs bg-slate-50 border border-slate-200 text-slate-600 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-[#00A859] cursor-pointer">
+                                <optgroup label="— Pipeline —">
+                                  {CRM_PIPELINE_VIEW_STAGES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                                </optgroup>
+                                <optgroup label="— Clients —">
+                                  {CRM_CLIENT_VIEW_STAGES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                                </optgroup>
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-slate-500 mb-2">
+                              <span>{leadContact(lead)}</span>
+                              <span className="font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-sm">₹{leadValue(lead).toLocaleString()}/mo</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 mb-2">
+                              <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border', priorityColors[lead.priority || 'Medium'] || priorityColors.Medium)}>{lead.priority || 'Medium'}</span>
+                              {lead.service_type && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-emerald-100 bg-emerald-50 text-emerald-700">{lead.service_type}</span>}
+                            </div>
+                            <div className="text-xs text-slate-500 space-y-1 mb-3">
+                              {lead.phone && <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {lead.phone}</p>}
+                              <p className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '—'}</p>
+                            </div>
+                            <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
+                              <button onClick={(e) => { e.stopPropagation(); setDetailsLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"><FileText className="mr-1 inline h-3.5 w-3.5" /> Details</button>
+                              <button onClick={(e) => { e.stopPropagation(); setAssignmentLead(lead); }} className="rounded-lg border border-emerald-100 bg-emerald-50 px-2 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100"><UserCheck className="mr-1 inline h-3.5 w-3.5" /> Staff</button>
+                              <button onClick={(e) => { e.stopPropagation(); setHistoryLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"><MessageCircle className="mr-1 inline h-3.5 w-3.5" /> WhatsApp</button>
+                              <button onClick={(e) => { e.stopPropagation(); sendTemplate(lead, 'quotation_sent'); }} className="rounded-lg border border-amber-100 bg-amber-50 px-2 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100"><Send className="mr-1 inline h-3.5 w-3.5" /> Quote</button>
+                            </div>
+                            {lead.notes && <p className="mt-2 line-clamp-2 rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-500">{lead.notes}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-500">{grouped[stage.id]?.length || 0}</span>
+            );
+          })}
+          {crmTab === 'clients' && (
+            <div className="w-[220px] rounded-xl border-2 border-dashed border-slate-200 p-6 text-center text-sm text-slate-400 hover:border-slate-300 cursor-pointer transition-colors">
+              <Plus className="h-5 w-5 mx-auto mb-2 text-slate-300" />
+              + Create a new one
             </div>
+          )}
+        </div>
+      )}
 
+      {crmTab === 'automations' && (
+        <div className="flex-1 grid lg:grid-cols-3 gap-6 pb-4">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <h2 className="font-bold text-slate-900 text-lg">WhatsApp Automation Workflows</h2>
+            <p className="text-sm text-slate-500">Post-inquiry automated message sequences.</p>
+            {[
+              { key: 'greeting', label: 'Auto-Greeting on New Lead', desc: 'Sends a welcome message when a new inquiry is received.', active: true, icon: '🌟' },
+              { key: 'quotation', label: 'Auto-Quotation Follow-up', desc: 'Sends quotation link 24h after initial discussion.', active: false, icon: '📋' },
+              { key: 'consent', label: 'Consent Form Dispatch', desc: 'Automatically sends consent form after quotation approval.', active: false, icon: '✅' },
+            ].map((wf) => (
+              <div key={wf.key} className={`p-4 rounded-lg border transition-colors ${wf.active ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{wf.icon}</span>
+                    <h3 className={`font-semibold ${wf.active ? 'text-emerald-700' : 'text-slate-600'}`}>{wf.label}</h3>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${wf.active ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 shadow-sm transition-all ${wf.active ? 'right-0.5' : 'left-0.5'}`} />
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500">{wf.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-slate-50 rounded-xl border border-slate-200 p-5">
+            <h3 className="font-semibold text-slate-900 flex items-center gap-2 mb-3"><Star className="w-5 h-5 text-amber-500" /> Recent Automations</h3>
             <div className="space-y-3">
-              {(grouped[stage.id] || []).map((lead) => (
-                <article key={lead.id} className="rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm transition-all hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-black text-slate-950">{leadName(lead)}</h3>
-                      <p className="mt-1 truncate text-xs font-semibold text-slate-500">{leadContact(lead)}</p>
-                    </div>
-                    <StatusBadge className="border-slate-200 bg-slate-50 text-slate-600">{CRM_STAGE_LABELS[normalizeCrmStage(lead.stage)]}</StatusBadge>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    <StatusBadge className={priorityColors[lead.priority || 'Medium'] || priorityColors.Medium}>{lead.priority || 'Medium'}</StatusBadge>
-                    {lead.service_type && <StatusBadge className="border-teal-100 bg-teal-50 text-teal-700">{lead.service_type}</StatusBadge>}
-                    {lead.assigned_staff_name && <StatusBadge className="border-blue-100 bg-blue-50 text-blue-700"><UserCheck className="h-3 w-3" /> {lead.assigned_staff_name}</StatusBadge>}
-                    {sourceBadges(lead).map((source) => <StatusBadge key={`${lead.id}-${source}`} className="border-slate-200 bg-slate-50 text-slate-600">{source}</StatusBadge>)}
-                  </div>
-
-                  <div className="mt-4 space-y-2 text-xs font-semibold text-slate-500">
-                    {lead.phone && <p className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> {lead.phone}</p>}
-                    <p className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '-'}</p>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span className="text-base font-black text-slate-950">Rs {leadValue(lead).toLocaleString()}</span>
-                    <select value={normalizeCrmStage(lead.stage)} onChange={(event) => updateStage(lead, event.target.value)} className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-600">
-                      {CRM_PIPELINE_STAGES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    <button onClick={() => setDetailsLead(lead)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50"><FileText className="mr-1 inline h-3.5 w-3.5" /> View Details</button>
-                    <button onClick={() => setAssignmentLead(lead)} className="rounded-xl border border-teal-100 bg-teal-50 px-3 py-2 text-xs font-black text-teal-700 hover:bg-teal-100"><IdCard className="mr-1 inline h-3.5 w-3.5" /> Assign Staff</button>
-                    <button onClick={() => setHistoryLead(lead)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600 hover:bg-slate-50"><MessageCircle className="mr-1 inline h-3.5 w-3.5" /> WhatsApp History</button>
-                    <button onClick={() => sendTemplate(lead, 'quotation_sent')} className="rounded-xl border border-pink-100 bg-pink-50 px-3 py-2 text-xs font-black text-pink-700 hover:bg-pink-100"><FileText className="mr-1 inline h-3.5 w-3.5" /> Quotation</button>
-                    <button onClick={() => sendTemplate(lead, 'deposit_pending')} className="rounded-xl border border-orange-100 bg-orange-50 px-3 py-2 text-xs font-black text-orange-700 hover:bg-orange-100"><CreditCard className="mr-1 inline h-3.5 w-3.5" /> Deposit</button>
-                    <button onClick={() => sendTemplate(lead, 'monthly_billing')} className="rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs font-black text-indigo-700 hover:bg-indigo-100"><Send className="mr-1 inline h-3.5 w-3.5" /> Billing</button>
-                  </div>
-
-                  {lead.notes && <p className="mt-3 line-clamp-2 rounded-xl bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-500">{lead.notes}</p>}
-                  {lead.last_template_sent && <p className="mt-3 text-[11px] font-bold text-slate-400"><CheckCircle2 className="mr-1 inline h-3.5 w-3.5 text-emerald-500" /> Last template: {lead.last_template_sent}</p>}
-                </article>
-              ))}
-
-              {(grouped[stage.id] || []).length === 0 && <div className="rounded-2xl border border-dashed border-slate-200 bg-white/40 py-7 text-center text-xs font-semibold text-slate-400">No leads in this stage</div>}
+              <div className="p-3 bg-white rounded-lg border border-slate-100 shadow-sm">
+                <p className="text-sm text-slate-700">Auto-greeting sent to new lead</p>
+                <p className="text-xs text-slate-400 mt-1">2 minutes ago</p>
+              </div>
+              <div className="p-3 bg-white rounded-lg border border-slate-100 shadow-sm">
+                <p className="text-sm text-slate-500 italic">No more recent activity.</p>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
-      <Surface>
-        <SectionHeader title="Template Message Layer" description="Current mode opens WhatsApp with a prefilled message and logs the action. Meta WhatsApp Business API can replace this adapter later without changing the CRM workflow." action={<IconFrame icon={Send} tone="emerald" />} />
-      </Surface>
-    </PageShell>
+      {crmTab === 'call-leads' && (
+        <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div>
+              <h2 className="font-semibold text-slate-900 flex items-center gap-2"><PhoneCall className="h-5 w-5" /> Call Leads</h2>
+              <p className="text-sm text-slate-500 mt-1">Incoming call inquiries — review and convert qualified calls to CRM leads.</p>
+            </div>
+            <button className="px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2" style={{ background: '#00A859' }}>
+              <Plus className="w-4 h-4" /> Add Manual Call
+            </button>
+          </div>
+          {callInquiries.length === 0 ? (
+            <div className="flex-1 p-8 text-center flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+                <PhoneCall className="w-8 h-8 text-emerald-500" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">No Call Leads Yet</h3>
+              <p className="text-slate-500 max-w-sm">Call logs will appear here when received. Use "Add Manual Call" to create entries, or connect Callyzer for automated sync in Phase 2.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 overflow-y-auto flex-1">
+              {callInquiries.map((call) => (
+                <div key={call.id} className="p-5 flex items-start gap-4 hover:bg-slate-50 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <Phone className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h4 className="font-bold text-slate-900">{call.caller_name || 'Unknown Caller'}</h4>
+                      {call.status === 'added_to_pipeline' && <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">✓ Added to CRM</span>}
+                      {call.intent && <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">{call.intent}</span>}
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-2">
+                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {call.caller_phone || '—'}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {call.call_date ? new Date(call.call_date).toLocaleString() : '—'}</span>
+                      <span>⏱ {formatCallDuration(call.duration_seconds)}</span>
+                    </div>
+                    {call.summary && <p className="text-sm text-slate-600 mb-2 line-clamp-2">{call.summary}</p>}
+                    {call.transcript && <p className="text-xs text-slate-400 bg-slate-50 rounded px-3 py-2 line-clamp-2 mb-2 italic">{call.transcript}</p>}
+                  </div>
+                  <div className="shrink-0 flex flex-col gap-2 items-end">
+                    {isCallConvertible(call) ? (
+                      <button
+                        onClick={async () => {
+                          const { data: newLead, error } = await supabase.from('crm_leads').insert([{
+                            full_name: call.caller_name || 'Call Lead',
+                            phone: call.caller_phone || '',
+                            stage: 'new-lead',
+                            source: 'call_lead',
+                            notes: `Call summary: ${call.summary || 'N/A'}`,
+                            priority: 'Medium',
+                          }]).select().single();
+                          if (!error && newLead) {
+                            await markCallAsAddedToPipeline(call.id, newLead.id);
+                            fetchData();
+                          }
+                        }}
+                        className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors flex items-center gap-1.5" style={{ background: '#00A859' }}
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Add to CRM
+                      </button>
+                    ) : (
+                      <span className="text-xs text-emerald-600 font-medium">In Pipeline ✓</span>
+                    )}
+                    {call.recording_url && (
+                      <button className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">▶ Play</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
+

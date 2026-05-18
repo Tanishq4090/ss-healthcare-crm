@@ -32,10 +32,34 @@ export function normalizeCrmStage(stage?: string | null): CrmStageId {
   return (CRM_PIPELINE_STAGES.find((item) => item.id === slug)?.id || 'new-lead') as CrmStageId;
 }
 
-export const CRM_CLIENT_STAGES = new Set<CrmStageId>([
-  'staff-assigned',
-  'deposit-pending',
+/** Post-conversion stages shown in the "Clients" tab */
+export const CRM_CLIENT_STAGE_IDS = new Set<CrmStageId>([
   'active-client',
   'monthly-billing',
   'closed-won',
 ]);
+
+/** Pre-conversion stages shown in the "Pipeline" tab */
+export const CRM_PIPELINE_STAGE_IDS = new Set<CrmStageId>([
+  'new-lead',
+  'new-inquiry',
+  'in-discussion',
+  'quotation-sent',
+  'form-submitted',
+  'staff-assigned',
+  'deposit-pending',
+]);
+
+/** Stages filtered for Pipeline tab view */
+export const CRM_PIPELINE_VIEW_STAGES = CRM_PIPELINE_STAGES.filter(
+  (s) => CRM_PIPELINE_STAGE_IDS.has(s.id)
+);
+
+/** Stages filtered for Clients tab view */
+export const CRM_CLIENT_VIEW_STAGES = CRM_PIPELINE_STAGES.filter(
+  (s) => CRM_CLIENT_STAGE_IDS.has(s.id)
+);
+
+/** @deprecated Use CRM_CLIENT_STAGE_IDS instead */
+export const CRM_CLIENT_STAGES = CRM_CLIENT_STAGE_IDS;
+

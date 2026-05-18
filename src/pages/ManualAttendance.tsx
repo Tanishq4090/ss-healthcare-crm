@@ -5,12 +5,8 @@ import {
   Clock,
   RefreshCw,
   Search,
-  UserCheck,
-  UserMinus,
-  Users,
   X,
 } from 'lucide-react';
-import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
@@ -226,7 +222,7 @@ export default function ManualAttendance() {
   }, [attendance, employees.length]);
 
   return (
-    <PageShell>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {selected && (
         <AttendanceModal
           employee={selected}
@@ -237,113 +233,78 @@ export default function ManualAttendance() {
         />
       )}
 
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex items-center gap-4">
-            <IconFrame icon={CalendarCheck} tone="emerald" className="h-12 w-12" />
-            <div>
-              <p className="text-xs font-bold uppercase" style={{ color: '#00A859' }}>Workforce control</p>
-              <h2 className="mt-1 text-2xl font-extrabold text-slate-950">Manual Attendance</h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                Mark daily attendance manually for caregivers and field workers before payroll automation.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="field-control" />
-            <button type="button" onClick={fetchData} className="btn-secondary">
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-            </button>
-          </div>
+      {/* Page header – 99Care pattern */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">Manual Attendance</h1>
+          <p className="text-slate-500 mt-1">Mark daily caregiver attendance and work-hour tracking.</p>
         </div>
-      </Surface>
+      </div>
 
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
-        {[
-          { label: 'Total Staff', value: summary.total, icon: Users, tone: 'blue' as const },
-          { label: 'Present', value: summary.present, icon: UserCheck, tone: 'emerald' as const },
-          { label: 'Absent', value: summary.absent, icon: UserMinus, tone: 'rose' as const },
-          { label: 'Half Day', value: summary.halfDay, icon: Clock, tone: 'amber' as const },
-          { label: 'Leave', value: summary.leave, icon: CalendarCheck, tone: 'cyan' as const },
-        ].map((item) => (
-          <Surface key={item.label}>
-            <div className="flex items-center justify-between gap-3">
+      {/* Daily Command Matrix card */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-slate-500" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
-                <p className="mt-3 text-2xl font-extrabold text-slate-950">{item.value}</p>
+                <h2 className="font-semibold text-slate-900">Daily Command Matrix</h2>
+                <p className="text-sm text-slate-500">Auto-synced attendance &amp; billing in real-time.</p>
               </div>
-              <IconFrame icon={item.icon} tone={item.tone} />
             </div>
-          </Surface>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full lg:max-w-sm">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff..." className="field-control w-full pl-10 pr-4" />
+            <div className="flex items-center gap-3">
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-[#00A859] focus:outline-none" />
+              <button onClick={fetchData} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+              </button>
+            </div>
+          </div>
         </div>
-        <p className="text-sm font-semibold text-slate-500">{filteredEmployees.length} staff shown</p>
-      </div>
 
-      <div className="table-shell">
-        <div className="clinical-content overflow-x-auto">
-          <table className="w-full min-w-[860px]">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="table-heading px-6 py-4">Staff</th>
-                <th className="table-heading px-6 py-4">Department</th>
-                <th className="table-heading px-6 py-4">Phone</th>
-                <th className="table-heading px-6 py-4">Status</th>
-                <th className="table-heading px-6 py-4">Hours</th>
-                <th className="table-heading px-6 py-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">Loading attendance…</td></tr>
-              )}
-              {!loading && filteredEmployees.length === 0 && (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">No employees found.</td></tr>
-              )}
-              {!loading && filteredEmployees.map((employee) => {
-                const row = attendanceByEmployee[employee.id];
-                const statusLabel = row?.status;
-                return (
-                  <tr key={employee.id} className="border-b border-slate-100/80 transition-colors hover:bg-green-50/30">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-extrabold text-white shadow-sm" style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
-                          {employee.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-950">{employee.full_name}</p>
-                          <p className="text-xs text-slate-400">{employee.position || employee.username || 'Care Staff'}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-600">{employee.department || '—'}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-600">{employee.phone || '—'}</td>
-                    <td className="px-6 py-4">
-                      {!statusLabel ? (
-                        <StatusBadge className="border-slate-200 bg-slate-50 text-slate-500">Not marked</StatusBadge>
-                      ) : (
-                        <StatusBadge className={statusStyles[statusLabel]}>{statusLabel.replace('_', ' ')}</StatusBadge>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-bold text-slate-700">{row?.hours_worked ?? '—'}</td>
-                    <td className="px-6 py-4 text-right">
-                      <button type="button" onClick={() => setSelected(employee)} className="btn-secondary py-2 text-xs">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> Mark / Edit
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        {/* Summary bar */}
+        <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-6 text-sm">
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-slate-400" /> Total: {summary.total}</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Present: {summary.present}</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-500" /> Leaves/Absent: {summary.absent + summary.leave}</span>
+          </div>
+          <span className="text-sm font-medium text-amber-600">{employees.length - attendance.length} Pending</span>
+        </div>
+
+        {/* Worker list */}
+        <div className="divide-y divide-slate-100">
+          {loading && <div className="py-12 text-center text-sm text-slate-400">Loading attendance…</div>}
+          {!loading && filteredEmployees.length === 0 && <div className="py-12 text-center text-sm text-slate-400">No employees found.</div>}
+          {!loading && filteredEmployees.map((employee) => {
+            const row = attendanceByEmployee[employee.id];
+            return (
+              <div key={employee.id} className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
+                    {employee.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{employee.full_name}</p>
+                    <p className="text-xs text-slate-500">{employee.position || 'care staff'} {employee.department ? `· ${employee.department}` : ''}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {row?.status ? (
+                    <span className={cn('inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border', statusStyles[row.status])}>
+                      {row.status.replace('_', ' ')} {row.hours_worked ? `· ${row.hours_worked}h` : ''}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-slate-400">—</span>
+                  )}
+                  <button onClick={() => setSelected(employee)} className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> {row ? 'Edit' : 'Mark'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </PageShell>
+    </div>
   );
 }

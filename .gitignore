@@ -10,3 +10,6 @@ frontend/.env
 dist
 .DS_Store
 .vscode
+
+dist-public/
+*.webp

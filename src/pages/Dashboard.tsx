@@ -3,7 +3,6 @@ import {
   Activity,
   AlertTriangle,
   CalendarCheck,
-  CheckCircle2,
   PhoneCall,
   RefreshCw,
   TrendingUp,
@@ -20,7 +19,6 @@ import {
   Bar,
   Cell,
 } from 'recharts';
-import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -36,31 +34,6 @@ import {
   stageColors,
   stageLabel,
 } from '@/lib/liveOps';
-
-function EmptyState({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-slate-200 bg-white/50 p-8 text-center">
-      <AlertTriangle className="mx-auto h-8 w-8 text-slate-300" />
-      <p className="mt-3 text-sm font-bold text-slate-700">{title}</p>
-      <p className="mt-1 text-xs leading-5 text-slate-400">{description}</p>
-    </div>
-  );
-}
-
-function MetricCard({ label, value, helper, icon: Icon, tone }: { label: string; value: string | number; helper: string; icon: any; tone: 'cyan' | 'emerald' | 'amber' | 'blue' | 'rose' }) {
-  return (
-    <Surface className="transition-all duration-300 hover:-translate-y-1 hover:shadow-soft">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-          <p className="mt-5 text-3xl font-extrabold tracking-tight text-slate-950">{value}</p>
-          <p className="mt-2 text-sm text-slate-500">{helper}</p>
-        </div>
-        <IconFrame icon={Icon} tone={tone} />
-      </div>
-    </Surface>
-  );
-}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -94,131 +67,215 @@ export default function Dashboard() {
   }, [load]);
 
   const metrics = useMemo(() => {
-    const pendingCalls = calls.filter((call) => call.review_status === 'new').length;
-    const reviewedCalls = calls.filter((call) => call.review_status === 'reviewed').length;
-    const addedCalls = calls.filter((call) => call.review_status === 'added_to_pipeline').length;
-    const pipelineValue = leads.reduce((sum, lead) => sum + Number(lead.value || 0), 0);
-    const activeClients = leads.filter((lead) => ['active-client', 'closed-won'].includes(String(lead.stage || ''))).length;
-    const presentToday = attendance.filter((row) => row.status === 'present').length;
+    const pendingCalls = calls.filter((c) => c.review_status === 'new').length;
+    const reviewedCalls = calls.filter((c) => c.review_status === 'reviewed').length;
+    const addedCalls = calls.filter((c) => c.review_status === 'added_to_pipeline').length;
+    const pipelineValue = leads.reduce((sum, l) => sum + Number(l.value || 0), 0);
+    const activeClients = leads.filter((l) => ['active-client', 'closed-won'].includes(String(l.stage || ''))).length;
+    const presentToday = attendance.filter((r) => r.status === 'present').length;
     return { pendingCalls, reviewedCalls, addedCalls, pipelineValue, activeClients, presentToday };
   }, [attendance, calls, leads]);
 
-  const pipelineData = useMemo(() => CRM_STAGES.map((stage) => ({
-    stage: stage.label,
-    count: leads.filter((lead) => (lead.stage || 'new-lead') === stage.id).length,
-    color: stageColors[stage.id],
-  })).filter((row) => row.count > 0), [leads]);
+  const pipelineData = useMemo(() =>
+    CRM_STAGES.map((stage) => ({
+      stage: stage.label,
+      count: leads.filter((l) => (l.stage || 'new-lead') === stage.id).length,
+      color: stageColors[stage.id],
+    })).filter((r) => r.count > 0), [leads]);
 
   const recentCalls = calls.slice(0, 6);
   const recentLeads = leads.slice(0, 6);
   const hasAnyError = Object.values(errors).some(Boolean);
 
-  return (
-    <PageShell>
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.28em]" style={{ color: '#00A859' }}>Live SS Health Care Admin OS</p>
-            <h2 className="mt-3 text-3xl font-extrabold text-slate-950">Good morning, {user?.name?.split(' ')[0] || 'Admin'}.</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-              This dashboard is now bound to live Supabase records: Callyzer calls, CRM leads, employees, attendance, and pipeline value.
-            </p>
-          </div>
-          <button type="button" onClick={load} className="btn-secondary self-start xl:self-auto">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh Live Data
-          </button>
-        </div>
-      </Surface>
+  const stats = [
+    { label: 'Pending Calls', value: metrics.pendingCalls, sub: 'Callyzer logs awaiting review', icon: PhoneCall, color: '#F59E0B' },
+    { label: 'Pipeline Leads', value: leads.length, sub: `${metrics.activeClients} active clients`, icon: TrendingUp, color: '#00A859' },
+    { label: 'Workers Present', value: `${metrics.presentToday}/${employees.length}`, sub: 'Manual attendance today', icon: Users, color: '#3B82F6' },
+    { label: 'Pipeline Value', value: formatINR(metrics.pipelineValue), sub: 'Live value from crm_leads', icon: WalletCards, color: '#004C8C' },
+  ];
 
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* ── Page header ──────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">
+            Platform Overview
+          </h1>
+          <p className="text-slate-500 mt-1">
+            Welcome back, {user?.name?.split(' ')[0] || 'Admin'}. Here's what's happening today.
+          </p>
+        </div>
+        <button
+          onClick={load}
+          className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
+
+      {/* ── Error banner ─────────────────────────────── */}
       {hasAnyError && (
-        <Surface className="border-amber-200 bg-amber-50">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
-            <div>
-              <p className="text-sm font-extrabold text-amber-900">Some live tables are not reachable</p>
-              <p className="mt-1 text-xs leading-5 text-amber-700">Run the latest migration and confirm Vercel/Supabase environment variables. This warning is intentionally visible so the app never silently looks static.</p>
-              <pre className="mt-3 whitespace-pre-wrap rounded-xl bg-white/70 p-3 text-xs text-amber-900">{JSON.stringify(errors, null, 2)}</pre>
-            </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-amber-900">Some live tables are not reachable</p>
+            <p className="mt-1 text-xs text-amber-700">Run the latest migration and confirm environment variables.</p>
+            <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-white/70 p-2 text-xs text-amber-800">{JSON.stringify(errors, null, 2)}</pre>
           </div>
-        </Surface>
+        </div>
       )}
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-4">
-        <MetricCard label="Pending Calls" value={metrics.pendingCalls} helper="Callyzer logs awaiting review" icon={PhoneCall} tone="amber" />
-        <MetricCard label="Pipeline Leads" value={leads.length} helper={`${metrics.activeClients} active clients`} icon={TrendingUp} tone="cyan" />
-        <MetricCard label="Workers Present" value={`${metrics.presentToday}/${employees.length}`} helper="Manual attendance today" icon={Users} tone="emerald" />
-        <MetricCard label="Pipeline Value" value={formatINR(metrics.pipelineValue)} helper="Live value from crm_leads" icon={WalletCards} tone="blue" />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Surface className="xl:col-span-2">
-          <SectionHeader title="Live Pipeline by Stage" description="No mock chart. This is calculated directly from crm_leads.stage." />
-          {pipelineData.length === 0 ? (
-            <div className="mt-6"><EmptyState title="No live leads yet" description="Add a lead manually or convert a reviewed Callyzer call into the pipeline." /></div>
-          ) : (
-            <div className="mt-6 h-[320px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pipelineData} margin={{ top: 12, right: 14, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" vertical={false} />
-                  <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={70} />
-                  <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 12 }} />
-                  <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.96)', border: '1px solid #CBD5E1', borderRadius: '12px' }} />
-                  <Bar dataKey="count" radius={[10, 10, 0, 0]}>
-                    {pipelineData.map((entry) => <Cell key={entry.stage} fill={entry.color} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+      {/* ── KPI cards ────────────────────────────────── */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex items-start justify-between">
+              <p className="text-sm font-medium text-slate-500 mb-1">{stat.label}</p>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: `${stat.color}15` }}>
+                <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
+              </div>
             </div>
-          )}
-        </Surface>
-
-        <Surface>
-          <SectionHeader title="Call Review Queue" description="Real Callyzer call-review status." action={<IconFrame icon={Activity} tone="emerald" className="h-10 w-10" />} />
-          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-2xl bg-amber-50 p-4"><p className="text-2xl font-extrabold text-amber-700">{metrics.pendingCalls}</p><p className="text-xs font-bold text-amber-600">New</p></div>
-            <div className="rounded-2xl bg-blue-50 p-4"><p className="text-2xl font-extrabold text-blue-700">{metrics.reviewedCalls}</p><p className="text-xs font-bold text-blue-600">Reviewed</p></div>
-            <div className="rounded-2xl bg-emerald-50 p-4"><p className="text-2xl font-extrabold text-emerald-700">{metrics.addedCalls}</p><p className="text-xs font-bold text-emerald-600">Converted</p></div>
+            <h3 className="text-2xl font-bold text-slate-900 mt-2">{stat.value}</h3>
+            <p className="text-xs text-slate-400 mt-1">{stat.sub}</p>
           </div>
-        </Surface>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Surface>
-          <SectionHeader title="Recent Callyzer Calls" description="Latest call logs received by webhook/API sync." />
-          <div className="mt-5 space-y-3">
-            {recentCalls.length === 0 ? <EmptyState title="No calls yet" description="Send a sample webhook or connect Callyzer using the deployed backend URL." /> : recentCalls.map((call) => (
-              <div key={call.id} className="rounded-2xl border border-slate-100 bg-white/90 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-extrabold text-slate-950">{call.caller_name || call.caller_number}</p>
-                    <p className="mt-1 text-xs text-slate-500">{call.employee_name || 'Unassigned'} · {formatDuration(call.duration_seconds)} · {formatDateTime(call.call_started_at || call.created_at)}</p>
-                  </div>
-                  <StatusBadge className={call.review_status === 'added_to_pipeline' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-amber-100 bg-amber-50 text-amber-700'}>{call.review_status.replaceAll('_', ' ')}</StatusBadge>
+      {/* ── Pipeline + Call review ────────────────── */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Pipeline chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-slate-900">Live Pipeline by Stage</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Calculated from crm_leads.stage</p>
+            </div>
+            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
+              Live Data
+            </span>
+          </div>
+          <div className="p-5">
+            {pipelineData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                  <span className="text-xl">📊</span>
                 </div>
-                <p className="mt-2 text-xs text-slate-500">{call.extracted_service || 'Service not extracted'} · {call.extracted_location || 'Location not set'}</p>
+                <p className="text-sm font-medium text-slate-600">No leads in pipeline yet</p>
+                <p className="text-xs text-slate-400 mt-1">Add a lead or convert a reviewed call.</p>
+              </div>
+            ) : (
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={pipelineData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={70} />
+                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 12 }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: 12 }} />
+                    <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                      {pipelineData.map((e) => <Cell key={e.stage} fill={e.color} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Call review queue */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900">Call Review Queue</h2>
+            <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,168,89,0.1)' }}>
+              <Activity className="h-4 w-4" style={{ color: '#00A859' }} />
+            </div>
+          </div>
+          <div className="p-5 flex-1">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-xl bg-amber-50 p-4">
+                <p className="text-2xl font-bold text-amber-700">{metrics.pendingCalls}</p>
+                <p className="text-xs font-medium text-amber-600 mt-1">New</p>
+              </div>
+              <div className="rounded-xl bg-blue-50 p-4">
+                <p className="text-2xl font-bold text-blue-700">{metrics.reviewedCalls}</p>
+                <p className="text-xs font-medium text-blue-600 mt-1">Reviewed</p>
+              </div>
+              <div className="rounded-xl bg-emerald-50 p-4">
+                <p className="text-2xl font-bold text-emerald-700">{metrics.addedCalls}</p>
+                <p className="text-xs font-medium text-emerald-600 mt-1">Converted</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Recent lists ─────────────────────────────── */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Recent calls */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900">Recent Callyzer Calls</h2>
+            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
+              Live
+            </span>
+          </div>
+          <div className="p-5 space-y-3">
+            {recentCalls.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                  <PhoneCall className="h-5 w-5 text-slate-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-600">No calls yet</p>
+                <p className="text-xs text-slate-400 mt-1">Send a sample webhook or connect Callyzer.</p>
+              </div>
+            ) : recentCalls.map((call) => (
+              <div key={call.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{call.caller_name || call.caller_number}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{call.employee_name || 'Unassigned'} · {formatDuration(call.duration_seconds)} · {formatDateTime(call.call_started_at || call.created_at)}</p>
+                </div>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  call.review_status === 'added_to_pipeline' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                }`}>
+                  {call.review_status.replaceAll('_', ' ')}
+                </span>
               </div>
             ))}
           </div>
-        </Surface>
+        </div>
 
-        <Surface>
-          <SectionHeader title="Recent Pipeline Leads" description="Latest records from crm_leads." />
-          <div className="mt-5 space-y-3">
-            {recentLeads.length === 0 ? <EmptyState title="No leads yet" description="Create a lead or add a call inquiry to pipeline." /> : recentLeads.map((lead) => (
-              <div key={lead.id} className="rounded-2xl border border-slate-100 bg-white/90 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-extrabold text-slate-950">{lead.client_name || 'Unnamed Lead'}</p>
-                    <p className="mt-1 text-xs text-slate-500">{lead.phone || 'No phone'} · {lead.assignee || 'Unassigned'} · {formatDateTime(lead.created_at)}</p>
-                  </div>
-                  <StatusBadge className="border-green-100 bg-green-50 text-green-700">{stageLabel[lead.stage || 'new-lead'] || lead.stage}</StatusBadge>
+        {/* Recent leads */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-900">Recent Pipeline Leads</h2>
+            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
+              Live
+            </span>
+          </div>
+          <div className="p-5 space-y-3">
+            {recentLeads.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                  <TrendingUp className="h-5 w-5 text-slate-400" />
                 </div>
-                <p className="mt-2 text-xs text-slate-500">{lead.notes || 'No notes added yet.'}</p>
+                <p className="text-sm font-medium text-slate-600">No leads yet</p>
+                <p className="text-xs text-slate-400 mt-1">Create a lead or add a call inquiry.</p>
+              </div>
+            ) : recentLeads.map((lead) => (
+              <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{lead.client_name || 'Unnamed Lead'}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{lead.phone || 'No phone'} · {lead.assignee || 'Unassigned'} · {formatDateTime(lead.created_at)}</p>
+                </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                  {stageLabel[lead.stage || 'new-lead'] || lead.stage}
+                </span>
               </div>
             ))}
           </div>
-        </Surface>
+        </div>
       </div>
-    </PageShell>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BadgeIndianRupee, Briefcase, CreditCard, IdCard, Plus, RefreshCw, Search, Upload, UserPlus, X } from 'lucide-react';
-import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
+import { BadgeIndianRupee, Briefcase, CheckCircle2, Clock, CreditCard, FileText, IdCard, Plus, RefreshCw, Search, Send, Upload, UserPlus, Users, X } from 'lucide-react';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
 import { supabase } from '@/lib/supabase';
@@ -241,6 +240,9 @@ export default function AIHR() {
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Employee | null>(null);
+  const [activeTab, setActiveTab] = useState<'allocation' | 'attendance' | 'payroll'>('allocation');
+  const [showPayslipModal, setShowPayslipModal] = useState(false);
+  const [payslipForm, setPayslipForm] = useState({ workerId: '', daysWorked: '', serviceMonth: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), advance: '' });
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
@@ -270,7 +272,7 @@ export default function AIHR() {
   };
 
   return (
-    <PageShell>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {showAdd && <AddEmployeeModal services={services} onClose={() => setShowAdd(false)} onCreated={(emp) => { setShowAdd(false); setSelectedCard(emp); fetchEmployees(); }} />}
       {selectedCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
@@ -280,94 +282,240 @@ export default function AIHR() {
         </div>
       )}
 
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <SectionHeader
-            eyebrow="Workforce intelligence"
-            title="Staff Directory and ID Centre"
-            description="Add staff, generate SS Health Care ID cards, assign services, and prepare staff profiles for client verification."
-            action={<IconFrame icon={Briefcase} tone="emerald" />}
-          />
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{employees.length}</p><p className="text-xs font-bold text-slate-400">Total Staff</p></div>
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{activeCount}</p><p className="text-xs font-bold text-slate-400">Active</p></div>
-            <div className="rounded-2xl bg-white/80 p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{services.length}</p><p className="text-xs font-bold text-slate-400">Services</p></div>
+      {/* Page header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI HR &amp; Billing</h1>
+          <p className="text-slate-500 mt-1">Manage worker allocation, automated attendance, and payroll dispatch.</p>
+        </div>
+        <div className="flex items-center p-1 bg-slate-100 rounded-lg shrink-0">
+          <button onClick={() => setActiveTab('allocation')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'allocation' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Allocation</button>
+          <button onClick={() => setActiveTab('attendance')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'attendance' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Attendance</button>
+          <button onClick={() => setActiveTab('payroll')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'payroll' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>Payroll</button>
+        </div>
+      </div>
+
+      {activeTab === 'allocation' ? (
+        <>
+          {/* Sub-tabs + Add Employee */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-lg">
+              <span className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-[#00A859] border-b-2 border-[#00A859]">
+                <Users className="h-4 w-4" /> AVAILABLE WORKERS
+              </span>
+              <span className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-slate-600">
+                <Briefcase className="h-4 w-4" /> DIRECTORY
+              </span>
+            </div>
+            <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style={{ background: '#00A859' }}>
+              <Plus className="h-4 w-4" /> Add Employee
+            </button>
+          </div>
+
+          {/* Search bar */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm focus:border-[#00A859] focus:outline-none focus:ring-2 focus:ring-[#00A859]/20" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, role, or ID..." />
+            </div>
+            <button onClick={fetchEmployees} className="p-2.5 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+
+          {/* Worker cards grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((emp) => (
+              <div key={emp.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
+                    {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900">{emp.full_name}</p>
+                    <p className="text-sm text-slate-500">{emp.job_title || emp.position || 'Care Specialist'}</p>
+                    <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-medium ${(emp.availability_status || 'available') === 'available' ? 'text-emerald-600' : 'text-slate-500'}`}>
+                      <span className={`h-2 w-2 rounded-full ${(emp.availability_status || 'available') === 'available' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                      {(emp.availability_status || 'available').toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> Skills</span><span className="text-slate-700 font-medium">{(emp.service_skills || []).slice(0,2).join(', ') || '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-500">Contact</span><span className="text-slate-700 font-medium">{emp.phone || '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-500">Joined</span><span className="text-slate-700 font-medium">{emp.created_at ? new Date(emp.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}</span></div>
+                </div>
+                <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+                  <button onClick={() => setSelectedCard(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                    ID Card
+                  </button>
+                  <button onClick={() => toggleAvailability(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-white transition-colors" style={{ background: '#00A859' }}>
+                    <Briefcase className="h-4 w-4" /> {(emp.availability_status || 'available') === 'available' ? 'Assign' : 'Activate'}
+                  </button>
+                </div>
+              </div>
+            ))}
+            {!filtered.length && !loading && (
+              <div className="col-span-full py-12 text-center text-sm text-slate-400">No staff found.</div>
+            )}
+          </div>
+        </>
+      ) : activeTab === 'attendance' ? (
+        /* Attendance View – matching 99Care pattern */
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+          <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div>
+              <h2 className="font-semibold text-slate-900">Live Attendance Log</h2>
+              <p className="text-sm text-slate-500 mt-1">Track daily attendance for all active staff members.</p>
+            </div>
+            <div className="flex gap-2">
+              <button className="px-3 py-1.5 border border-slate-200 bg-white text-slate-600 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">Filter: Today</button>
+            </div>
+          </div>
+          <div className="flex-1 p-8 text-center flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+              <Clock className="w-8 h-8 text-blue-500" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Awaiting Duty Starts</h3>
+            <p className="text-slate-500 max-w-sm">No duty starts logged for today yet. Staff or clients can use their unique tracking links to submit attendance automatically.</p>
+            <button className="mt-6 px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Generate Attendance Report
+            </button>
           </div>
         </div>
-      </Surface>
-
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full lg:max-w-sm">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input className="field-control w-full pl-10" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff, code, service..." />
-        </div>
-        <div className="flex gap-3">
-          <button onClick={fetchEmployees} className="btn-secondary"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh</button>
-          <button onClick={() => setShowAdd(true)} className="btn-primary"><Plus className="h-4 w-4" /> Add Employee</button>
-        </div>
-      </div>
-
-      <div className="table-shell">
-        <div className="clinical-content overflow-x-auto">
-          <table className="w-full min-w-[980px]">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="table-heading px-6 py-4">Employee</th>
-                <th className="table-heading px-6 py-4">Role</th>
-                <th className="table-heading px-6 py-4">Services</th>
-                <th className="table-heading px-6 py-4">Rate</th>
-                <th className="table-heading px-6 py-4">Status</th>
-                <th className="table-heading px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((emp) => (
-                <tr key={emp.id} className="border-b border-slate-100 hover:bg-teal-50/30">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-teal-700 to-blue-700 text-sm font-black text-white">
-                        {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
+      ) : (
+        /* Payroll & Invoicing View – matching 99Care pattern */
+        <div className="grid lg:grid-cols-3 gap-6 flex-1">
+          {/* Main Payroll List */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <div className="bg-gradient-to-r from-[#004C8C] to-[#00A859] rounded-xl p-5 text-white">
+              <h2 className="font-bold text-lg">Financial Execution Center</h2>
+              <p className="text-white/80 text-sm mt-1">Auto-calculate and pattern all invoices for active deployments.</p>
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => setShowPayslipModal(true)} className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur rounded-lg text-sm font-medium transition-colors">
+                  <FileText className="h-4 w-4" /> Manual Payslip
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2 bg-white text-[#004C8C] rounded-lg text-sm font-bold hover:bg-white/90 transition-colors">
+                  <Send className="h-4 w-4" /> Generate & Dispatch All
+                </button>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <h2 className="font-semibold text-slate-900">Current Billing Cycle</h2>
+                <span className="text-sm text-slate-500 border border-slate-200 px-3 py-1 rounded-full bg-white">Auto-calculating from active hours</span>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {employees.filter(e => (e.availability_status || 'available') !== 'available').length === 0 ? (
+                  <div className="p-8 text-center text-slate-500">No active payroll entries found for this cycle. Assign workers to generate billing.</div>
+                ) : (
+                  employees.filter(e => (e.availability_status || 'available') !== 'available').map((emp) => (
+                    <div key={emp.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                          <Users className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-slate-900">{emp.full_name}</h4>
+                          <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {emp.daily_rate || 0} /day rate</span>
+                            <span>•</span>
+                            <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" /> {emp.job_title || 'Assigned'}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-black text-slate-950">{emp.full_name}</p>
-                        <p className="text-xs font-bold text-teal-700">{emp.employee_code}</p>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-emerald-600">₹{((emp.daily_rate || 0) * 26).toLocaleString()}</p>
+                        <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mt-1">PENDING</p>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-600">{emp.job_title || emp.position || 'Care Specialist'}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex max-w-md flex-wrap gap-1.5">
-                      {(emp.service_skills || []).slice(0, 3).map((skill) => <span key={skill} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-500">{skill}</span>)}
-                      {(emp.service_skills || []).length > 3 && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">+{(emp.service_skills || []).length - 3}</span>}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-bold text-slate-700"><BadgeIndianRupee className="mr-1 inline h-3.5 w-3.5" />{Number(emp.daily_rate || 0).toLocaleString()}</td>
-                  <td className="px-6 py-4">
-                    <StatusBadge className={(emp.availability_status || 'available') === 'available' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-600'}>
-                      {emp.availability_status || 'available'}
-                    </StatusBadge>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => toggleAvailability(emp)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm hover:bg-slate-50">
-                        {(emp.availability_status || 'available') === 'available' ? 'Set Inactive' : 'Set Available'}
-                      </button>
-                      <button onClick={() => setSelectedCard(emp)} className="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-white px-3 py-2 text-xs font-black text-teal-700 shadow-sm hover:bg-teal-50">
-                        <IdCard className="h-4 w-4" /> ID Card
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!filtered.length && !loading && <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-400">No staff found.</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
 
-      <Surface>
-        <SectionHeader title="ID Card Workflow" description="When staff is assigned from CRM Pipeline, the generated staff ID card link is included in the Staff Assigned WhatsApp template." action={<IconFrame icon={CreditCard} tone="blue" />} />
-      </Surface>
-    </PageShell>
+          {/* Action Panel */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 text-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,168,89,0.1)' }}>
+                <Send className="w-8 h-8 ml-1" style={{ color: '#00A859' }} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Run Automation</h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Clicking this will generate <strong>Worker Payslips</strong> and <strong>Client Monthly Bills</strong> based on verified attendance hours.
+              </p>
+              <button className="w-full py-3 px-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5" style={{ background: '#00A859' }}>
+                <FileText className="w-5 h-5" /> Dispatch Payslips & Invoices
+              </button>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 space-y-4">
+              <h3 className="font-semibold text-slate-900 flex items-center gap-2 mb-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Automation Checklist
+              </h3>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="text-slate-700">Attendance manually verified by HR</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="text-slate-700">Salary rates verified</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="text-slate-700">Client billing active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Manual Payslip Generator Modal */}
+      {showPayslipModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#00A859]/10 rounded-full flex items-center justify-center">
+                  <FileText className="w-5 h-5" style={{ color: '#00A859' }} />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">Manual Payslip Generator</h2>
+              </div>
+              <button onClick={() => setShowPayslipModal(false)} className="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Select Worker</label>
+                <select value={payslipForm.workerId} onChange={(e) => setPayslipForm({ ...payslipForm, workerId: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-[#00A859] focus:border-transparent text-sm bg-white">
+                  <option value="">-- Choose Worker --</option>
+                  {employees.map((emp) => <option key={emp.id} value={emp.id}>{emp.full_name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Total Days Worked</label>
+                <input type="number" placeholder="e.g. 21.5" value={payslipForm.daysWorked} onChange={(e) => setPayslipForm({ ...payslipForm, daysWorked: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-[#00A859] focus:border-transparent text-sm" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Service Month</label>
+                  <input type="text" value={payslipForm.serviceMonth} onChange={(e) => setPayslipForm({ ...payslipForm, serviceMonth: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-[#00A859] focus:border-transparent text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Advance Received (₹)</label>
+                  <input type="number" placeholder="e.g. 2000" value={payslipForm.advance} onChange={(e) => setPayslipForm({ ...payslipForm, advance: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-[#00A859] focus:border-transparent text-sm" />
+                  <p className="text-xs text-slate-400 mt-1 italic">This will be subtracted from worker salary.</p>
+                </div>
+              </div>
+              <div className="pt-2 flex gap-3">
+                <button type="button" onClick={() => setShowPayslipModal(false)} className="flex-1 py-2.5 px-4 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
+                <button type="button" onClick={() => { setShowPayslipModal(false); }} className="flex-1 py-2.5 px-4 rounded-lg font-semibold text-white transition-colors shadow-sm" style={{ background: '#00A859' }}>Generate & Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
