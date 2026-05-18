@@ -2,24 +2,20 @@
  * System Health Service
  * Checks the health of all system components and integrations.
  */
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+import { supabase } from './supabase.js';
 
-async function checkDatabaseHealth() {
+export async function checkDatabaseHealth() {
   try {
     const { count, error } = await supabase
       .from('crm_leads')
       .select('*', { count: 'exact', head: true });
-    return { status: 'healthy', leads_count: count, error: null };
+    return { status: error ? 'error' : 'healthy', leads_count: count || 0, error: error?.message || null };
   } catch (err) {
     return { status: 'error', leads_count: 0, error: err.message };
   }
 }
 
-async function checkEmployeesTable() {
+export async function checkEmployeesTable() {
   try {
     const { count, error } = await supabase
       .from('employees')
@@ -30,7 +26,7 @@ async function checkEmployeesTable() {
   }
 }
 
-async function getFullSystemStatus() {
+export async function getFullSystemStatus() {
   const [db, employees] = await Promise.all([
     checkDatabaseHealth(),
     checkEmployeesTable(),
@@ -50,5 +46,3 @@ async function getFullSystemStatus() {
     timestamp: new Date().toISOString(),
   };
 }
-
-module.exports = { checkDatabaseHealth, checkEmployeesTable, getFullSystemStatus };

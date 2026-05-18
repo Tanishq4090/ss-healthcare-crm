@@ -2,13 +2,9 @@
  * Staff Assignment Service
  * Backend operations for assigning workers to clients/leads.
  */
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+import { supabase } from './supabase.js';
 
-async function assignWorker(leadId, workerId) {
+export async function assignWorker(leadId, workerId) {
   const { data: worker, error: wErr } = await supabase
     .from('employees')
     .select('*')
@@ -27,7 +23,6 @@ async function assignWorker(leadId, workerId) {
     .eq('id', leadId);
   if (error) throw error;
 
-  // Mark worker as assigned
   await supabase
     .from('employees')
     .update({ availability_status: 'assigned' })
@@ -36,7 +31,7 @@ async function assignWorker(leadId, workerId) {
   return { lead_id: leadId, worker };
 }
 
-async function getAvailableWorkers() {
+export async function getAvailableWorkers() {
   const { data, error } = await supabase
     .from('employees')
     .select('*')
@@ -45,5 +40,3 @@ async function getAvailableWorkers() {
   if (error) throw error;
   return data || [];
 }
-
-module.exports = { assignWorker, getAvailableWorkers };

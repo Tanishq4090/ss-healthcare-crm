@@ -2,11 +2,7 @@
  * WhatsApp Template Service
  * Backend service for generating and dispatching WhatsApp messages.
  */
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+import { supabase } from './supabase.js';
 
 const TEMPLATES = {
   inquiry: (vars) =>
@@ -21,13 +17,13 @@ const TEMPLATES = {
     `Namaste ${vars.name} ji! 📄 Is mahine ka bill taiyar ho gaya hai.\n\nShukriya! 🙏`,
 };
 
-function buildMessage(templateKey, variables) {
+export function buildMessage(templateKey, variables) {
   const builder = TEMPLATES[templateKey];
   if (!builder) return `[Template "${templateKey}" not found]`;
   return builder(variables);
 }
 
-async function logMessage({ leadId, phone, templateName, content, sentBy = 'system' }) {
+export async function logMessage({ leadId, phone, templateName, content, sentBy = 'system' }) {
   const { error } = await supabase.rpc('log_whatsapp_template_message', {
     p_lead_id: leadId || null,
     p_phone: phone,
@@ -39,4 +35,4 @@ async function logMessage({ leadId, phone, templateName, content, sentBy = 'syst
   if (error) console.warn('WhatsApp log error:', error.message);
 }
 
-module.exports = { buildMessage, logMessage, TEMPLATES };
+export { TEMPLATES };

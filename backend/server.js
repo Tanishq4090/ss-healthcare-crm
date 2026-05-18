@@ -19,6 +19,7 @@ import attendanceRoutes from "./routes/attendance.js";
 import crmRoutes from "./routes/crm.js";
 import callyzerRoutes from "./routes/callyzer.js";
 import systemRoutes from "./routes/system.js";
+import metaWhatsappRoutes from "./routes/metaWhatsapp.js";
 import authRoutes from "./routes/auth.js";
 import { requireAuth } from "./middleware/auth.js";
 
@@ -73,6 +74,7 @@ app.use("/api/attendance", requireAuth, attendanceRoutes);
 app.use("/api/crm-config", requireAuth, crmRoutes);
 app.use("/api/callyzer", callyzerRoutes);
 app.use("/api/system", systemRoutes);
+app.use("/api/meta", metaWhatsappRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "ss-healthcare-backend", ts: new Date().toISOString() });
@@ -86,7 +88,7 @@ app.use((err, req, res, _next) => {
 
 httpServer.listen(PORT, () => {
   console.log(`\n✅  SS Healthcare backend → http://localhost:${PORT}`);
-  console.log("   API ready: /health, /api/system/health, /api/callyzer/health");
+  console.log("   API ready: /health, /api/system/health, /api/callyzer/health, /api/meta/health");
 });
 
 export default app;

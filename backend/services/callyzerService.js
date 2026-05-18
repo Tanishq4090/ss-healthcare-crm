@@ -2,17 +2,12 @@
  * Callyzer Service (Phase 2 Integration)
  * Handles webhook ingestion, call sync, and health checks for Callyzer integration.
  */
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+import { supabase } from './supabase.js';
 
 /**
  * Process incoming Callyzer webhook payload
- * Creates call_inquiries records from webhook data
  */
-async function processWebhook(payload) {
+export async function processWebhook(payload) {
   if (!payload || !payload.calls || !Array.isArray(payload.calls)) {
     return { processed: 0, errors: ['Invalid payload format'] };
   }
@@ -44,15 +39,14 @@ async function processWebhook(payload) {
 /**
  * Sync recent calls from Callyzer API (Phase 2)
  */
-async function syncRecentCalls(apiKey, dateFrom) {
-  // Phase 2: Will connect to Callyzer API
+export async function syncRecentCalls(apiKey, dateFrom) {
   return { synced: 0, message: 'Callyzer API sync not yet connected. Phase 2.' };
 }
 
 /**
  * Health check for Callyzer integration
  */
-async function getHealth() {
+export async function getHealth() {
   try {
     const { count, error } = await supabase
       .from('call_inquiries')
@@ -61,11 +55,9 @@ async function getHealth() {
       status: 'integration_ready',
       table_exists: !error,
       total_records: count || 0,
-      callyzer_api_connected: false, // Phase 2
+      callyzer_api_connected: false,
     };
   } catch {
     return { status: 'error', table_exists: false, total_records: 0, callyzer_api_connected: false };
   }
 }
-
-module.exports = { processWebhook, syncRecentCalls, getHealth };

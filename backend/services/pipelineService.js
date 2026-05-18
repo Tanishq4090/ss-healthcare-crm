@@ -2,19 +2,15 @@
  * Pipeline Service
  * Backend operations for CRM pipeline stage management.
  */
-const { createClient } = require('@supabase/supabase-js');
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+import { supabase } from './supabase.js';
 
-const PIPELINE_STAGES = [
+export const PIPELINE_STAGES = [
   'new-lead', 'new-inquiry', 'in-discussion', 'quotation-sent',
   'form-submitted', 'staff-assigned', 'deposit-pending',
   'active-client', 'monthly-billing', 'closed-won',
 ];
 
-async function moveLeadStage(leadId, newStage) {
+export async function moveLeadStage(leadId, newStage) {
   if (!PIPELINE_STAGES.includes(newStage)) {
     throw new Error(`Invalid stage: ${newStage}`);
   }
@@ -28,7 +24,7 @@ async function moveLeadStage(leadId, newStage) {
   return data;
 }
 
-async function createLeadFromCallInquiry(callId) {
+export async function createLeadFromCallInquiry(callId) {
   const { data: call, error: fetchErr } = await supabase
     .from('call_inquiries')
     .select('*')
@@ -50,7 +46,6 @@ async function createLeadFromCallInquiry(callId) {
     .single();
   if (insertErr) throw insertErr;
 
-  // Mark call as added to pipeline
   await supabase
     .from('call_inquiries')
     .update({ status: 'added_to_pipeline', lead_id: lead.id })
@@ -59,12 +54,10 @@ async function createLeadFromCallInquiry(callId) {
   return lead;
 }
 
-async function getLeadsByStage(stage) {
+export async function getLeadsByStage(stage) {
   const query = supabase.from('crm_leads').select('*').order('created_at', { ascending: false });
   if (stage) query.eq('stage', stage);
   const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
-
-module.exports = { moveLeadStage, createLeadFromCallInquiry, getLeadsByStage, PIPELINE_STAGES };

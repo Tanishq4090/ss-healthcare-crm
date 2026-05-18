@@ -64,7 +64,9 @@ function normalizeCallyzerPayload(payload) {
   const caller = normalizePhone(pick(root, ['number', 'phone', 'callerNumber', 'customerNumber', 'customerPhone', 'from', 'mobileNumber']));
 
   return {
-    external_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id'], `${Date.now()}-${caller || 'unknown'}`)),
+    provider: 'callyzer',
+    provider_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id', 'uuid'], `${Date.now()}-${caller || 'unknown'}`)),
+    external_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id', 'uuid'], `${Date.now()}-${caller || 'unknown'}`)),
     caller_number: caller,
     employee_name: pick(root, ['employeeName', 'employee_name', 'emp_name', 'userName', 'agentName', 'staffName'], null),
     employee_number: normalizePhone(pick(root, ['employeeNumber', 'employee_number', 'emp_number', 'userNumber', 'agentNumber', 'staffNumber'])),
@@ -86,6 +88,7 @@ function normalizeCallyzerPayload(payload) {
     captured_budget: pick(root, ['budget', 'rate', 'price'], null),
     captured_timing: pick(root, ['timing', 'preferredTime', 'startDate'], null),
     captured_notes: note,
+    raw_payload: root,
     extracted_data: root,
     review_status: 'new',
   };
@@ -100,7 +103,17 @@ function verifySecret(req, res, next) {
 }
 
 router.get('/health', (_req, res) => {
-  res.json({ ok: true, service: 'callyzer', mode: 'manual-call-review' });
+  const hasSecret = Boolean(process.env.CALLYZER_WEBHOOK_SECRET);
+  const hasApiToken = Boolean(process.env.CALLYZER_API_TOKEN);
+  res.json({
+    ok: true,
+    service: 'callyzer',
+    mode: 'manual-call-review',
+    integration_ready: true,
+    connected: hasSecret || hasApiToken,
+    webhook_secret_configured: hasSecret,
+    api_token_configured: hasApiToken,
+  });
 });
 
 router.post('/webhook', verifySecret, async (req, res) => {
@@ -121,8 +134,17 @@ router.post('/webhook', verifySecret, async (req, res) => {
 });
 
 router.post('/sync', verifySecret, async (_req, res) => {
-  // Placeholder for Callyzer API backfill. Webhook is the production path.
-  res.json({ ok: true, message: 'Webhook-first sync is active. Add Callyzer API token here for historical backfill.' });
+  const apiToken = process.env.CALLYZER_API_TOKEN;
+  if (!apiToken) {
+    return res.json({
+      ok: false,
+      integration_ready: true,
+      connected: false,
+      message: 'Callyzer API token not configured. Webhook ingestion is available. Set CALLYZER_API_TOKEN for historical sync.',
+    });
+  }
+  // Phase 2: connect to Callyzer API for historical backfill
+  res.json({ ok: true, integration_ready: true, connected: true, message: 'Callyzer API sync ready. Historical backfill endpoint.' });
 });
 
 export default router;

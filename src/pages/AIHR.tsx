@@ -241,6 +241,7 @@ export default function AIHR() {
   const [showAdd, setShowAdd] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Employee | null>(null);
   const [activeTab, setActiveTab] = useState<'allocation' | 'attendance' | 'payroll'>('allocation');
+  const [hrSubTab, setHrSubTab] = useState<'workers' | 'directory'>('workers');
   const [showPayslipModal, setShowPayslipModal] = useState(false);
   const [payslipForm, setPayslipForm] = useState({ workerId: '', daysWorked: '', serviceMonth: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), advance: '' });
 
@@ -258,10 +259,16 @@ export default function AIHR() {
 
   useEffect(() => { fetchEmployees(); fetchServices(); }, [fetchEmployees, fetchServices]);
 
-  const filtered = useMemo(() => employees.filter((e) => {
+  const filtered = useMemo(() => {
+    let list = employees;
+    if (hrSubTab === 'workers') {
+      list = list.filter((e) => (e.availability_status || 'available') === 'available');
+    }
     const term = search.toLowerCase();
-    return [e.full_name, e.username, e.job_title, e.position, e.phone, e.employee_code].some((v) => String(v || '').toLowerCase().includes(term));
-  }), [employees, search]);
+    return list.filter((e) =>
+      [e.full_name, e.username, e.job_title, e.position, e.phone, e.employee_code].some((v) => String(v || '').toLowerCase().includes(term))
+    );
+  }, [employees, search, hrSubTab]);
 
   const activeCount = employees.filter((e) => (e.status || 'active') === 'active').length;
 
@@ -300,12 +307,12 @@ export default function AIHR() {
           {/* Sub-tabs + Add Employee */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-lg">
-              <span className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-[#00A859] border-b-2 border-[#00A859]">
+              <button onClick={() => setHrSubTab('workers')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'workers' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
                 <Users className="h-4 w-4" /> AVAILABLE WORKERS
-              </span>
-              <span className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-slate-600">
+              </button>
+              <button onClick={() => setHrSubTab('directory')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'directory' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
                 <Briefcase className="h-4 w-4" /> DIRECTORY
-              </span>
+              </button>
             </div>
             <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style={{ background: '#00A859' }}>
               <Plus className="h-4 w-4" /> Add Employee
