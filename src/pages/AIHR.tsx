@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BadgeIndianRupee, Briefcase, CheckCircle2, Clock, CreditCard, FileText, IdCard, Plus, RefreshCw, Search, Send, Upload, UserPlus, Users, X } from 'lucide-react';
+import { BadgeIndianRupee, Briefcase, CheckCircle2, ChevronDown, Clock, CreditCard, FileText, IdCard, Link2, Plus, RefreshCw, Search, Send, Trash2, Upload, UserPlus, Users, X } from 'lucide-react';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
 import { supabase } from '@/lib/supabase';
@@ -241,7 +241,8 @@ export default function AIHR() {
   const [showAdd, setShowAdd] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Employee | null>(null);
   const [activeTab, setActiveTab] = useState<'allocation' | 'attendance' | 'payroll'>('allocation');
-  const [hrSubTab, setHrSubTab] = useState<'workers' | 'directory'>('workers');
+  const [hrSubTab, setHrSubTab] = useState<'workers' | 'deployments' | 'directory' | 'trash'>('workers');
+  const [dirFilter, setDirFilter] = useState<'all' | 'available' | 'assigned' | 'inactive'>('all');
   const [showPayslipModal, setShowPayslipModal] = useState(false);
   const [payslipForm, setPayslipForm] = useState({ workerId: '', daysWorked: '', serviceMonth: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), advance: '' });
 
@@ -310,8 +311,14 @@ export default function AIHR() {
               <button onClick={() => setHrSubTab('workers')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'workers' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
                 <Users className="h-4 w-4" /> AVAILABLE WORKERS
               </button>
+              <button onClick={() => setHrSubTab('deployments')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'deployments' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
+                <Briefcase className="h-4 w-4" /> DEPLOYMENTS
+              </button>
               <button onClick={() => setHrSubTab('directory')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'directory' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
-                <Briefcase className="h-4 w-4" /> DIRECTORY
+                <IdCard className="h-4 w-4" /> DIRECTORY
+              </button>
+              <button onClick={() => setHrSubTab('trash')} className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${hrSubTab === 'trash' ? 'text-[#00A859] border-b-2 border-[#00A859]' : 'text-slate-600 hover:text-slate-900'}`}>
+                <Trash2 className="h-4 w-4" /> TRASH
               </button>
             </div>
             <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style={{ background: '#00A859' }}>
@@ -330,42 +337,199 @@ export default function AIHR() {
             </button>
           </div>
 
-          {/* Worker cards grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((emp) => (
-              <div key={emp.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                <div className="flex items-start gap-3 mb-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
-                    {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
+          {/* Worker cards grid — Available Workers sub-tab */}
+          {hrSubTab === 'workers' && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((emp) => (
+                <div key={emp.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
+                      {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-slate-900">{emp.full_name}</p>
+                      <p className="text-sm text-slate-500">{emp.job_title || emp.position || 'Care Specialist'}</p>
+                      <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-medium ${(emp.availability_status || 'available') === 'available' ? 'text-emerald-600' : 'text-slate-500'}`}>
+                        <span className={`h-2 w-2 rounded-full ${(emp.availability_status || 'available') === 'available' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                        {(emp.availability_status || 'available').toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900">{emp.full_name}</p>
-                    <p className="text-sm text-slate-500">{emp.job_title || emp.position || 'Care Specialist'}</p>
-                    <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-medium ${(emp.availability_status || 'available') === 'available' ? 'text-emerald-600' : 'text-slate-500'}`}>
-                      <span className={`h-2 w-2 rounded-full ${(emp.availability_status || 'available') === 'available' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                      {(emp.availability_status || 'available').toUpperCase()}
-                    </span>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> Skills</span><span className="text-slate-700 font-medium">{(emp.service_skills || []).slice(0,2).join(', ') || '—'}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">Contact</span><span className="text-slate-700 font-medium">{emp.phone || '—'}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">Joined</span><span className="text-slate-700 font-medium">{emp.created_at ? new Date(emp.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}</span></div>
+                  </div>
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+                    <button onClick={() => setSelectedCard(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                      ID Card
+                    </button>
+                    <button onClick={() => toggleAvailability(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-white transition-colors" style={{ background: '#00A859' }}>
+                      <Briefcase className="h-4 w-4" /> Assign
+                    </button>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-slate-500 flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> Skills</span><span className="text-slate-700 font-medium">{(emp.service_skills || []).slice(0,2).join(', ') || '—'}</span></div>
-                  <div className="flex justify-between"><span className="text-slate-500">Contact</span><span className="text-slate-700 font-medium">{emp.phone || '—'}</span></div>
-                  <div className="flex justify-between"><span className="text-slate-500">Joined</span><span className="text-slate-700 font-medium">{emp.created_at ? new Date(emp.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}</span></div>
-                </div>
-                <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
-                  <button onClick={() => setSelectedCard(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                    ID Card
-                  </button>
-                  <button onClick={() => toggleAvailability(emp)} className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-white transition-colors" style={{ background: '#00A859' }}>
-                    <Briefcase className="h-4 w-4" /> {(emp.availability_status || 'available') === 'available' ? 'Assign' : 'Activate'}
-                  </button>
-                </div>
+              ))}
+              {!filtered.length && !loading && (
+                <div className="col-span-full py-12 text-center text-sm text-slate-400">No available workers found.</div>
+              )}
+            </div>
+          )}
+
+          {/* Deployments sub-tab */}
+          {hrSubTab === 'deployments' && (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+                <h3 className="font-semibold text-slate-900 flex items-center gap-2"><Briefcase className="h-5 w-5" style={{ color: '#00A859' }} /> {employees.filter(e => (e.availability_status || 'available') === 'assigned').length} ACTIVE DEPLOYMENT{employees.filter(e => (e.availability_status || 'available') === 'assigned').length !== 1 ? 'S' : ''}</h3>
+                <button onClick={fetchEmployees} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh</button>
               </div>
-            ))}
-            {!filtered.length && !loading && (
-              <div className="col-span-full py-12 text-center text-sm text-slate-400">No staff found.</div>
-            )}
-          </div>
+              {employees.filter(e => (e.availability_status || 'available') === 'assigned').length === 0 ? (
+                <div className="p-8 text-center text-sm text-slate-400">No active deployments. Assign workers to clients from the Available Workers tab.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead><tr className="bg-slate-50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <th className="px-5 py-3">Staff Member</th>
+                    <th className="px-5 py-3">ID No.</th>
+                    <th className="px-5 py-3">Role</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3">Deployment Actions</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {employees.filter(e => (e.availability_status || 'available') === 'assigned').map((emp) => (
+                      <tr key={emp.id} className="hover:bg-slate-50">
+                        <td className="px-5 py-4 flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
+                            {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full rounded-full object-cover" alt="" /> : (emp.full_name || 'S')[0]}
+                          </div>
+                          <div><p className="font-semibold text-slate-900">{emp.full_name}</p><p className="text-xs text-slate-500">{emp.job_title || 'Specialist'}</p></div>
+                        </td>
+                        <td className="px-5 py-4"><span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{emp.employee_code || '—'}</span></td>
+                        <td className="px-5 py-4 text-slate-600">{emp.job_title || '—'}</td>
+                        <td className="px-5 py-4"><span className="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">● CONFIRMED</span></td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <button onClick={() => setSelectedCard(emp)} className="text-xs font-medium text-[#00A859] hover:underline flex items-center gap-1"><IdCard className="h-3.5 w-3.5" /> ID Card</button>
+                            <button className="text-xs font-medium text-blue-600 hover:underline flex items-center gap-1"><Link2 className="h-3.5 w-3.5" /> Resend Link</button>
+                            <button onClick={() => toggleAvailability(emp)} className="text-xs font-medium text-slate-500 hover:underline">Release</button>
+                            <button className="text-xs font-medium text-red-500 hover:underline">Terminate</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {/* Directory sub-tab — Table view matching 99Care */}
+          {hrSubTab === 'directory' && (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-4 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, role, or ID..." />
+                </div>
+                <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg">
+                  {(['all','available','assigned','inactive'] as const).map((f) => (
+                    <button key={f} onClick={() => setDirFilter(f)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${dirFilter === f ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>{f.toUpperCase()}</button>
+                  ))}
+                </div>
+                <button onClick={fetchEmployees} className="ml-3 p-2 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /></button>
+              </div>
+              <table className="w-full text-sm">
+                <thead><tr className="bg-slate-50/80 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-5 py-3">Worker Info</th>
+                  <th className="px-5 py-3">Services & Payment</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Quick Actions</th>
+                </tr></thead>
+                <tbody className="divide-y divide-slate-100">
+                  {employees.filter((e) => {
+                    const status = (e.availability_status || 'available');
+                    if (dirFilter !== 'all' && status !== dirFilter) return false;
+                    if (!search) return true;
+                    const t = search.toLowerCase();
+                    return [e.full_name, e.job_title, e.employee_code, e.phone].some(v => String(v||'').toLowerCase().includes(t));
+                  }).map((emp) => (
+                    <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
+                            {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full rounded-full object-cover" alt="" /> : (emp.full_name || 'S')[0]}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-900">{emp.full_name}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              {emp.employee_code && <span className="text-[10px] font-medium bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{emp.employee_code}</span>}
+                              <span className="text-xs text-slate-500">{emp.job_title || 'Specialist'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {(emp.service_skills || []).slice(0,2).map((s, i) => <span key={i} className="text-[10px] font-medium bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-100">{s}</span>)}
+                          <span className="text-[10px] font-medium bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-100">{emp.daily_rate ? 'HOURLY' : 'MONTHLY BASE'}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+                          (emp.availability_status || 'available') === 'available' ? 'text-emerald-600' :
+                          (emp.availability_status || 'available') === 'assigned' ? 'text-amber-600' : 'text-slate-400'
+                        }`}>
+                          <span className={`h-2 w-2 rounded-full ${
+                            (emp.availability_status || 'available') === 'available' ? 'bg-emerald-500' :
+                            (emp.availability_status || 'available') === 'assigned' ? 'bg-amber-500' : 'bg-slate-300'
+                          }`} />
+                          {(emp.availability_status || 'available').toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setSelectedCard(emp)} className="text-xs font-medium text-[#00A859] hover:underline flex items-center gap-1"><IdCard className="h-3.5 w-3.5" /> ID CARD</button>
+                          <ChevronDown className="h-4 w-4 text-slate-400" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {employees.filter((e) => {
+                    const status = (e.availability_status || 'available');
+                    if (dirFilter !== 'all' && status !== dirFilter) return false;
+                    if (!search) return true;
+                    const t = search.toLowerCase();
+                    return [e.full_name, e.job_title, e.employee_code, e.phone].some(v => String(v||'').toLowerCase().includes(t));
+                  }).length === 0 && (
+                    <tr><td colSpan={4} className="py-12 text-center">
+                      <Users className="h-10 w-10 text-slate-200 mx-auto mb-3" />
+                      <p className="text-sm text-slate-400 uppercase tracking-wide">No employees found in directory</p>
+                    </td></tr>
+                  )}
+                </tbody>
+              </table>
+              <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                <span>DIRECTORY SUMMARY</span>
+                <span>{employees.filter((e) => {
+                  const status = (e.availability_status || 'available');
+                  if (dirFilter !== 'all' && status !== dirFilter) return false;
+                  if (!search) return true;
+                  const t = search.toLowerCase();
+                  return [e.full_name, e.job_title, e.employee_code, e.phone].some(v => String(v||'').toLowerCase().includes(t));
+                }).length} Staff Members | {dirFilter.toUpperCase()}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Trash sub-tab */}
+          {hrSubTab === 'trash' && (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-slate-300" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Trash is Empty</h3>
+              <p className="text-slate-500 max-w-sm mx-auto">Deactivated or terminated staff members will appear here. They can be restored or permanently deleted.</p>
+            </div>
+          )}
         </>
       ) : activeTab === 'attendance' ? (
         /* Attendance View – matching 99Care pattern */
