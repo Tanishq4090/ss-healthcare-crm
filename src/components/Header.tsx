@@ -3,11 +3,20 @@ import { useLocation } from 'react-router';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/': { title: 'Dashboard', subtitle: 'Centralized patient insights and care operations.' },
-  '/ai-crm': { title: 'AI CRM', subtitle: 'Lead intelligence and patient engagement workflows.' },
+  '/admin': { title: 'Dashboard', subtitle: 'Centralized patient insights and care operations.' },
+  '/ai-crm': { title: 'CRM Pipeline', subtitle: 'Lead intake, staffing, and WhatsApp follow-up workflows.' },
+  '/admin/crm': { title: 'CRM Pipeline', subtitle: 'Lead intake, staffing, and WhatsApp follow-up workflows.' },
+  '/admin/calls': { title: 'Call Leads', subtitle: 'Manual call review and Callyzer-ready call intake.' },
   '/clients': { title: 'Clients', subtitle: 'Patient and provider records in one place.' },
-  '/ai-hr': { title: 'AI HR', subtitle: 'Healthcare staffing, schedules and payroll.' },
+  '/admin/clients': { title: 'Clients', subtitle: 'Operational client records, staffing, deposit, and billing status.' },
+  '/ai-hr': { title: 'Staff Directory', subtitle: 'Healthcare staffing, verification, and deployment records.' },
+  '/admin/hr': { title: 'Staff Directory', subtitle: 'Healthcare staffing, verification, and deployment records.' },
   '/finance': { title: 'Finance', subtitle: 'Revenue tracking, billing and forecasts.' },
+  '/admin/attendance': { title: 'Attendance', subtitle: 'Manual caregiver attendance and work-hour tracking.' },
+  '/admin/billing': { title: 'Finance', subtitle: 'Deposit and monthly billing operations from live CRM records.' },
   '/access-control': { title: 'Access Control', subtitle: 'Permissions and team security settings.' },
+  '/admin/settings': { title: 'Access Control', subtitle: 'Permissions and team security settings.' },
+  '/admin/system': { title: 'System Status', subtitle: 'Backend and Supabase health checks for the admin OS.' },
 };
 
 export default function Header({

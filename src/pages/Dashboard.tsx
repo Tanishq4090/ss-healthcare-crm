@@ -98,7 +98,7 @@ export default function Dashboard() {
     const reviewedCalls = calls.filter((call) => call.review_status === 'reviewed').length;
     const addedCalls = calls.filter((call) => call.review_status === 'added_to_pipeline').length;
     const pipelineValue = leads.reduce((sum, lead) => sum + Number(lead.value || 0), 0);
-    const activeClients = leads.filter((lead) => ['closed-won', 'active'].includes(String(lead.stage || ''))).length;
+    const activeClients = leads.filter((lead) => ['active-client', 'closed-won'].includes(String(lead.stage || ''))).length;
     const presentToday = attendance.filter((row) => row.status === 'present').length;
     return { pendingCalls, reviewedCalls, addedCalls, pipelineValue, activeClients, presentToday };
   }, [attendance, calls, leads]);

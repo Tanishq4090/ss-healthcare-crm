@@ -21,7 +21,7 @@ serve(async (req) => {
     const challenge = url.searchParams.get('hub.challenge');
     
     // Configured via Supabase secrets
-    const META_VERIFY_TOKEN = Deno.env.get('META_VERIFY_TOKEN') || '99care_meta_webhook';
+    const META_VERIFY_TOKEN = Deno.env.get('META_VERIFY_TOKEN') || 'ss_healthcare_meta_webhook';
 
     if (mode === 'subscribe' && token === META_VERIFY_TOKEN) {
       console.log('Webhook verified successfully!');
@@ -77,7 +77,7 @@ serve(async (req) => {
 
           // 2. Incoming Messages
           if (value.messages && value.messages.length > 0) {
-            // Usually, whatsapp-elevenlabs-bot handles inbound, but if Meta sends it here, just ack it.
+            // Phase 1 only acknowledges inbound Meta events. CRM uses outbound template logs.
             return new Response('EVENT_RECEIVED', { status: 200 });
           }
         }

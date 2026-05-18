@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Eye, EyeOff, Stethoscope, Lock, User } from 'lucide-react'
 
 const ADMIN_USERNAME = 'admin'
-const ADMIN_PASSWORD = 'secure_demo_pass_2026'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -34,14 +34,18 @@ export default function LoginPage() {
         return
       }
 
-      // Admin shortcut — hardcoded for robustness
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        login('admin')
-        navigate('/', { replace: true })
-        return
-      }
+      const response = await fetch(`${BACKEND_URL}/api/auth/admin-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
 
-      throw new Error('Invalid username or password.')
+      if (!response.ok) throw new Error('Invalid username or password.')
+
+      const data = await response.json()
+      login(data?.user?.name || 'System Admin')
+      navigate('/', { replace: true })
+      return
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed.')
     } finally {
@@ -83,7 +87,7 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-slate-950">SS Health Care</h1>
-              <p className="mt-1 text-sm font-medium text-slate-500">AI CRM — Admin Portal</p>
+              <p className="mt-1 text-sm font-medium text-slate-500">Admin OS Login</p>
             </div>
           </div>
 
@@ -165,7 +169,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="mt-8 text-center text-xs text-slate-400">
-            SS Health Care AI CRM &nbsp;·&nbsp; Powered by Supabase + Callyzer
+            SS Health Care Admin OS · Powered by Supabase + Callyzer-ready call review
           </p>
         </div>
       </div>

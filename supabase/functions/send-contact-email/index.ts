@@ -27,7 +27,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: 'website@yourdomain.com', // Update this to your verified Resend domain
-        to: '99careforyou@gmail.com',
+        to: 'contact@sshealthcare.in',
         subject: `New Contact Form Submission from ${name}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -40,7 +40,7 @@ serve(async (req) => {
               <p style="white-space: pre-wrap;">${message}</p>
             </div>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-            <p style="color:#888;font-size:12px">Sent from 99care.org contact form</p>
+            <p style="color:#888;font-size:12px">Sent from SS Health Care contact form</p>
           </div>
         `,
       }),

@@ -1,31 +1,9 @@
+import { CRM_PIPELINE_STAGES, CRM_STAGE_COLORS, CRM_STAGE_LABELS } from '@/config/crmStages';
 import { supabase } from '@/lib/supabase';
 
-export const CRM_STAGES = [
-  { id: 'new-lead', label: 'New Lead' },
-  { id: 'new-inquiry', label: 'New Inquiry' },
-  { id: 'in-discussion', label: 'In Discussion' },
-  { id: 'quotation-sent', label: 'Quotation Sent' },
-  { id: 'staff-confirmed', label: 'Staff Confirmed' },
-  { id: 'deposit-pending', label: 'Deposit Pending' },
-  { id: 'closed-won', label: 'Active Client' },
-  { id: 'closed-lost', label: 'Closed Lost' },
-] as const;
-
-export const stageLabel = CRM_STAGES.reduce<Record<string, string>>((acc, stage) => {
-  acc[stage.id] = stage.label;
-  return acc;
-}, {});
-
-export const stageColors: Record<string, string> = {
-  'new-lead': '#3B82F6',
-  'new-inquiry': '#8B5CF6',
-  'in-discussion': '#F59E0B',
-  'quotation-sent': '#EC4899',
-  'staff-confirmed': '#0EA5E9',
-  'deposit-pending': '#F97316',
-  'closed-won': '#00A859',
-  'closed-lost': '#64748B',
-};
+export const CRM_STAGES = CRM_PIPELINE_STAGES;
+export const stageLabel = CRM_STAGE_LABELS;
+export const stageColors = CRM_STAGE_COLORS;
 
 export type LeadRow = {
   id: string;

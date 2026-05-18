@@ -46,7 +46,7 @@ export default function HomePage() {
       <SEOMeta
         title="SS Health Care — Home Healthcare Services in Surat | 24/7 Nursing & Caretaker"
         description="Professional home healthcare in Surat. Expert nurses, caretakers, wound care, maternity & newborn care — background verified, available 24/7. Call +91 9016 116 564."
-        canonical="https://99care.org"
+        canonical="https://sshealthcare.in"
       />
       <div className="w-full bg-white dark:bg-slate-950">
       {/* SECTION 1 — HERO */}

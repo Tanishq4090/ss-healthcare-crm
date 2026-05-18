@@ -5,6 +5,8 @@ backend/.env
 frontend/.env
 *.exe
 *-log.txt
+*.log
+.codex-logs/
 dist
 .DS_Store
 .vscode

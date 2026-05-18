@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 export type AccessModule =
   | 'dashboard'
   | 'crm'
+  | 'calls'
   | 'call_review'
   | 'clients'
   | 'hr'
@@ -36,11 +37,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = 'healthfirst_pure_token';
+const ADMIN_SESSION_KEY = 'ss_healthcare_admin_session';
 
 const ADMIN_ACCESSES: AccessModule[] = [
   'dashboard',
   'crm',
-  'call_review',
+  'calls',
   'clients',
   'hr',
   'attendance',
@@ -53,72 +55,89 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [allUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const setAdminUser = (name = 'System Admin') => {
+    setUser({
+      id: 'admin',
+      username: 'admin',
+      name,
+      role: 'admin',
+      accesses: ADMIN_ACCESSES,
+      avatar: 'SA',
+    });
+  };
+
+  const loadSupabaseProfile = async () => {
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    if (!supabaseUser) {
+      setUser(null);
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from('employees')
+      .select('id, username, full_name, role, accesses, photo_url')
+      .eq('username', supabaseUser.email?.split('@')[0])
+      .single();
+
+    if (profile) {
+      setUser({
+        id: profile.id,
+        username: profile.username,
+        name: profile.full_name,
+        role: profile.role,
+        accesses: profile.role === 'admin' ? ADMIN_ACCESSES : (profile.accesses || []),
+        avatar: profile.photo_url || profile.full_name?.[0] || 'U',
+      });
+      return;
+    }
+
+    setUser(null);
+  };
+
   useEffect(() => {
     const checkUser = async () => {
       const localToken = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (localToken === 'admin-token') {
-        setUser({
-          id: 'admin',
-          username: 'admin',
-          name: 'System Admin',
-          role: 'admin',
-          accesses: ADMIN_ACCESSES,
-          avatar: 'SA',
-        });
+      const adminSession = localStorage.getItem(ADMIN_SESSION_KEY);
+      if (localToken === 'admin-token' && adminSession) {
+        try {
+          const parsed = JSON.parse(adminSession) as { name?: string };
+          setAdminUser(parsed.name || 'System Admin');
+        } catch {
+          setAdminUser();
+        }
         setLoading(false);
         return;
       }
 
-      const { data: { user: supabaseUser } } = await supabase.auth.getUser();
-      if (supabaseUser) {
-        const { data: profile } = await supabase
-          .from('employees')
-          .select('id, username, full_name, role, accesses, photo_url')
-          .eq('username', supabaseUser.email?.split('@')[0])
-          .single();
-
-        if (profile) {
-          setUser({
-            id: profile.id,
-            username: profile.username,
-            name: profile.full_name,
-            role: profile.role,
-            accesses: profile.role === 'admin' ? ADMIN_ACCESSES : (profile.accesses || []),
-            avatar: profile.photo_url || profile.full_name?.[0] || 'U',
-          });
-        }
-      } else {
-        setUser(null);
-      }
+      await loadSupabaseProfile();
       setLoading(false);
     };
 
     checkUser();
   }, []);
 
-  const login = async (role?: string) => {
-    if (role === 'admin') {
+  const login = async (adminName?: string) => {
+    if (adminName) {
       localStorage.setItem(LOCAL_STORAGE_KEY, 'admin-token');
-      setUser({
-        id: 'admin',
-        username: 'admin',
-        name: 'System Admin',
-        role: 'admin',
-        accesses: ADMIN_ACCESSES,
-        avatar: 'SA',
-      });
+      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ name: adminName }));
+      setAdminUser(adminName);
+      return;
     }
+
+    await loadSupabaseProfile();
   };
 
   const logout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem(LOCAL_STORAGE_KEY);
+    localStorage.removeItem(ADMIN_SESSION_KEY);
     setUser(null);
   };
 
   const hasAccess = (module: AccessModule) => {
     if (!user) return false;
     if (user.role === 'admin') return true;
+    if (module === 'calls' && user.accesses.includes('call_review')) return true;
     return user.accesses.includes(module);
   };
 

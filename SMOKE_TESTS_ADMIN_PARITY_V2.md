@@ -4,8 +4,8 @@
 
 ```bash
 curl http://localhost:3001/health
-curl http://localhost:3001/api/chat/health
 curl http://localhost:3001/api/callyzer/health
+curl http://localhost:3001/api/system/health
 ```
 
 Expected: JSON success response.

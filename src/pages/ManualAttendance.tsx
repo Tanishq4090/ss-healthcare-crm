@@ -308,7 +308,7 @@ export default function ManualAttendance() {
               )}
               {!loading && filteredEmployees.map((employee) => {
                 const row = attendanceByEmployee[employee.id];
-                const statusLabel = row?.status || 'not_marked';
+                const statusLabel = row?.status;
                 return (
                   <tr key={employee.id} className="border-b border-slate-100/80 transition-colors hover:bg-green-50/30">
                     <td className="px-6 py-4">
@@ -325,7 +325,7 @@ export default function ManualAttendance() {
                     <td className="px-6 py-4 text-sm font-medium text-slate-600">{employee.department || '—'}</td>
                     <td className="px-6 py-4 text-sm font-medium text-slate-600">{employee.phone || '—'}</td>
                     <td className="px-6 py-4">
-                      {statusLabel === 'not_marked' ? (
+                      {!statusLabel ? (
                         <StatusBadge className="border-slate-200 bg-slate-50 text-slate-500">Not marked</StatusBadge>
                       ) : (
                         <StatusBadge className={statusStyles[statusLabel]}>{statusLabel.replace('_', ' ')}</StatusBadge>

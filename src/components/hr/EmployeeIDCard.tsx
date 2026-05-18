@@ -298,7 +298,7 @@ export function EmployeeIDCard({
             pointerEvents: 'none', zIndex: 20, transform: 'rotate(-20deg)',
           }}>
             <span style={{ color: 'rgba(15,118,110,0.04)', fontSize: 48, fontWeight: 900, letterSpacing: '0.4em', textTransform: 'uppercase', userSelect: 'none' }}>
-              99CARE
+              SS Health Care
             </span>
           </div>
         )}

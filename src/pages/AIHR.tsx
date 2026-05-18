@@ -11,6 +11,7 @@ type Employee = StaffIDCardEmployee & {
   email?: string | null;
   aadhaar?: string | null;
   daily_rate?: number | null;
+  availability_status?: string | null;
   created_at?: string;
 };
 
@@ -109,6 +110,7 @@ function AddEmployeeModal({
           role: 'user',
           accesses: ['hr'],
           status: 'active',
+          availability_status: 'available',
         })
         .select('*')
         .single();
@@ -261,6 +263,12 @@ export default function AIHR() {
 
   const activeCount = employees.filter((e) => (e.status || 'active') === 'active').length;
 
+  const toggleAvailability = async (employee: Employee) => {
+    const nextStatus = (employee.availability_status || 'available') === 'available' ? 'inactive' : 'available';
+    await supabase.from('employees').update({ availability_status: nextStatus, status: nextStatus === 'available' ? 'active' : 'inactive' }).eq('id', employee.id);
+    fetchEmployees();
+  };
+
   return (
     <PageShell>
       {showAdd && <AddEmployeeModal services={services} onClose={() => setShowAdd(false)} onCreated={(emp) => { setShowAdd(false); setSelectedCard(emp); fetchEmployees(); }} />}
@@ -276,8 +284,8 @@ export default function AIHR() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <SectionHeader
             eyebrow="Workforce intelligence"
-            title="AI HR Deployment Centre"
-            description="Add staff, generate SS Healthcare ID cards, assign services, and prepare staff profiles for client verification."
+            title="Staff Directory and ID Centre"
+            description="Add staff, generate SS Health Care ID cards, assign services, and prepare staff profiles for client verification."
             action={<IconFrame icon={Briefcase} tone="emerald" />}
           />
           <div className="grid grid-cols-3 gap-3 text-center">
@@ -334,11 +342,20 @@ export default function AIHR() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-bold text-slate-700"><BadgeIndianRupee className="mr-1 inline h-3.5 w-3.5" />{Number(emp.daily_rate || 0).toLocaleString()}</td>
-                  <td className="px-6 py-4"><StatusBadge className="border-emerald-100 bg-emerald-50 text-emerald-700">Active</StatusBadge></td>
+                  <td className="px-6 py-4">
+                    <StatusBadge className={(emp.availability_status || 'available') === 'available' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-600'}>
+                      {emp.availability_status || 'available'}
+                    </StatusBadge>
+                  </td>
                   <td className="px-6 py-4 text-right">
-                    <button onClick={() => setSelectedCard(emp)} className="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-white px-3 py-2 text-xs font-black text-teal-700 shadow-sm hover:bg-teal-50">
-                      <IdCard className="h-4 w-4" /> ID Card
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => toggleAvailability(emp)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm hover:bg-slate-50">
+                        {(emp.availability_status || 'available') === 'available' ? 'Set Inactive' : 'Set Available'}
+                      </button>
+                      <button onClick={() => setSelectedCard(emp)} className="inline-flex items-center gap-2 rounded-xl border border-teal-100 bg-white px-3 py-2 text-xs font-black text-teal-700 shadow-sm hover:bg-teal-50">
+                        <IdCard className="h-4 w-4" /> ID Card
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -349,7 +366,7 @@ export default function AIHR() {
       </div>
 
       <Surface>
-        <SectionHeader title="ID Card Workflow" description="When staff is assigned from AI CRM, the generated staff ID card link is included in the Staff Assigned WhatsApp template." action={<IconFrame icon={CreditCard} tone="blue" />} />
+        <SectionHeader title="ID Card Workflow" description="When staff is assigned from CRM Pipeline, the generated staff ID card link is included in the Staff Assigned WhatsApp template." action={<IconFrame icon={CreditCard} tone="blue" />} />
       </Surface>
     </PageShell>
   );

@@ -6,10 +6,10 @@ const attendanceApi = axios.create({
   baseURL: `${API_URL}/attendance`,
 });
 
-// Automatically inject pure token for auth
+// Reuse the locally stored admin or Supabase session token when present.
 attendanceApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('healthfirst_pure_token') || 'pure_dev_token_admin';
-  config.headers.Authorization = `Bearer ${token}`;
+  const token = localStorage.getItem('healthfirst_pure_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

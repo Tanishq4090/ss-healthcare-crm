@@ -12,15 +12,15 @@ Expected:
 
 ```text
 SS Healthcare backend → http://localhost:3001
-API ready: /health, /api/chat/health, /api/callyzer/health
+API ready: /health, /api/system/health, /api/callyzer/health
 ```
 
 ## Health checks
 
 ```bash
 curl http://localhost:3001/health
-curl http://localhost:3001/api/chat/health
 curl http://localhost:3001/api/callyzer/health
+curl http://localhost:3001/api/system/health
 ```
 
 ## Insert test call through webhook

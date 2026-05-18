@@ -13,7 +13,7 @@ export default function AboutPage() {
       <SEOMeta
         title="About SS Health Care | Trusted Home Healthcare in Surat"
         description="Learn about SS Health Care's mission to bring verified, compassionate healthcare to Surat homes. Meet our team and discover our commitment to quality care."
-        canonical="https://99care.org/about"
+        canonical="https://sshealthcare.in/about"
       />
       <div className="w-full">
       {/* SECTION 1 — PAGE HERO */}

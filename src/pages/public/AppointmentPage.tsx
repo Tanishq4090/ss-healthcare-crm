@@ -111,7 +111,7 @@ export default function AppointmentPage() {
       <SEOMeta
         title="Book Home Healthcare Appointment | SS Health Care Surat"
         description="Book a professional nurse, caretaker or home healthcare service in Surat. Fill in your details and our team will confirm within 2 hours. Available 24/7."
-        canonical="https://99care.org/appointment"
+        canonical="https://sshealthcare.in/appointment"
       />
       <div className="w-full bg-brand-gray dark:bg-slate-950 min-h-screen pb-32">
         {/* SECTION 1 — HERO Minimal */}
@@ -333,13 +333,13 @@ export default function AppointmentPage() {
                       </div>
                     </a>
 
-                    <a href="mailto:99careforyou@gmail.com" className="flex items-center gap-4 group">
+                    <a href="mailto:contact@sshealthcare.in" className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-full bg-brand-blue-light flex items-center justify-center text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-colors">
                         <Mail className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="text-sm font-semibold text-gray-900 dark:text-white">Email Us</div>
-                        <div className="text-gray-500 font-medium">99careforyou@gmail.com</div>
+                        <div className="text-gray-500 font-medium">contact@sshealthcare.in</div>
                       </div>
                     </a>
                     

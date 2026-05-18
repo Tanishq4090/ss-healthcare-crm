@@ -91,7 +91,7 @@ export default function ContactPage() {
       <SEOMeta
         title="Contact SS Health Care | Home Healthcare in Surat — +91 9016 116 564"
         description="Contact SS Health Care Surat for home nursing, caretaker, and healthcare services. Call, WhatsApp, or fill out the form. We respond within 2 hours."
-        canonical="https://99care.org/contact"
+        canonical="https://sshealthcare.in/contact"
       />
       <div className="w-full bg-brand-gray dark:bg-slate-950 min-h-screen pb-32">
         {/* SECTION 1 — HERO Minimal */}
@@ -221,9 +221,9 @@ export default function ContactPage() {
                       <span className="font-medium">+91 9016 116 564</span>
                     </a>
 
-                    <a href="mailto:99careforyou@gmail.com" className="flex items-center gap-4 hover:text-brand-blue transition-colors group">
+                    <a href="mailto:contact@sshealthcare.in" className="flex items-center gap-4 hover:text-brand-blue transition-colors group">
                       <Mail className="w-5 h-5 text-gray-400 group-hover:text-brand-blue transition-colors flex-shrink-0" />
-                      <span className="font-medium">99careforyou@gmail.com</span>
+                      <span className="font-medium">contact@sshealthcare.in</span>
                     </a>
                   </div>
 
@@ -249,7 +249,7 @@ export default function ContactPage() {
                     <motion.a 
                       whileHover={{ y: -3, scale: 1.1 }} 
                       transition={{ duration: 0.2 }} 
-                      href="https://www.instagram.com/99careservy/" 
+                      href="#" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-800 flex items-center justify-center transition-all hover:border-[#E4405F]/30 hover:bg-[#E4405F]/5"
@@ -287,7 +287,7 @@ export default function ContactPage() {
                     <motion.a 
                       whileHover={{ y: -3, scale: 1.1 }} 
                       transition={{ duration: 0.2 }} 
-                      href="https://x.com/99CARESERVY" 
+                      href="#" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-800 flex items-center justify-center transition-all hover:border-gray-900/30 hover:bg-gray-900/5 dark:hover:bg-white/5"

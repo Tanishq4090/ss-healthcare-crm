@@ -20,10 +20,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { path: '/admin/crm', label: 'AI CRM', icon: Bot },
+  { path: '/admin/crm', label: 'CRM Pipeline', icon: Bot },
   { path: '/admin/calls', label: 'Callyzer Calls', icon: PhoneCall },
   { path: '/admin/clients', label: 'Clients', icon: Users },
-  { path: '/admin/hr', label: 'AI HR', icon: Briefcase },
+  { path: '/admin/hr', label: 'Staff Directory', icon: Briefcase },
   { path: '/admin/attendance', label: 'Attendance', icon: CalendarCheck },
   { path: '/admin/billing', label: 'Finance', icon: Landmark },
   { path: '/admin/settings', label: 'Access Control', icon: ShieldCheck },

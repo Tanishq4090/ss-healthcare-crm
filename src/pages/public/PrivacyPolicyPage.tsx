@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
       <SEOMeta
         title="Privacy Policy | SS Health Care Home Healthcare"
         description="Read our privacy policy to understand how SS Health Care handles your personal information with respect and care."
-        canonical="https://99care.org/privacy"
+        canonical="https://sshealthcare.in/privacy"
       />
       <div className="w-full">
         {/* HERO SECTION */}
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
           <div className="container mx-auto px-6 max-w-4xl">
             <div className="prose prose-slate dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
-                Your privacy is important to us. It is the policy of 99CARE Helping Hand to respect your privacy regarding any information we may collect from you across our website, <a href="https://www.99care.org" className="text-brand-blue hover:underline">https://www.99care.org</a>, and other sites we own and operate.
+                Your privacy is important to us. It is the policy of SS Health Care to respect your privacy regarding any information we may collect from you across our website, <a href="https://sshealthcare.in" className="text-brand-blue hover:underline">https://sshealthcare.in</a>, and other sites we own and operate.
               </p>
 
               <div className="space-y-12">

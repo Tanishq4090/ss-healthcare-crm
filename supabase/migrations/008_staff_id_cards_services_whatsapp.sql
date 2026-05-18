@@ -210,7 +210,7 @@ on conflict (id) do update set
   updated_at = now();
 
 -- -----------------------------------------------------------------------------
--- 5) Staff assignment RPC used by AI CRM
+-- 5) Staff assignment RPC used by CRM Pipeline
 -- -----------------------------------------------------------------------------
 create or replace function public.assign_staff_to_lead(
   p_lead_id uuid,

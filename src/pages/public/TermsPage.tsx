@@ -71,16 +71,16 @@ export default function TermsPage() {
       id: "privacy",
       title: "7. Privacy & Data Protection",
       content: [
-        "By using the website, users consent to 99CARE’s Privacy Policy.",
+        "By using the website, users consent to SS Health Care's Privacy Policy.",
         "Personal data is collected, stored, and processed in compliance with Indian IT laws.",
-        "Users indemnify 99CARE against breaches of data protection obligations."
+        "Users indemnify SS Health Care against breaches of data protection obligations."
       ]
     },
     {
       id: "ip",
       title: "8. Intellectual Property",
       content: [
-        "All content, software, and materials on the website belong to 99CARE Helping Hand.",
+        "All content, software, and materials on the website belong to SS Health Care.",
         "Unauthorized copying, reproduction, or distribution is prohibited.",
         "Trademarks of third-party products remain with their respective owners."
       ]
@@ -90,7 +90,7 @@ export default function TermsPage() {
       title: "9. Liability & Disclaimer",
       content: [
         "Product images are for reference; actual items may differ.",
-        "99CARE does not guarantee product quality or suitability.",
+        "SS Health Care does not guarantee product quality or suitability.",
         "They are not liable for damages, losses, or service interruptions beyond their control."
       ]
     }
@@ -101,7 +101,7 @@ export default function TermsPage() {
       <SEOMeta
         title="Terms & Conditions | SS Health Care Home Healthcare"
         description="Review the terms and conditions for using SS Health Care services and our website."
-        canonical="https://99care.org/terms"
+        canonical="https://sshealthcare.in/terms"
       />
       <div className="w-full">
         {/* HERO SECTION */}
@@ -134,7 +134,7 @@ export default function TermsPage() {
             <div className="bg-brand-gray/30 dark:bg-slate-900/50 p-8 rounded-3xl mb-12 border border-gray-100 dark:border-slate-800">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">🔑 Key Highlights</h2>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed italic">
-                99CARE Helping Hand provides a wide range of home healthcare services, but patients must give consent, respect staff, ensure security, and comply with laws. Refunds and services follow strict policies, and 99CARE limits its liability for product/service outcomes.
+                SS Health Care provides a wide range of home healthcare services, but patients must give consent, respect staff, ensure security, and comply with laws. Refunds and services follow strict policies, and SS Health Care limits its liability for product/service outcomes.
               </p>
             </div>
 

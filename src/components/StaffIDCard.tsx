@@ -11,31 +11,19 @@ export type StaffIDCardEmployee = {
   department?: string | null;
   phone?: string | null;
   gender?: string | null;
-  date_of_birth?: string | null;
   experience?: string | null;
-  residential_address?: string | null;
-  address?: string | null;
   payment_scheme?: string | null;
-  daily_rate?: number | string | null;
   photo_url?: string | null;
   service_skills?: string[] | null;
   status?: string | null;
   id_card_url?: string | null;
 };
 
-function ageFromDob(dob?: string | null) {
-  if (!dob) return '';
-  const date = new Date(dob);
-  if (Number.isNaN(date.getTime())) return '';
-  const diff = Date.now() - date.getTime();
-  return `${Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000))} yrs`;
-}
-
 function initials(name: string) {
   return name
     .split(' ')
     .filter(Boolean)
-    .map((n) => n[0])
+    .map((part) => part[0])
     .join('')
     .slice(0, 2)
     .toUpperCase() || 'SS';
@@ -50,28 +38,26 @@ export default function StaffIDCard({
   showActions?: boolean;
   onClose?: () => void;
 }) {
-  const name = employee.full_name || employee.name || employee.username || 'SS Healthcare Staff';
+  const name = employee.full_name || employee.name || employee.username || 'SS Health Care Staff';
   const code = employee.employee_code || employee.username || 'EMP-000000';
   const role = employee.job_title || employee.position || 'Care Specialist';
-  const duty = employee.payment_scheme || 'Daily Rate';
+  const duty = employee.payment_scheme || 'Operational Staff';
   const status = employee.status || 'active';
-  const age = ageFromDob(employee.date_of_birth);
-  const gender = employee.gender || '';
-  const address = employee.residential_address || employee.address || 'Verified SS Healthcare staff';
+  const skills = (employee.service_skills || []).slice(0, 4);
 
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-[450px] overflow-hidden rounded-[1.4rem] bg-white shadow-2xl ring-1 ring-slate-200 print:shadow-none print:ring-0">
         <div className="relative overflow-hidden rounded-[1.4rem] border border-teal-100 bg-white">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20px_20px,rgba(13,148,136,0.06)_1px,transparent_1px)] [background-size:18px_18px]" />
-          <div className="relative flex items-center justify-between bg-gradient-to-r from-teal-950 via-teal-800 to-teal-500 px-5 py-4 text-white">
+          <div className="relative flex items-center justify-between bg-gradient-to-r from-teal-950 via-teal-800 to-blue-700 px-5 py-4 text-white">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                <img src="/logo.png" alt="SS Healthcare" className="h-8 w-8 object-contain" />
+                <img src="/logo.png" alt="SS Health Care" className="h-8 w-8 object-contain" />
               </div>
               <div>
                 <p className="text-lg font-black leading-tight tracking-tight">SS Health Care</p>
-                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-teal-50">Employee Identification</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-teal-50">Employee Verification</p>
               </div>
             </div>
             <div className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs font-black tracking-wider">
@@ -89,7 +75,7 @@ export default function StaffIDCard({
                 )}
               </div>
               <div className="rounded-lg border border-teal-100 bg-teal-50 px-3 py-1.5 text-center text-[11px] font-black uppercase tracking-wider text-teal-800">
-                {code}
+                Verified
               </div>
             </div>
 
@@ -98,28 +84,32 @@ export default function StaffIDCard({
               <p className="mt-1 text-xs font-black uppercase tracking-widest text-teal-600">{role}</p>
 
               <div className="mt-5 space-y-3 text-sm">
-                <div className="grid grid-cols-[72px_1fr] items-center gap-2">
+                <div className="grid grid-cols-[86px_1fr] items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gender</span>
+                  <span className="font-bold text-slate-700">{employee.gender || 'Verified'}</span>
+                </div>
+                <div className="grid grid-cols-[86px_1fr] items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Experience</span>
+                  <span className="font-bold text-slate-700">{employee.experience || 'Verified'}</span>
+                </div>
+                <div className="grid grid-cols-[86px_1fr] items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Duty</span>
                   <span className="w-fit rounded-md border border-teal-100 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">{duty}</span>
                 </div>
-                <div className="grid grid-cols-[72px_1fr] items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Exp.</span>
-                  <span className="font-bold text-slate-700">{employee.experience || 'Verified'}</span>
-                </div>
-                <div className="grid grid-cols-[72px_1fr] items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Age</span>
-                  <span className="font-bold text-slate-700">{[age, gender].filter(Boolean).join(' • ') || 'Verified'}</span>
-                </div>
-                <div className="grid grid-cols-[72px_1fr] gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Address</span>
-                  <span className="line-clamp-2 text-xs font-semibold text-slate-600">{address}</span>
+                <div className="grid grid-cols-[86px_1fr] gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Skills</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {skills.length ? skills.map((skill) => (
+                      <span key={skill} className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-slate-600">{skill}</span>
+                    )) : <span className="text-xs font-semibold text-slate-600">Verified SS Health Care services</span>}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="relative flex items-center justify-between bg-gradient-to-r from-teal-950 to-teal-600 px-5 py-3 text-white">
-            <span className="text-[10px] font-black uppercase tracking-[0.28em]">Authorized Personnel Only</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.28em]">Public Verification Link</span>
             <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-200">
               <span className="h-2 w-2 rounded-full bg-emerald-300" /> {status}
             </span>
@@ -138,7 +128,7 @@ export default function StaffIDCard({
 
       {showActions && (
         <p className="mx-auto mt-5 flex max-w-[580px] items-center justify-center gap-2 text-center text-sm text-slate-400">
-          <ShieldCheck className="h-4 w-4 text-teal-500" /> This ID card is generated from the verified SS Healthcare staff profile.
+          <ShieldCheck className="h-4 w-4 text-teal-500" /> This card only exposes safe public verification fields.
         </p>
       )}
     </div>

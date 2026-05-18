@@ -45,7 +45,7 @@ export default function BlogPage() {
       <SEOMeta
         title="Home Healthcare Blog | Tips & Guides by SS Health Care Surat"
         description="Read expert articles on home nursing, wound care, maternity care, and elderly care in Surat. Healthcare tips from the SS Health Care team."
-        canonical="https://99care.org/blog"
+        canonical="https://sshealthcare.in/blog"
       />
       <div className="w-full bg-white dark:bg-slate-950 min-h-screen pb-32">
         {/* SECTION 1 — HERO */}

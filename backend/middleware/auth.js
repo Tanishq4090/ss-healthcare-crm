@@ -12,9 +12,9 @@ export async function requireAuth(req, res, next) {
 
   const token = authHeader.split(' ')[1];
 
-  // Pure Token Bypass for Non-Supabase Username Auth
-  if (token === 'pure_dev_token_admin' || token === 'pure_dev_token_client') {
-    req.user = { id: token, role: token.includes('admin') ? 'admin' : 'user' };
+  const adminToken = process.env.ADMIN_FALLBACK_SESSION_TOKEN;
+  if (adminToken && token === adminToken) {
+    req.user = { id: 'admin-fallback', role: 'admin' };
     return next();
   }
 

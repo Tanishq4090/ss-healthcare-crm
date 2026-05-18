@@ -19,7 +19,7 @@ export default function PublicStaffIDCard() {
       }
       const { data, error: err } = await supabase
         .from('employees')
-        .select('id, employee_code, username, full_name, job_title, position, department, phone, gender, date_of_birth, experience, residential_address, address, payment_scheme, photo_url, service_skills, status')
+        .select('id, employee_code, username, full_name, job_title, position, gender, experience, payment_scheme, photo_url, service_skills, status')
         .eq('id_card_token', token)
         .maybeSingle();
 
@@ -48,7 +48,6 @@ export default function PublicStaffIDCard() {
           <div className="mx-auto mt-8 max-w-xl rounded-3xl border border-teal-100 bg-white/90 p-5 text-sm leading-6 text-slate-600 shadow-sm">
             <p className="font-bold text-slate-950">Verification note</p>
             <p className="mt-1">This employee has been assigned by SS Health Care. Please verify the employee name and code before allowing service entry.</p>
-            {employee.phone && <p className="mt-3 font-semibold text-teal-700">Staff contact: {employee.phone}</p>}
           </div>
         )}
       </div>

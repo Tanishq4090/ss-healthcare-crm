@@ -1,5 +1,5 @@
 -- 008_whatsapp_chat_history.sql
--- Creates the whatsapp_messages table and seeds demo conversations for AI CRM.
+-- Creates the whatsapp_messages table and seeds demo conversations for CRM.
 
 create table if not exists public.whatsapp_messages (
   id uuid primary key default gen_random_uuid(),

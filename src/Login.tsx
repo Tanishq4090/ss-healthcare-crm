@@ -42,14 +42,7 @@ export default function Login() {
             });
 
             if (error) {
-                // Check if it's the legacy dev credentials for quick fallback
-                if (cleanUser === 'admin' && password === 'password123') {
-                     await login('admin');
-                     navigate('/admin', { replace: true });
-                     return;
-                } else {
-                    setError('Invalid username or password.');
-                }
+                setError('Invalid username or password.');
                 return;
             }
 
@@ -77,7 +70,7 @@ export default function Login() {
                 <div className="text-center mb-8">
                     <div className="w-20 h-20 bg-white shadow-xl shadow-slate-200/50 rounded-3xl flex items-center justify-center mx-auto mb-6 p-3 ring-1 ring-slate-100">
                         <img 
-                            src="https://99care.org/wp-content/uploads/2024/01/logo.png" 
+                            src="/logo.png" 
                             alt="SS Health Care Logo" 
                             className="w-full h-full object-contain"
                         />

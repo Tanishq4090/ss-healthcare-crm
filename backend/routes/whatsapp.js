@@ -5,10 +5,9 @@
 
 import express from "express";
 import { generateOTP, verifyOTP, hasActiveOTP } from "../services/otpService.js";
-import { processMessage } from "../services/aiHandler.js";
 import {
-  getOrCreate, addMessage, markRead,
-  getAllConversations, getConversation, setAIEnabled
+  addMessage, markRead,
+  getAllConversations, getConversation
 } from "../services/conversationStore.js";
 import { requireAuth } from "../middleware/auth.js";
 import { validateStrict } from "../middleware/validation.js";
@@ -19,14 +18,6 @@ import * as whatsappService from "../services/whatsappService.js";
 const router = express.Router();
 
 // ── Strict Rate Limiters ──────────────────────────────────────────────────────
-const aiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour per IP
-  limit: 20, // 20 requests per hour strictly
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "AI quota exceeded. Please try again later." }
-});
-
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 5, // 5 OTP requests per 15 minutes
@@ -73,19 +64,6 @@ router.post("/conversations/:phone/read", [
   res.json({ success: true });
 });
 
-// ── CRM: Toggle AI ────────────────────────────────────────────────────────────
-router.post("/bot/toggle/:phone", [
-  param("phone").trim().isString().notEmpty(),
-  body("enabled").isBoolean(),
-  validateStrict
-], requireAuth, (req, res) => {
-  const phone = decodeURIComponent(req.params.phone);
-  const { enabled } = req.body;
-  setAIEnabled(phone, enabled);
-  broadcast("conversation_updated", getConversation(phone));
-  res.json({ success: true, aiEnabled: enabled });
-});
-
 // ── CRM: Agent sends message ──────────────────────────────────────────────────
 router.post("/conversations/:phone/send", [
   param("phone").trim().isString().notEmpty(),
@@ -127,21 +105,6 @@ router.post("/send-booking-confirmation", [
     console.error("[Booking confirmation] Failed:", err.message);
     // Don't fail the whole booking if WhatsApp fails
     res.json({ success: false, warning: err.message });
-  }
-});
-
-// ── CRM: Chat (AI reply test) ─────────────────────────────────────────────────
-router.post("/chat", aiLimiter, [
-  body("phone").trim().isString().notEmpty(),
-  body("message").trim().isString().notEmpty(),
-  validateStrict
-], requireAuth, async (req, res) => {
-  const { phone, message } = req.body;
-  try {
-    const { reply } = await processMessage(phone, message);
-    res.json({ reply });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 });
 
@@ -207,12 +170,6 @@ router.post("/webhook", (req, res) => {
     broadcast("new_message", { phone: from, message: msg });
     broadcast("conversation_updated", getConversation(from));
     console.log(`[Webhook] From ${from}: "${text}"`);
-
-    const conv = getOrCreate(from);
-    if (conv.aiEnabled) {
-      const isDevMode = DEV_MODE?.trim() === "true";
-      whatsappService.handleInboundMessage(from, text, isDevMode, broadcast);
-    }
   } catch (err) {
     console.error("[Webhook] Error:", err.message);
   }

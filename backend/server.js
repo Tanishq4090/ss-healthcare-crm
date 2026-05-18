@@ -17,9 +17,9 @@ dotenv.config();
 import whatsappRoutes, { setWss } from "./routes/whatsapp.js";
 import attendanceRoutes from "./routes/attendance.js";
 import crmRoutes from "./routes/crm.js";
-import chatRoutes from "./routes/chat.js";
 import callyzerRoutes from "./routes/callyzer.js";
 import systemRoutes from "./routes/system.js";
+import authRoutes from "./routes/auth.js";
 import { requireAuth } from "./middleware/auth.js";
 
 const app = express();
@@ -67,10 +67,10 @@ app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 app.use("/api/whatsapp/webhook", express.urlencoded({ extended: false }));
 app.use(express.json({ limit: "10mb" }));
 
+app.use("/api/auth", authRoutes);
 app.use("/api/whatsapp", whatsappRoutes);
 app.use("/api/attendance", requireAuth, attendanceRoutes);
 app.use("/api/crm-config", requireAuth, crmRoutes);
-app.use("/api/chat", chatRoutes);
 app.use("/api/callyzer", callyzerRoutes);
 app.use("/api/system", systemRoutes);
 

@@ -20,8 +20,6 @@ export function getOrCreate(phone) {
             lastMessage: "",
             lastMessageTime: new Date().toISOString(),
             unread: 0,
-            aiEnabled: true, // Auto-reply with Gemini by default
-            aiResponseCount: 0, // Track AI replies for cost control
             messages: []
         });
     }
@@ -50,10 +48,6 @@ export function addMessage(phone, role, content) {
 
     if (role === "user") {
         conv.unread += 1;
-    }
-
-    if (role === "assistant") {
-        conv.aiResponseCount += 1;
     }
 
     // Keep history manageable
@@ -96,10 +90,3 @@ export function getConversation(phone) {
     return conversations.get(phone);
 }
 
-/**
- * Toggles AI auto-reply for a conversation.
- */
-export function setAIEnabled(phone, enabled) {
-    const conv = getOrCreate(phone);
-    conv.aiEnabled = !!enabled;
-}

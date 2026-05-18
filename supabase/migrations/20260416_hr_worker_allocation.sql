@@ -1,5 +1,5 @@
 -- ============================================================
--- Migration: AI HR Worker Allocation Module
+-- Migration: Staff Directory Worker Allocation Module
 -- Project: HealthCare CRM (Supabase + React + TypeScript)
 -- Date: 2026-04-16
 -- ============================================================
