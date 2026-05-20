@@ -484,9 +484,9 @@ export default function AICRM() {
         </div>
 
         {/* Module Tabs – 99Care: Pipeline | Clients | AI Auto | Voice AI */}
-        <div className="flex items-center p-1 bg-slate-100 rounded-lg shrink-0">
+        <div className="segmented-control shrink-0">
           {([['pipeline','Pipeline'],['clients','Clients'],['automations','AI Auto'],['call-leads','Call Leads']] as const).map(([key, label]) => (
-            <button key={key} onClick={() => setCrmTab(key)} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${crmTab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+            <button key={key} onClick={() => setCrmTab(key)} className={cn('segmented-item', crmTab === key && 'segmented-item-active')}>
               {label}
             </button>
           ))}
@@ -496,15 +496,15 @@ export default function AICRM() {
       {/* Live sync bar + action buttons */}
       {(crmTab === 'pipeline' || crmTab === 'clients') && (
         <div className="flex items-center justify-between mb-4">
-          <div className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" /> Live Sync Active
+          <div className="status-pill status-pill-green bg-white shadow-sm border-0">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#00A859] animate-pulse" /> Live Sync Active
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style={{ background: '#00A859' }}>
-              <Plus className="h-4 w-4" /> Add Lead
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
+            <button className="btn-secondary">
               Export CSV
+            </button>
+            <button className="btn-primary">
+              <Plus className="h-4 w-4" /> Add Lead
             </button>
           </div>
         </div>
@@ -517,14 +517,14 @@ export default function AICRM() {
             const stageLeads = grouped[stage.id] || [];
             const isOpen = expandedStages[stage.id];
             return (
-              <div key={stage.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <button onClick={() => toggleStage(stage.id)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors">
+              <div key={stage.id} className="premium-card overflow-hidden">
+                <button onClick={() => toggleStage(stage.id)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50/50 transition-colors bg-slate-50/30 border-b border-slate-100/60">
                   <div className="flex items-center gap-3">
                     {isOpen ? <ChevronDown className="h-4 w-4 text-slate-400" /> : <ChevronRight className="h-4 w-4 text-slate-400" />}
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
-                    <h3 className="font-semibold text-slate-900">{stage.label}</h3>
+                    <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: stage.color }} />
+                    <h3 className="font-bold text-slate-900">{stage.label}</h3>
                   </div>
-                  <span className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                  <span className="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shadow-sm">
                     {stageLeads.length}
                   </span>
                 </button>
@@ -535,10 +535,10 @@ export default function AICRM() {
                     ) : (
                       <div className="flex gap-4 p-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
                         {stageLeads.map((lead) => (
-                          <div key={lead.id} onClick={() => setDetailsLead(lead)} className="w-[300px] shrink-0 bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
-                            <div className="flex items-start justify-between mb-2">
+                          <div key={lead.id} onClick={() => setDetailsLead(lead)} className="w-[320px] shrink-0 bg-white p-5 rounded-xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,76,140,0.08)] hover:border-slate-200 transition-all cursor-pointer group">
+                            <div className="flex items-start justify-between mb-3">
                               <h4 className="font-bold text-slate-900 group-hover:text-[#00A859] transition-colors">{leadName(lead)}</h4>
-                              <select value={normalizeCrmStage(lead.stage)} onChange={(event) => { event.stopPropagation(); updateStage(lead, event.target.value); }} onClick={(e) => e.stopPropagation()} className="text-xs bg-slate-50 border border-slate-200 text-slate-600 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-[#00A859] cursor-pointer">
+                              <select value={normalizeCrmStage(lead.stage)} onChange={(event) => { event.stopPropagation(); updateStage(lead, event.target.value); }} onClick={(e) => e.stopPropagation()} className="text-[11px] font-bold uppercase tracking-wider bg-slate-50 border border-slate-200 text-slate-600 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer shadow-sm">
                                 <optgroup label="— Pipeline —">
                                   {CRM_PIPELINE_VIEW_STAGES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
                                 </optgroup>
@@ -547,25 +547,25 @@ export default function AICRM() {
                                 </optgroup>
                               </select>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-slate-500 mb-2">
-                              <span>{leadContact(lead)}</span>
-                              <span className="font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-sm">₹{leadValue(lead).toLocaleString()}/mo</span>
+                            <div className="flex items-center gap-3 text-[13px] text-slate-500 mb-3">
+                              <span className="font-medium">{leadContact(lead)}</span>
+                              <span className="font-bold text-[#00A859] bg-[#00A859]/10 border border-[#00A859]/20 px-2 py-0.5 rounded-md">₹{leadValue(lead).toLocaleString()}/mo</span>
                             </div>
-                            <div className="flex flex-wrap gap-1.5 mb-2">
-                              <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border', priorityColors[lead.priority || 'Medium'] || priorityColors.Medium)}>{lead.priority || 'Medium'}</span>
-                              {lead.service_type && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-emerald-100 bg-emerald-50 text-emerald-700">{lead.service_type}</span>}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <span className={cn('inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border', priorityColors[lead.priority || 'Medium'] || priorityColors.Medium)}>{lead.priority || 'Medium'}</span>
+                              {lead.service_type && <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-[#00A859]/20 bg-[#00A859]/10 text-[#00A859]">{lead.service_type}</span>}
                             </div>
-                            <div className="text-xs text-slate-500 space-y-1 mb-3">
-                              {lead.phone && <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {lead.phone}</p>}
-                              <p className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '—'}</p>
+                            <div className="text-xs font-medium text-slate-500 space-y-1.5 mb-4 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                              {lead.phone && <p className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-slate-400" /> {lead.phone}</p>}
+                              <p className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-slate-400" /> {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '—'}</p>
                             </div>
                             <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
-                              <button onClick={(e) => { e.stopPropagation(); setDetailsLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"><FileText className="mr-1 inline h-3.5 w-3.5" /> Details</button>
-                              <button onClick={(e) => { e.stopPropagation(); setAssignmentLead(lead); }} className="rounded-lg border border-emerald-100 bg-emerald-50 px-2 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100"><UserCheck className="mr-1 inline h-3.5 w-3.5" /> Staff</button>
-                              <button onClick={(e) => { e.stopPropagation(); setHistoryLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"><MessageCircle className="mr-1 inline h-3.5 w-3.5" /> WhatsApp</button>
-                              <button onClick={(e) => { e.stopPropagation(); sendTemplate(lead, 'quotation_sent'); }} className="rounded-lg border border-amber-100 bg-amber-50 px-2 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100"><Send className="mr-1 inline h-3.5 w-3.5" /> Quote</button>
+                              <button onClick={(e) => { e.stopPropagation(); setDetailsLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"><FileText className="mr-1 inline h-3.5 w-3.5" /> Details</button>
+                              <button onClick={(e) => { e.stopPropagation(); setAssignmentLead(lead); }} className="rounded-lg border border-[#00A859]/20 bg-[#00A859]/5 px-2 py-2 text-xs font-bold text-[#00A859] shadow-sm hover:bg-[#00A859]/10 transition-colors"><UserCheck className="mr-1 inline h-3.5 w-3.5" /> Staff</button>
+                              <button onClick={(e) => { e.stopPropagation(); setHistoryLead(lead); }} className="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-colors"><MessageCircle className="mr-1 inline h-3.5 w-3.5" /> WhatsApp</button>
+                              <button onClick={(e) => { e.stopPropagation(); sendTemplate(lead, 'quotation_sent'); }} className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-2 text-xs font-bold text-amber-700 shadow-sm hover:bg-amber-100 transition-colors"><Send className="mr-1 inline h-3.5 w-3.5" /> Quote</button>
                             </div>
-                            {lead.notes && <p className="mt-2 line-clamp-2 rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-500">{lead.notes}</p>}
+                            {lead.notes && <p className="mt-3 line-clamp-2 rounded-lg border border-amber-100 bg-amber-50/50 px-3 py-2 text-[11px] font-medium text-amber-800">{lead.notes}</p>}
                           </div>
                         ))}
                       </div>
@@ -624,13 +624,13 @@ export default function AICRM() {
       )}
 
       {crmTab === 'call-leads' && (
-        <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="flex-1 premium-card flex flex-col">
+          <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
             <div>
-              <h2 className="font-semibold text-slate-900 flex items-center gap-2"><PhoneCall className="h-5 w-5" /> Call Leads</h2>
-              <p className="text-sm text-slate-500 mt-1">Incoming call inquiries — review and convert qualified calls to CRM leads.</p>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2"><PhoneCall className="h-5 w-5 text-[#004C8C]" /> Call Leads</h2>
+              <p className="text-sm font-medium text-slate-500 mt-1">Incoming call inquiries — review and convert qualified calls to CRM leads.</p>
             </div>
-            <button className="px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2" style={{ background: '#00A859' }}>
+            <button className="btn-primary flex items-center gap-2">
               <Plus className="w-4 h-4" /> Add Manual Call
             </button>
           </div>
@@ -643,27 +643,29 @@ export default function AICRM() {
               <p className="text-slate-500 max-w-sm">Call logs will appear here when received. Use "Add Manual Call" to create entries, or connect Callyzer for automated sync in Phase 2.</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 overflow-y-auto flex-1">
+            <div className="divide-y divide-slate-100/60 overflow-y-auto flex-1 p-2">
               {callInquiries.map((call) => (
-                <div key={call.id} className="p-5 flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
-                    <Phone className="w-5 h-5 text-blue-500" />
+                <div key={call.id} className="p-5 flex items-start gap-5 hover:bg-slate-50/80 transition-colors rounded-xl mx-2 my-1 border border-transparent hover:border-slate-100 group">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100/50 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                    <Phone className="w-5 h-5 text-[#004C8C]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h4 className="font-bold text-slate-900">{call.caller_name || 'Unknown Caller'}</h4>
-                      {call.status === 'added_to_pipeline' && <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">✓ Added to CRM</span>}
-                      {call.intent && <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">{call.intent}</span>}
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <h4 className="font-bold text-slate-900 text-base">{call.caller_name || 'Unknown Caller'}</h4>
+                      {call.status === 'added_to_pipeline' && <span className="text-[10px] font-bold uppercase tracking-wider text-[#00A859] bg-[#00A859]/10 px-2.5 py-1 rounded-md border border-[#00A859]/20 shadow-sm">✓ Added to CRM</span>}
+                      {call.intent && <span className="text-[10px] font-bold uppercase tracking-wider text-[#004C8C] bg-[#004C8C]/5 px-2.5 py-1 rounded-md border border-[#004C8C]/10">{call.intent}</span>}
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-2">
-                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {call.caller_phone || '—'}</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {call.call_date ? new Date(call.call_date).toLocaleString() : '—'}</span>
-                      <span>⏱ {formatCallDuration(call.duration_seconds)}</span>
+                    <div className="flex items-center gap-4 text-[13px] font-medium text-slate-500 mb-3 bg-slate-50/50 inline-flex px-3 py-1.5 rounded-lg border border-slate-100">
+                      <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" /> {call.caller_phone || '—'}</span>
+                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                      <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-slate-400" /> {call.call_date ? new Date(call.call_date).toLocaleString() : '—'}</span>
+                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                      <span className="flex items-center gap-1.5">⏱ {formatCallDuration(call.duration_seconds)}</span>
                     </div>
-                    {call.summary && <p className="text-sm text-slate-600 mb-2 line-clamp-2">{call.summary}</p>}
-                    {call.transcript && <p className="text-xs text-slate-400 bg-slate-50 rounded px-3 py-2 line-clamp-2 mb-2 italic">{call.transcript}</p>}
+                    {call.summary && <p className="text-sm font-medium text-slate-600 mb-3 line-clamp-2 leading-relaxed">{call.summary}</p>}
+                    {call.transcript && <p className="text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded-lg px-4 py-3 line-clamp-2 italic leading-relaxed">{call.transcript}</p>}
                   </div>
-                  <div className="shrink-0 flex flex-col gap-2 items-end">
+                  <div className="shrink-0 flex flex-col gap-2.5 items-end ml-4">
                     {isCallConvertible(call) ? (
                       <button
                         onClick={async () => {
@@ -680,15 +682,15 @@ export default function AICRM() {
                             fetchData();
                           }
                         }}
-                        className="px-3 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors flex items-center gap-1.5" style={{ background: '#00A859' }}
+                        className="btn-primary py-2 px-4 shadow-md"
                       >
                         <Plus className="w-3.5 h-3.5" /> Add to CRM
                       </button>
                     ) : (
-                      <span className="text-xs text-emerald-600 font-medium">In Pipeline ✓</span>
+                      <span className="text-xs text-[#00A859] font-bold bg-[#00A859]/10 px-3 py-1.5 rounded-lg border border-[#00A859]/20">In Pipeline ✓</span>
                     )}
                     {call.recording_url && (
-                      <button className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">▶ Play</button>
+                      <button className="btn-secondary py-2 px-4">▶ Play Recording</button>
                     )}
                   </div>
                 </div>

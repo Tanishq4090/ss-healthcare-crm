@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, RefreshCw, Server } from 'lucide-react';
 import { IconFrame, PageShell, SectionHeader, Surface } from '@/components/AppPrimitives';
 import { supabase } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
@@ -43,31 +44,58 @@ export default function SystemStatus() {
 
   return (
     <PageShell>
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <SectionHeader
-          title="Live System Status"
-          description="This page proves whether the deployed product is live or only showing a static shell."
-          action={<button type="button" onClick={load} className="btn-secondary"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh</button>}
-        />
+      <Surface className="bg-gradient-to-br from-[#004C8C]/5 via-white to-[#00A859]/5 border-[#00A859]/20 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-40 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between relative z-10">
+          <SectionHeader
+            title="Live System Status"
+            description="This page proves whether the deployed product is live or only showing a static shell."
+          />
+          <button type="button" onClick={load} className="btn-secondary self-start xl:self-center">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+        </div>
       </Surface>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Surface>
-          <SectionHeader title="Backend API" description={`Expected backend: ${BACKEND_URL}`} action={<IconFrame icon={Server} tone="blue" />} />
+        <Surface className="premium-card">
+          <SectionHeader title="Backend API" description={`Expected backend: ${BACKEND_URL}`} action={<div className="h-10 w-10 bg-[#004C8C]/10 rounded-xl flex items-center justify-center border border-[#004C8C]/20"><Server className="w-5 h-5 text-[#004C8C]" /></div>} />
           {error ? (
-            <div className="mt-5 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-700"><AlertTriangle className="mb-2 h-5 w-5" />{error}</div>
+            <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-[13px] font-bold text-rose-700 shadow-sm"><AlertTriangle className="mb-2 h-6 w-6" />{error}</div>
           ) : health ? (
-            <div className="mt-5 space-y-3">
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"><p className="flex items-center gap-2 text-sm font-extrabold text-emerald-700"><CheckCircle2 className="h-5 w-5" /> Backend reachable</p><p className="mt-1 text-xs text-emerald-600">{health.service} · {health.ts}</p></div>
-              {Object.entries(health.env).map(([key, value]) => <div key={key} className="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-3 text-sm"><span className="font-semibold text-slate-600">{key}</span><span className={value ? 'font-bold text-emerald-700' : 'font-bold text-rose-700'}>{value ? 'configured' : 'missing'}</span></div>)}
+            <div className="mt-6 space-y-4">
+              <div className="rounded-2xl border border-emerald-200/60 bg-emerald-50 p-5 shadow-sm">
+                <p className="flex items-center gap-2 text-[15px] font-extrabold text-[#00A859] tracking-tight"><CheckCircle2 className="h-6 w-6" /> Backend Reachable</p>
+                <p className="mt-1 text-[11px] font-bold text-emerald-700 uppercase tracking-wider">{health.service} · {health.ts}</p>
+              </div>
+              <div className="space-y-2">
+                {Object.entries(health.env).map(([key, value]) => (
+                  <div key={key} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-[13px]">
+                    <span className="font-bold text-slate-700">{key}</span>
+                    <span className={cn('uppercase tracking-wider text-[10px] font-bold px-2 py-0.5 rounded-md border', value ? 'text-[#00A859] bg-[#00A859]/10 border-[#00A859]/20' : 'text-rose-700 bg-rose-50 border-rose-200/60')}>
+                      {value ? 'Configured' : 'Missing'}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : <p className="mt-5 text-sm text-slate-400">Checking backend...</p>}
+          ) : <p className="mt-6 text-[13px] font-bold text-slate-500 animate-pulse">Checking backend connection...</p>}
         </Surface>
 
-        <Surface>
+        <Surface className="premium-card">
           <SectionHeader title="Frontend Supabase Access" description="These counts are read directly from the browser using VITE_SUPABASE_* keys." />
-          <div className="mt-5 space-y-3">
-            {frontChecks.map((check) => <div key={check.table} className="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-3 text-sm"><div><p className="font-extrabold text-slate-800">{check.table}</p>{check.error && <p className="mt-1 text-xs text-rose-600">{check.error}</p>}</div><span className={check.ok ? 'font-extrabold text-emerald-700' : 'font-extrabold text-rose-700'}>{check.ok ? `${check.count} rows` : 'error'}</span></div>)}
+          <div className="mt-6 space-y-3">
+            {frontChecks.map((check) => (
+              <div key={check.table} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-[13px]">
+                <div>
+                  <p className="font-extrabold text-slate-900 tracking-tight">{check.table}</p>
+                  {check.error && <p className="mt-1.5 text-[11px] font-medium text-rose-600 italic bg-rose-50 px-2 py-1 rounded-md">{check.error}</p>}
+                </div>
+                <span className={cn('text-lg tracking-tight', check.ok ? 'font-extrabold text-[#00A859]' : 'font-extrabold text-rose-700')}>
+                  {check.ok ? `${check.count} rows` : 'Error'}
+                </span>
+              </div>
+            ))}
           </div>
         </Surface>
       </div>

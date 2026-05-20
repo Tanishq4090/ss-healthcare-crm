@@ -127,23 +127,24 @@ export default function AccessControl() {
 
   return (
     <PageShell>
-      <Surface className="bg-gradient-to-br from-white via-green-50/40 to-blue-50/60" style={{ borderColor: 'rgba(0,168,89,0.12)' }}>
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+      <Surface className="bg-gradient-to-br from-[#004C8C]/5 via-white to-[#00A859]/5 border-[#00A859]/20 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-40 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between relative z-10">
           <SectionHeader
-            eyebrow="Security workspace"
+            eyebrow="Security Workspace"
             title="Access Control"
             description="Manage module access from employee records used by the SS Health Care Admin OS."
-            action={<IconFrame icon={ShieldCheck} tone="cyan" className="h-12 w-12" />}
+            action={<div className="h-10 w-10 bg-[#004C8C]/10 rounded-xl flex items-center justify-center border border-[#004C8C]/20"><ShieldCheck className="w-5 h-5 text-[#004C8C]" /></div>}
           />
-          <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="grid grid-cols-3 gap-3 text-center self-start xl:self-center">
             {[
               { value: stats.total, label: 'Members' },
               { value: stats.admins, label: 'Admins' },
               { value: stats.inactive, label: 'Inactive' },
             ].map((item) => (
-              <div key={item.label} className="rounded-lg border border-white/80 bg-white/75 px-4 py-3 shadow-sm">
-                <p className="text-xl font-extrabold text-slate-950">{item.value}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{item.label}</p>
+              <div key={item.label} className="rounded-xl border border-white/80 bg-white/75 px-5 py-3.5 shadow-sm">
+                <p className="text-2xl font-extrabold text-slate-900 tracking-tight">{item.value}</p>
+                <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">{item.label}</p>
               </div>
             ))}
           </div>
@@ -168,16 +169,16 @@ export default function AccessControl() {
 
       {error && <p className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
 
-      <div className="table-shell">
-        <div className="clinical-content overflow-x-auto">
+      <div className="premium-card overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px]">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="table-heading px-6 py-4">Member</th>
-                <th className="table-heading px-6 py-4">Role</th>
-                <th className="table-heading px-6 py-4">Status</th>
-                <th className="table-heading px-6 py-4">Module Access</th>
-                <th className="table-heading px-6 py-4 text-right">Admin</th>
+              <tr className="border-b border-slate-200 bg-slate-50/50">
+                <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">Member</th>
+                <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-[11px] font-bold text-slate-500 uppercase tracking-wider">Module Access</th>
+                <th className="px-6 py-4 text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Admin Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -190,22 +191,22 @@ export default function AccessControl() {
                   <tr key={member.id} className="border-b border-slate-100/80 transition-colors hover:bg-green-50/30">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-700 to-blue-700 text-xs font-extrabold text-white shadow-sm">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl text-[14px] font-extrabold text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
                           {initials(member.full_name || member.username)}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-950">{member.full_name || member.username || 'Unnamed Staff'}</p>
-                          <p className="text-xs text-slate-500">{member.email || member.username || 'No login email'}</p>
+                          <p className="text-[14px] font-bold text-slate-900">{member.full_name || member.username || 'Unnamed Staff'}</p>
+                          <p className="text-[11px] font-medium text-slate-500 mt-0.5">{member.email || member.username || 'No login email'}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge className={roleColors[member.role || 'user'] || roleColors.user}>{member.role || 'user'}</StatusBadge>
+                      <StatusBadge className={cn(roleColors[member.role || 'user'] || roleColors.user, 'uppercase tracking-wider text-[10px] font-bold')}>{member.role || 'user'}</StatusBadge>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        {isActive ? <Unlock className="h-4 w-4 text-emerald-500" /> : <Lock className="h-4 w-4 text-slate-400" />}
-                        <span className={cn('text-sm font-bold', isActive ? 'text-emerald-700' : 'text-slate-500')}>
+                        {isActive ? <Unlock className="h-4 w-4 text-[#00A859]" /> : <Lock className="h-4 w-4 text-slate-400" />}
+                        <span className={cn('text-[13px] font-bold', isActive ? 'text-[#00A859]' : 'text-slate-500')}>
                           {isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
@@ -246,8 +247,8 @@ export default function AccessControl() {
         </div>
       </div>
 
-      <Surface>
-        <SectionHeader title="Permission Matrix" description="Admin users receive all modules. Staff rows store explicit module access in the employees table." action={<IconFrame icon={Key} tone="emerald" />} />
+      <Surface className="border-[#00A859]/20 bg-slate-50/50">
+        <SectionHeader title="Permission Matrix" description="Admin users receive all modules. Staff rows store explicit module access in the employees table." action={<div className="h-10 w-10 bg-[#00A859]/10 rounded-xl flex items-center justify-center border border-[#00A859]/20"><Key className="w-5 h-5 text-[#00A859]" /></div>} />
       </Surface>
     </PageShell>
   );

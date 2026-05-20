@@ -95,50 +95,55 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* ── Page header ──────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">
+          <h1 className="text-[28px] font-extrabold text-slate-900 tracking-tight">
             Platform Overview
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-sm font-medium text-slate-500 mt-1">
             Welcome back, {user?.name?.split(' ')[0] || 'Admin'}. Here's what's happening today.
           </p>
         </div>
         <button
           onClick={load}
-          className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+          className="btn-secondary hidden sm:flex"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
+          Refresh Data
         </button>
       </div>
 
       {/* ── Error banner ─────────────────────────────── */}
       {hasAnyError && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-5 flex items-start gap-4 shadow-sm animate-slide-in">
+          <div className="bg-red-100 rounded-full p-2 mt-0.5">
+            <AlertTriangle className="h-5 w-5 text-red-600 shrink-0" />
+          </div>
           <div>
-            <p className="text-sm font-semibold text-amber-900">Some live tables are not reachable</p>
-            <p className="mt-1 text-xs text-amber-700">Run the latest migration and confirm environment variables.</p>
-            <pre className="mt-2 whitespace-pre-wrap rounded-lg bg-white/70 p-2 text-xs text-amber-800">{JSON.stringify(errors, null, 2)}</pre>
+            <p className="text-sm font-bold text-red-900">Live Data Connectivity Issue</p>
+            <p className="mt-1 text-xs font-medium text-red-700">Some tables are unreachable. Please verify database credentials.</p>
+            <pre className="mt-3 whitespace-pre-wrap rounded-xl bg-white/60 p-3 text-xs text-red-800 border border-red-100/50">{JSON.stringify(errors, null, 2)}</pre>
           </div>
         </div>
       )}
 
       {/* ── KPI cards ────────────────────────────────── */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <div className="flex items-start justify-between">
-              <p className="text-sm font-medium text-slate-500 mb-1">{stat.label}</p>
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: `${stat.color}15` }}>
-                <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
+          <div key={stat.label} className="premium-card p-6 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-10 transition-opacity duration-300">
+              <stat.icon className="w-24 h-24 transform translate-x-4 -translate-y-4" style={{ color: stat.color }} />
+            </div>
+            <div className="flex items-start justify-between relative z-10">
+              <p className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-1">{stat.label}</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm transition-transform group-hover:scale-110" style={{ background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}05)`, border: `1px solid ${stat.color}20` }}>
+                <stat.icon className="h-5 w-5" style={{ color: stat.color }} />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mt-2">{stat.value}</h3>
-            <p className="text-xs text-slate-400 mt-1">{stat.sub}</p>
+            <h3 className="text-3xl font-extrabold text-slate-900 mt-3 tracking-tight relative z-10">{stat.value}</h3>
+            <p className="text-xs font-medium text-slate-400 mt-1.5 relative z-10">{stat.sub}</p>
           </div>
         ))}
       </div>
@@ -146,34 +151,35 @@ export default function Dashboard() {
       {/* ── Pipeline + Call review ────────────────── */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Pipeline chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="lg:col-span-2 premium-card overflow-hidden flex flex-col">
+          <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
             <div>
-              <h2 className="font-semibold text-slate-900">Live Pipeline by Stage</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Calculated from crm_leads.stage</p>
+              <h2 className="text-base font-bold text-slate-900">Live Pipeline Velocity</h2>
+              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mt-1">Real-time Lead Distribution</p>
             </div>
-            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
+            <span className="status-pill status-pill-green">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#00A859] animate-pulse"></span>
               Live Data
             </span>
           </div>
-          <div className="p-5">
+          <div className="p-6 flex-1">
             {pipelineData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                  <span className="text-xl">📊</span>
+              <div className="flex flex-col items-center justify-center h-full min-h-[280px] text-center">
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-4">
+                  <span className="text-2xl">📊</span>
                 </div>
-                <p className="text-sm font-medium text-slate-600">No leads in pipeline yet</p>
-                <p className="text-xs text-slate-400 mt-1">Add a lead or convert a reviewed call.</p>
+                <p className="text-sm font-bold text-slate-700">Pipeline is Empty</p>
+                <p className="text-xs font-medium text-slate-400 mt-1.5 max-w-[200px]">Add new leads to the CRM to visualize your sales velocity.</p>
               </div>
             ) : (
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={pipelineData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="4 4" stroke="#E2E8F0" vertical={false} />
-                    <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={70} />
-                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#64748B', fontSize: 12 }} />
-                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E2E8F0', borderRadius: '8px', fontSize: 12 }} />
-                    <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                    <CartesianGrid strokeDasharray="4 4" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} interval={0} angle={-15} textAnchor="end" height={70} />
+                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} />
+                    <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: 12, fontWeight: 600, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)' }} />
+                    <Bar dataKey="count" radius={[6, 6, 0, 0]} maxBarSize={50}>
                       {pipelineData.map((e) => <Cell key={e.stage} fill={e.color} />)}
                     </Bar>
                   </BarChart>
@@ -184,26 +190,35 @@ export default function Dashboard() {
         </div>
 
         {/* Call review queue */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Call Review Queue</h2>
-            <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,168,89,0.1)' }}>
-              <Activity className="h-4 w-4" style={{ color: '#00A859' }} />
+        <div className="premium-card overflow-hidden flex flex-col">
+          <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
+            <h2 className="text-base font-bold text-slate-900">Call Review Queue</h2>
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-[#00A859]/10 border border-[#00A859]/20">
+              <Activity className="h-4 w-4 text-[#00A859]" />
             </div>
           </div>
-          <div className="p-5 flex-1">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-xl bg-amber-50 p-4">
-                <p className="text-2xl font-bold text-amber-700">{metrics.pendingCalls}</p>
-                <p className="text-xs font-medium text-amber-600 mt-1">New</p>
+          <div className="p-6 flex-1 flex flex-col justify-center">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-5 flex items-center justify-between transition-colors hover:bg-amber-50">
+                <div>
+                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">New Inquiries</p>
+                  <p className="text-3xl font-extrabold text-amber-700 mt-1">{metrics.pendingCalls}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center"><PhoneCall className="h-5 w-5 text-amber-600" /></div>
               </div>
-              <div className="rounded-xl bg-blue-50 p-4">
-                <p className="text-2xl font-bold text-blue-700">{metrics.reviewedCalls}</p>
-                <p className="text-xs font-medium text-blue-600 mt-1">Reviewed</p>
+              <div className="rounded-2xl border border-[#004C8C]/10 bg-[#004C8C]/5 p-5 flex items-center justify-between transition-colors hover:bg-[#004C8C]/10">
+                <div>
+                  <p className="text-xs font-bold text-[#004C8C] uppercase tracking-wider">Reviewed</p>
+                  <p className="text-3xl font-extrabold text-[#004C8C] mt-1">{metrics.reviewedCalls}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#004C8C]/10 flex items-center justify-center"><Users className="h-5 w-5 text-[#004C8C]" /></div>
               </div>
-              <div className="rounded-xl bg-emerald-50 p-4">
-                <p className="text-2xl font-bold text-emerald-700">{metrics.addedCalls}</p>
-                <p className="text-xs font-medium text-emerald-600 mt-1">Converted</p>
+              <div className="rounded-2xl border border-[#00A859]/10 bg-[#00A859]/5 p-5 flex items-center justify-between transition-colors hover:bg-[#00A859]/10">
+                <div>
+                  <p className="text-xs font-bold text-[#00A859] uppercase tracking-wider">Converted</p>
+                  <p className="text-3xl font-extrabold text-[#00A859] mt-1">{metrics.addedCalls}</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-[#00A859]/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-[#00A859]" /></div>
               </div>
             </div>
           </div>
@@ -213,30 +228,35 @@ export default function Dashboard() {
       {/* ── Recent lists ─────────────────────────────── */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recent calls */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Recent Callyzer Calls</h2>
-            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
-              Live
-            </span>
+        <div className="premium-card overflow-hidden">
+          <div className="p-5 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
+            <h2 className="text-sm font-bold text-slate-900">Recent Callyzer Logs</h2>
+            <span className="text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider bg-slate-100 text-slate-500">Last 6 Calls</span>
           </div>
-          <div className="p-5 space-y-3">
+          <div className="p-4 space-y-2">
             {recentCalls.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                  <PhoneCall className="h-5 w-5 text-slate-400" />
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                  <PhoneCall className="h-5 w-5 text-slate-300" />
                 </div>
-                <p className="text-sm font-medium text-slate-600">No calls yet</p>
-                <p className="text-xs text-slate-400 mt-1">Send a sample webhook or connect Callyzer.</p>
+                <p className="text-sm font-bold text-slate-600">No calls available</p>
+                <p className="text-xs font-medium text-slate-400 mt-1 max-w-[200px] mx-auto">Waiting for inbound calls from Callyzer webhook.</p>
               </div>
             ) : recentCalls.map((call) => (
-              <div key={call.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{call.caller_name || call.caller_number}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{call.employee_name || 'Unassigned'} · {formatDuration(call.duration_seconds)} · {formatDateTime(call.call_started_at || call.created_at)}</p>
+              <div key={call.id} className="flex items-center justify-between p-3.5 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50/80 transition-all cursor-default group">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0 group-hover:bg-white group-hover:text-[#00A859] group-hover:border-[#00A859]/30 transition-colors">
+                    {(call.caller_name || call.caller_number)[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-bold text-slate-900">{call.caller_name || call.caller_number}</p>
+                    <p className="text-[11px] font-medium text-slate-500 mt-0.5">{call.employee_name || 'Unassigned'} · {formatDuration(call.duration_seconds)} · {formatDateTime(call.call_started_at || call.created_at)}</p>
+                  </div>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  call.review_status === 'added_to_pipeline' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                  call.review_status === 'added_to_pipeline' ? 'bg-[#00A859]/10 text-[#00A859] border border-[#00A859]/20' : 
+                  call.review_status === 'reviewed' ? 'bg-[#004C8C]/10 text-[#004C8C] border border-[#004C8C]/20' :
+                  'bg-amber-50 text-amber-600 border border-amber-200/60'
                 }`}>
                   {call.review_status.replaceAll('_', ' ')}
                 </span>
@@ -246,29 +266,32 @@ export default function Dashboard() {
         </div>
 
         {/* Recent leads */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Recent Pipeline Leads</h2>
-            <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ background: 'rgba(0,168,89,0.1)', color: '#00A859' }}>
-              Live
-            </span>
+        <div className="premium-card overflow-hidden">
+          <div className="p-5 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
+            <h2 className="text-sm font-bold text-slate-900">Recent CRM Leads</h2>
+            <span className="text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider bg-slate-100 text-slate-500">Last 6 Leads</span>
           </div>
-          <div className="p-5 space-y-3">
+          <div className="p-4 space-y-2">
             {recentLeads.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                  <TrendingUp className="h-5 w-5 text-slate-400" />
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                  <TrendingUp className="h-5 w-5 text-slate-300" />
                 </div>
-                <p className="text-sm font-medium text-slate-600">No leads yet</p>
-                <p className="text-xs text-slate-400 mt-1">Create a lead or add a call inquiry.</p>
+                <p className="text-sm font-bold text-slate-600">No leads available</p>
+                <p className="text-xs font-medium text-slate-400 mt-1 max-w-[200px] mx-auto">Leads added to the pipeline will appear here.</p>
               </div>
             ) : recentLeads.map((lead) => (
-              <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{lead.client_name || 'Unnamed Lead'}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{lead.phone || 'No phone'} · {lead.assignee || 'Unassigned'} · {formatDateTime(lead.created_at)}</p>
+              <div key={lead.id} className="flex items-center justify-between p-3.5 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50/80 transition-all cursor-default group">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0 group-hover:bg-white group-hover:text-[#004C8C] group-hover:border-[#004C8C]/30 transition-colors">
+                    {(lead.client_name || 'U')[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-bold text-slate-900">{lead.client_name || 'Unnamed Lead'}</p>
+                    <p className="text-[11px] font-medium text-slate-500 mt-0.5">{lead.phone || 'No phone'} · {lead.assignee || 'Unassigned'} · {formatDateTime(lead.created_at)}</p>
+                  </div>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200/60">
                   {stageLabel[lead.stage || 'new-lead'] || lead.stage}
                 </span>
               </div>

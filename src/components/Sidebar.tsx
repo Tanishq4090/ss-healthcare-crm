@@ -67,19 +67,20 @@ export default function Sidebar({
 
       <aside
         className={cn(
-          'fixed bottom-4 left-4 top-4 z-50 flex w-[280px] flex-col rounded-[1.5rem] border border-slate-200/80 bg-white/95 shadow-soft backdrop-blur-xl transition-all duration-300',
+          'fixed bottom-4 left-4 top-4 z-50 flex w-[280px] flex-col rounded-[1.5rem] bg-white/95 backdrop-blur-xl transition-all duration-300',
+          'border border-slate-100 shadow-[0_8px_30px_-4px_rgba(0,76,140,0.1)]',
           mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)]',
           collapsed ? 'lg:w-[72px]' : 'lg:w-[272px]',
           'lg:translate-x-0'
         )}
       >
         <div className={cn('flex h-[84px] items-center border-b border-slate-100 px-4', collapsed ? 'lg:justify-center' : 'gap-3')}>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl ring-1" style={{ background: 'rgba(0,168,89,0.10)', '--tw-ring-color': 'rgba(0,168,89,0.2)' } as React.CSSProperties}>
-            <img src="/logo.png" alt="SS Health Care" className="h-8 w-8 object-contain" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#00A859]/10 to-[#004C8C]/5 border border-[#00A859]/20 shadow-sm">
+            <img src="/logo.png" alt="SS Health Care" className="h-8 w-8 object-contain drop-shadow-sm" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00A859" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-stethoscope"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>'); }} />
           </div>
           <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
-            <span className="block truncate text-sm font-extrabold text-slate-950">SS Health Care</span>
-            <span className="mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ background: 'rgba(0,168,89,0.10)', color: '#004C8C' }}>
+            <span className="block truncate text-sm font-extrabold text-slate-900 tracking-tight">SS Health Care</span>
+            <span className="mt-1 inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-[#004C8C]/5 text-[#004C8C] border border-[#004C8C]/10">
               Operations CRM
             </span>
           </div>
@@ -88,27 +89,27 @@ export default function Sidebar({
         <button
           type="button"
           onClick={() => onCollapseChange?.(!collapsed)}
-          className="absolute -right-3 top-[84px] hidden h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:text-cyan-700 lg:flex"
+          className="absolute -right-3 top-[84px] hidden h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:text-[#00A859] hover:border-[#00A859]/30 lg:flex"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
         </button>
 
         <div className={cn('px-4 py-4', collapsed && 'lg:px-3')}>
-          <div className={cn('rounded-lg p-3', collapsed && 'lg:flex lg:justify-center lg:p-2')} style={{ border: '1px solid rgba(0,168,89,0.18)', background: 'rgba(0,168,89,0.07)' }}>
+          <div className={cn('rounded-xl p-3 border border-[#00A859]/20 bg-gradient-to-r from-[#00A859]/5 to-transparent', collapsed && 'lg:flex lg:justify-center lg:p-2')}>
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm" style={{ color: '#00A859' }}>
-                <BellRing className="h-4 w-4" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-[#00A859]">
+                <ShieldCheck className="h-4 w-4" />
               </div>
               <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
-                <p className="truncate text-xs font-bold text-slate-800">Care Ops Live</p>
-                <p className="truncate text-[11px] text-slate-500">Callyzer, CRM and workforce sync</p>
+                <span className="block truncate text-xs font-bold text-slate-900">Secure Access</span>
+                <span className="block truncate text-[10px] text-slate-500 font-medium">Verified Session</span>
               </div>
             </div>
           </div>
         </div>
 
-        <nav className={cn('flex-1 overflow-y-auto px-3 pb-4', collapsed && 'lg:px-2')}>
+        <nav className={cn('flex-1 overflow-y-auto px-3 pb-4', collapsed && 'lg:px-2')} aria-label="Sidebar">
           {navItems.map((item) => {
             const isActive = isActivePath(location.pathname, item.path, item.exact);
             const Icon = item.icon;
@@ -118,13 +119,13 @@ export default function Sidebar({
                 to={item.path}
                 onClick={onMobileClose}
                 className={cn(
-                  'group mb-1 flex items-center rounded-lg border border-transparent px-3 py-3 text-sm font-semibold transition-all',
+                  'group mb-1.5 flex items-center rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold transition-all',
                   collapsed ? 'lg:justify-center lg:px-2' : 'gap-3',
-                  isActive ? 'shadow-sm' : 'text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-900'
+                  isActive ? 'shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                 )}
-                style={isActive ? { border: '1px solid rgba(0,168,89,0.22)', background: 'rgba(0,168,89,0.08)', color: '#003d70' } : {}}
+                style={isActive ? { border: '1px solid rgba(0,168,89,0.2)', background: 'rgba(0,168,89,0.06)', color: '#004C8C' } : {}}
               >
-                <Icon className="h-5 w-5 shrink-0" style={{ color: isActive ? '#00A859' : undefined }} />
+                <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-colors", isActive ? 'text-[#00A859]' : 'text-slate-400 group-hover:text-slate-600')} />
                 <span className={cn('truncate', collapsed && 'lg:hidden')}>{item.label}</span>
               </NavLink>
             );
@@ -134,13 +135,13 @@ export default function Sidebar({
         <div className="mx-4 border-t border-slate-100" />
 
         <div className={cn('p-4', collapsed && 'lg:px-3')}>
-          <div className={cn('flex items-center gap-3 rounded-2xl p-3', collapsed && 'lg:justify-center lg:p-2')} style={{ background: 'rgba(0,168,89,0.07)' }}>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl text-white shadow-sm" style={{ background: 'linear-gradient(135deg,#00A859,#004C8C)' }}>
+          <div className={cn('flex items-center gap-3 rounded-2xl p-3 bg-slate-50 border border-slate-100', collapsed && 'lg:justify-center lg:p-2')}>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm bg-gradient-to-br from-[#00A859] to-[#004C8C]">
               <Stethoscope className="h-4 w-4" />
             </div>
             <div className={cn('min-w-0', collapsed && 'lg:hidden')}>
-              <span className="block truncate text-sm font-bold text-slate-950">{user?.name || 'System Admin'}</span>
-              <span className="text-xs text-slate-500">{user?.role === 'admin' ? 'Admin' : 'Staff'}</span>
+              <span className="block truncate text-sm font-bold text-slate-900">{user?.name || 'System Admin'}</span>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{user?.role === 'admin' ? 'Admin' : 'Staff'}</span>
             </div>
           </div>
           <button
