@@ -100,6 +100,7 @@ create trigger trg_call_inquiries_touch before update on public.call_inquiries f
 drop trigger if exists trg_manual_attendance_touch on public.manual_attendance;
 create trigger trg_manual_attendance_touch before update on public.manual_attendance for each row execute function public.touch_updated_at();
 
+drop function if exists public.add_call_inquiry_to_pipeline(uuid);
 create or replace function public.add_call_inquiry_to_pipeline(p_call_id uuid)
 returns jsonb
 language plpgsql

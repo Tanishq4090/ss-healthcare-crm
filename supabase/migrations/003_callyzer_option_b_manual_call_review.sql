@@ -160,6 +160,7 @@ with check (bucket_id = 'call-recordings');
 -- Converts one reviewed call into crm_leads.
 -- This assumes the current crm_leads table has the common SS Healthcare columns used by AICRM.tsx:
 -- client_name/contact_person/phone/stage/status/priority/value/assignee/due_date/tags.
+drop function if exists public.add_call_inquiry_to_pipeline(uuid);
 create or replace function public.add_call_inquiry_to_pipeline(p_call_id uuid)
 returns jsonb
 language plpgsql
