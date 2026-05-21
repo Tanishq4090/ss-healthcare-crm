@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BadgeIndianRupee, Briefcase, Calendar, CheckCircle2, ChevronDown, Clock, CreditCard, Edit3, FileText, IdCard, Link2, MapPin, Phone, Plus, RefreshCw, Search, Send, Shield, Trash2, Upload, UserPlus, Users, X } from 'lucide-react';
+import { BadgeIndianRupee, Briefcase, Calendar, CheckCircle2, ChevronDown, Clock, CreditCard, Lock, Edit3, FileText, IdCard, Link2, MapPin, Phone, Plus, RefreshCw, Search, Send, Shield, Trash2, Upload, UserPlus, Users, X } from 'lucide-react';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
 import { supabase } from '@/lib/supabase';
