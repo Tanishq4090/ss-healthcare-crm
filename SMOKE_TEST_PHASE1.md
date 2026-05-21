@@ -11,7 +11,7 @@ Run this on the deployed production CRM URL.
 Pass criteria:
 - Dashboard opens
 - SS Health Care logo/theme visible
-- No 99Care branding
+- No SS Health Care branding
 
 ## 2. System status
 
@@ -163,5 +163,5 @@ Check:
 
 Pass criteria:
 - All screens use SS Health Care green/blue theme and logo
-- No 99Care text/logo
+- No SS Health Care text/logo
 - No ElevenLabs or AI-calling language

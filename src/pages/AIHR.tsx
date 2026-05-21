@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BadgeIndianRupee, Briefcase, CheckCircle2, ChevronDown, Clock, CreditCard, FileText, IdCard, Link2, Plus, RefreshCw, Search, Send, Trash2, Upload, UserPlus, Users, X } from 'lucide-react';
+import { BadgeIndianRupee, Briefcase, Calendar, CheckCircle2, ChevronDown, Clock, CreditCard, Edit3, FileText, IdCard, Link2, MapPin, Phone, Plus, RefreshCw, Search, Send, Shield, Trash2, Upload, UserPlus, Users, X } from 'lucide-react';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
 import { supabase } from '@/lib/supabase';
@@ -20,15 +20,132 @@ type ServiceOption = { id: string; name: string; category?: string };
 const genderOptions = ['', 'Male', 'Female', 'Other'];
 const paymentSchemes = ['Daily Rate', 'Monthly', 'Hourly', 'Per Visit'];
 
-function AddEmployeeModal({
+function FullProfileModal({
+  employee,
+  onClose,
+}: {
+  employee: Employee;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-3xl bg-white shadow-2xl overflow-hidden text-left flex flex-col max-h-[90vh]">
+        {/* Banner Header */}
+        <div className="bg-[#0C8C8C] p-6 relative flex items-center gap-5 shrink-0">
+          <button onClick={onClose} className="absolute top-4 right-4 text-white/80 hover:text-white rounded-full p-2"><X className="h-5 w-5" /></button>
+          
+          <div className="w-20 h-20 rounded-full border-4 border-white/30 overflow-hidden shrink-0 shadow-md">
+            {employee.photo_url ? (
+              <img src={employee.photo_url} className="h-full w-full object-cover" alt="" />
+            ) : (
+              <div className="w-full h-full bg-teal-800 text-white flex items-center justify-center font-bold text-2xl">
+                {(employee.full_name || 'S').charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          
+          <div className="text-white">
+            <h3 className="text-2xl font-bold">{employee.full_name}</h3>
+            <p className="text-white/85 text-sm font-medium mt-0.5">{employee.job_title || employee.position || 'Registered Doctor'}</p>
+            <div className="flex gap-2 mt-2.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-white/15 border border-white/10 px-2.5 py-1 rounded text-white font-mono">
+                {employee.employee_code || 'EMP-XXXXXX'}
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-white/15 border border-white/10 px-2.5 py-1 rounded text-white">
+                {employee.availability_status || 'AVAILABLE'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Body */}
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto">
+          {/* Left Column: Verification Profile */}
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-black tracking-widest text-slate-400 uppercase">Verification Profile</h4>
+            
+            {/* Aadhaar */}
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Aadhaar Identification</p>
+                <p className="text-sm font-bold text-slate-800 mt-1">{employee.aadhaar || '0000 0000 0000'}</p>
+              </div>
+              <Shield className="h-5 w-5 text-[#00A859]" />
+            </div>
+
+            {/* Primary Contact */}
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex items-center gap-3">
+              <Phone className="h-5 w-5 text-slate-400 shrink-0" />
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Primary Contact</p>
+                <p className="text-sm font-bold text-slate-800 mt-1">{employee.phone || 'Not captured'}</p>
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex items-center gap-3">
+              <MapPin className="h-5 w-5 text-slate-400 shrink-0" />
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Current Address</p>
+                <p className="text-sm font-bold text-slate-800 mt-1">{employee.residential_address || employee.address || 'Not specified'}</p>
+              </div>
+            </div>
+
+            {/* Financial Meta */}
+            <div className="space-y-3 pt-2">
+              <h4 className="text-[11px] font-black tracking-widest text-slate-400 uppercase">Financial Meta</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4">
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Rate</p>
+                  <p className="text-base font-bold text-slate-800 mt-1">₹{employee.daily_rate || 0}</p>
+                </div>
+                <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4">
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Payment Scheme</p>
+                  <span className="inline-block mt-1 text-xs font-bold text-[#0C8C8C] bg-[#E6F4F4] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {employee.payment_scheme || 'Daily Rate'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Uploaded ID Proofs */}
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-black tracking-widest text-slate-400 uppercase">Uploaded ID Proofs</h4>
+            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center h-[260px]">
+              <FileText className="h-10 w-10 text-slate-300 mb-3" />
+              <p className="text-sm font-semibold text-slate-400 max-w-[200px]">
+                {employee.id_documents && (employee.id_documents as Array<any>).length > 0 ? (
+                  <span className="text-slate-700">Documents verified on file</span>
+                ) : (
+                  "No documents verification on file"
+                )}
+              </p>
+              {employee.id_documents && (employee.id_documents as Array<any>).map((doc, idx) => (
+                <a key={idx} href={doc.url} target="_blank" rel="noreferrer" className="mt-2 text-xs font-bold text-teal-600 hover:underline">
+                  Download {doc.name || 'Proof'}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmployeeFormModal({
+  employee,
   services,
   onClose,
-  onCreated,
+  onSaved,
 }: {
+  employee?: Employee | null;
   services: ServiceOption[];
   onClose: () => void;
-  onCreated: (employee: Employee) => void;
+  onSaved: () => void;
 }) {
+  const isEdit = !!employee;
   const [form, setForm] = useState({
     full_name: '',
     job_title: '',
@@ -48,6 +165,25 @@ function AddEmployeeModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (employee) {
+      setForm({
+        full_name: employee.full_name || '',
+        job_title: employee.job_title || employee.position || '',
+        gender: employee.gender || '',
+        phone: employee.phone || '',
+        email: employee.email || '',
+        aadhaar: employee.aadhaar || '',
+        date_of_birth: employee.date_of_birth || '',
+        residential_address: employee.residential_address || employee.address || '',
+        experience: employee.experience || '',
+        payment_scheme: employee.payment_scheme || 'Daily Rate',
+        daily_rate: String(employee.daily_rate || '0'),
+      });
+      setSkills(employee.service_skills || []);
+    }
+  }, [employee]);
+
   const set = (key: string, value: string) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const toggleSkill = (name: string) => {
@@ -63,7 +199,7 @@ function AddEmployeeModal({
     return { path, publicUrl: data.publicUrl };
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.full_name.trim()) return setError('Full name is required.');
     if (!form.job_title.trim()) return setError('Job title is required.');
@@ -72,8 +208,8 @@ function AddEmployeeModal({
     setError('');
 
     try {
-      let photo_url = '';
-      const idDocs: Array<Record<string, string>> = [];
+      let photo_url = employee?.photo_url || '';
+      let idDocs = employee?.id_documents || [];
 
       if (photoFile) {
         const uploaded = await uploadFile(photoFile, 'staff-photos');
@@ -82,43 +218,54 @@ function AddEmployeeModal({
 
       if (docFile) {
         const uploaded = await uploadFile(docFile, 'staff-documents');
-        idDocs.push({ name: docFile.name, path: uploaded.path, url: uploaded.publicUrl });
+        const newDoc = { name: docFile.name, path: uploaded.path, url: uploaded.publicUrl };
+        idDocs = Array.isArray(idDocs) ? [...idDocs, newDoc] : [newDoc];
       }
 
-      const username = form.full_name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || `staff_${Date.now()}`;
+      const payload = {
+        full_name: form.full_name.trim(),
+        job_title: form.job_title.trim(),
+        position: form.job_title.trim(),
+        gender: form.gender || null,
+        phone: form.phone || null,
+        email: form.email || null,
+        aadhaar: form.aadhaar || null,
+        date_of_birth: form.date_of_birth || null,
+        residential_address: form.residential_address || null,
+        address: form.residential_address || null,
+        experience: form.experience || null,
+        payment_scheme: form.payment_scheme,
+        daily_rate: Number(form.daily_rate) || 0,
+        service_skills: skills,
+        id_documents: idDocs,
+        photo_url,
+      };
 
-      const { data, error: insertError } = await supabase
-        .from('employees')
-        .insert({
-          username,
-          full_name: form.full_name.trim(),
-          job_title: form.job_title.trim(),
-          position: form.job_title.trim(),
-          gender: form.gender || null,
-          phone: form.phone || null,
-          email: form.email || null,
-          aadhaar: form.aadhaar || null,
-          date_of_birth: form.date_of_birth || null,
-          residential_address: form.residential_address || null,
-          address: form.residential_address || null,
-          experience: form.experience || null,
-          payment_scheme: form.payment_scheme,
-          daily_rate: Number(form.daily_rate) || 0,
-          service_skills: skills,
-          id_documents: idDocs,
-          photo_url,
-          role: 'user',
-          accesses: ['hr'],
-          status: 'active',
-          availability_status: 'available',
-        })
-        .select('*')
-        .single();
+      if (isEdit && employee) {
+        const { error: updateError } = await supabase
+          .from('employees')
+          .update(payload)
+          .eq('id', employee.id);
+        if (updateError) throw updateError;
+      } else {
+        const username = form.full_name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || `staff_${Date.now()}`;
+        const { error: insertError } = await supabase
+          .from('employees')
+          .insert({
+            ...payload,
+            username,
+            role: 'user',
+            accesses: ['hr'],
+            status: 'active',
+            availability_status: 'available',
+          });
+        if (insertError) throw insertError;
+      }
 
-      if (insertError) throw insertError;
-      onCreated(data as Employee);
+      onSaved();
+      onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create employee.');
+      setError(err instanceof Error ? err.message : 'Failed to save employee.');
     } finally {
       setSaving(false);
     }
@@ -126,106 +273,207 @@ function AddEmployeeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm">
-      <div className="my-6 w-full max-w-3xl rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200">
-        <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-3xl border-b border-slate-100 bg-white/95 px-7 py-5 backdrop-blur">
+      <div className="my-6 w-full max-w-xl rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200 text-left flex flex-col">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-3xl border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur shrink-0">
           <div className="flex items-center gap-3">
             <UserPlus className="h-5 w-5 text-teal-600" />
-            <h3 className="text-2xl font-black text-slate-950">Add New Employee</h3>
+            <h3 className="text-xl font-bold text-slate-950">
+              {isEdit ? 'Edit Employee Details' : 'Add New Employee'}
+            </h3>
           </div>
           <button onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
         </div>
 
-        <form onSubmit={handleCreate} className="space-y-6 p-7">
-          <label className="block cursor-pointer rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-6 py-8 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
-            <Upload className="mx-auto h-9 w-9 text-slate-300" />
-            <p className="mt-3 text-lg text-slate-500">Drag & drop or <span className="font-bold text-teal-600">click to upload</span></p>
-            <p className="mt-1 text-sm text-slate-400">Staff photo — JPEG, PNG, WebP · max 5 MB</p>
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="space-y-5 p-6 overflow-y-auto">
+          {/* Photo Drag & Drop Zone */}
+          <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-6 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
+            <Upload className="mx-auto h-8 w-8 text-slate-300" />
+            <p className="mt-2 text-sm text-slate-500 font-medium">Drag & drop or <span className="font-bold text-teal-600">click to upload</span></p>
+            <p className="text-xs text-slate-400 mt-0.5">JPEG, PNG, WebP · max 5 MB</p>
             <input type="file" accept="image/*" className="hidden" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} />
-            {photoFile && <p className="mt-3 text-sm font-bold text-teal-700">Selected: {photoFile.name}</p>}
+            {photoFile && <p className="mt-2 text-xs font-bold text-teal-700">Selected: {photoFile.name}</p>}
+            {!photoFile && employee?.photo_url && (
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <img src={employee.photo_url} className="w-8 h-8 rounded-full object-cover" alt="" />
+                <span className="text-xs font-bold text-slate-400">Current Photo loaded</span>
+              </div>
+            )}
           </label>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Full Name <span className="text-rose-500">*</span></label>
-              <input className="field-control w-full" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} placeholder="e.g. Anita Sharma" />
+          {/* Full Name */}
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Full Name *</label>
+            <input
+              type="text"
+              required
+              value={form.full_name}
+              onChange={(e) => set('full_name', e.target.value)}
+              className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              placeholder="e.g. Anita Sharma"
+            />
+          </div>
+
+          {/* Job Title and Gender */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Job Title *</label>
+              <input
+                type="text"
+                required
+                value={form.job_title}
+                onChange={(e) => set('job_title', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="e.g. Registered Nurse"
+              />
             </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Job Title <span className="text-rose-500">*</span></label>
-              <input className="field-control w-full" value={form.job_title} onChange={(e) => set('job_title', e.target.value)} placeholder="e.g. Registered Nurse" />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Gender</label>
-              <select className="field-control w-full" value={form.gender} onChange={(e) => set('gender', e.target.value)}>
-                {genderOptions.map((g) => <option key={g} value={g}>{g || 'Select Gender'}</option>)}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Gender</label>
+              <select
+                value={form.gender}
+                onChange={(e) => set('gender', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 bg-white rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
 
-          <div>
-            <label className="mb-3 block text-sm font-semibold text-slate-700">Services & Skills</label>
-            <div className="flex flex-wrap gap-2">
-              {services.map((service) => (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => toggleSkill(service.name)}
-                  className={`rounded-full border px-4 py-2 text-sm font-bold transition ${skills.includes(service.name) ? 'border-teal-300 bg-teal-50 text-teal-700' : 'border-slate-200 bg-white text-slate-500 hover:border-teal-200'}`}
-                >
-                  {service.name}
-                </button>
-              ))}
+          {/* Services & Skills Badges */}
+          <div className="space-y-2">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Services & Skills</label>
+            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 border border-slate-100 rounded-xl">
+              {services.map((service) => {
+                const isSelected = skills.includes(service.name);
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => toggleSkill(service.name)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      isSelected
+                        ? 'border-teal-300 bg-teal-50 text-teal-700'
+                        : 'border-slate-200 bg-white text-slate-500 hover:border-teal-200'
+                    }`}
+                  >
+                    {service.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Phone</label>
-              <input className="field-control w-full" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="98765 43210" />
+          {/* Phone */}
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Phone</label>
+            <input
+              type="text"
+              value={form.phone}
+              onChange={(e) => set('phone', e.target.value)}
+              className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              placeholder="98765 43210"
+            />
+          </div>
+
+          {/* Aadhaar and Date of Birth */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Aadhaar</label>
+              <input
+                type="text"
+                value={form.aadhaar}
+                onChange={(e) => set('aadhaar', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="0000 0000 0000"
+              />
             </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Aadhaar</label>
-              <input className="field-control w-full" value={form.aadhaar} onChange={(e) => set('aadhaar', e.target.value)} placeholder="0000 0000 0000" />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Date of Birth</label>
-              <input type="date" className="field-control w-full" value={form.date_of_birth} onChange={(e) => set('date_of_birth', e.target.value)} />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Residential Address</label>
-              <input className="field-control w-full" value={form.residential_address} onChange={(e) => set('residential_address', e.target.value)} placeholder="Full Address" />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">Experience</label>
-              <input className="field-control w-full" value={form.experience} onChange={(e) => set('experience', e.target.value)} placeholder="e.g. 5 Years" />
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Date of Birth</label>
+              <input
+                type="date"
+                value={form.date_of_birth}
+                onChange={(e) => set('date_of_birth', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              />
             </div>
           </div>
 
-          <label className="block cursor-pointer rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-6 py-7 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
-            <Upload className="mx-auto h-7 w-7 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-500">Click to upload Aadhaar, PAN, or other proofs</p>
-            <input type="file" className="hidden" onChange={(e) => setDocFile(e.target.files?.[0] || null)} />
-            {docFile && <p className="mt-3 text-sm font-bold text-teal-700">Selected: {docFile.name}</p>}
-          </label>
+          {/* Residential Address and Experience */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Residential Address</label>
+              <input
+                type="text"
+                value={form.residential_address}
+                onChange={(e) => set('residential_address', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="Full Address"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Experience</label>
+              <input
+                type="text"
+                value={form.experience}
+                onChange={(e) => set('experience', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="e.g. 5 Years"
+              />
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-xs font-black uppercase tracking-wider text-slate-700">Payment Scheme</label>
-              <select className="field-control w-full" value={form.payment_scheme} onChange={(e) => set('payment_scheme', e.target.value)}>
-                {paymentSchemes.map((scheme) => <option key={scheme} value={scheme}>{scheme}</option>)}
+          {/* ID Proofs Document upload */}
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">ID Proofs & Documents</label>
+            <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-4 text-center transition hover:border-teal-300 hover:bg-teal-50/40">
+              <Upload className="mx-auto h-6 w-6 text-slate-300" />
+              <p className="mt-1 text-xs text-slate-500">Click to upload Aadhaar, PAN, or other proofs</p>
+              <input type="file" className="hidden" onChange={(e) => setDocFile(e.target.files?.[0] || null)} />
+              {docFile && <p className="mt-2 text-xs font-bold text-teal-700">Selected: {docFile.name}</p>}
+            </label>
+          </div>
+
+          {/* Payment Scheme & Rate */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Payment Scheme</label>
+              <select
+                value={form.payment_scheme}
+                onChange={(e) => set('payment_scheme', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 bg-white rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer"
+              >
+                <option value="Daily Rate">Daily Rate</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Hourly">Hourly</option>
+                <option value="Per Visit">Per Visit</option>
               </select>
             </div>
-            <div>
-              <label className="mb-2 block text-xs font-black uppercase tracking-wider text-slate-700">Daily Rate (₹)</label>
-              <input className="field-control w-full" value={form.daily_rate} onChange={(e) => set('daily_rate', e.target.value)} placeholder="0" />
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                {form.payment_scheme === 'Hourly' ? 'HOURLY RATE (₹)' :
+                 form.payment_scheme === 'Monthly' ? 'MONTHLY RATE (₹)' :
+                 form.payment_scheme === 'Per Visit' ? 'PER VISIT RATE (₹)' : 'DAILY RATE (₹)'}
+              </label>
+              <input
+                type="number"
+                value={form.daily_rate}
+                onChange={(e) => set('daily_rate', e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              />
             </div>
           </div>
 
-          {error && <p className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
+          {error && <p className="text-xs font-semibold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg">{error}</p>}
 
-          <div className="sticky bottom-0 -mx-7 -mb-7 flex justify-end gap-3 rounded-b-3xl border-t border-slate-100 bg-white/95 px-7 py-5 backdrop-blur">
-            <button type="button" onClick={onClose} className="btn-secondary px-8">Cancel</button>
-            <button type="submit" disabled={saving} className="btn-primary px-8">
-              <UserPlus className="h-4 w-4" /> {saving ? 'Creating…' : 'Create Employee'}
+          {/* Footer Buttons */}
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
+            <button type="button" onClick={onClose} className="btn-secondary px-5">Cancel</button>
+            <button type="submit" disabled={saving} className="btn-primary px-5 flex items-center gap-1.5">
+              <UserPlus className="h-4 w-4" /> {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Employee'}
             </button>
           </div>
         </form>
@@ -241,11 +489,21 @@ export default function AIHR() {
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [selectedCard, setSelectedCard] = useState<Employee | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<Employee | null>(null);
+  const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  
   const [activeTab, setActiveTab] = useState<'allocation' | 'attendance' | 'payroll'>('allocation');
   const [hrSubTab, setHrSubTab] = useState<'workers' | 'deployments' | 'directory' | 'trash'>('workers');
   const [dirFilter, setDirFilter] = useState<'all' | 'available' | 'assigned' | 'inactive'>('all');
   const [showPayslipModal, setShowPayslipModal] = useState(false);
   const [payslipForm, setPayslipForm] = useState({ workerId: '', daysWorked: '', serviceMonth: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), advance: '' });
+
+  useEffect(() => {
+    const handleClose = () => setActiveMenuId(null);
+    window.addEventListener('click', handleClose);
+    return () => window.removeEventListener('click', handleClose);
+  }, []);
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
@@ -282,7 +540,27 @@ export default function AIHR() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      {showAdd && <AddEmployeeModal services={services} onClose={() => setShowAdd(false)} onCreated={(emp) => { setShowAdd(false); setSelectedCard(emp); fetchEmployees(); }} />}
+      {showAdd && (
+        <EmployeeFormModal
+          services={services}
+          onClose={() => setShowAdd(false)}
+          onSaved={fetchEmployees}
+        />
+      )}
+      {editEmployee && (
+        <EmployeeFormModal
+          employee={editEmployee}
+          services={services}
+          onClose={() => setEditEmployee(null)}
+          onSaved={fetchEmployees}
+        />
+      )}
+      {selectedProfile && (
+        <FullProfileModal
+          employee={selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+        />
+      )}
       {selectedCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-3xl rounded-3xl bg-white p-7 shadow-2xl">
@@ -342,13 +620,80 @@ export default function AIHR() {
           {hrSubTab === 'workers' && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map((emp) => (
-                <div key={emp.id} className="premium-card p-6 group">
+                <div key={emp.id} className="premium-card p-6 group relative">
                   <div className="flex items-start gap-4 mb-5">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-base font-bold text-white shadow-sm transition-transform group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #00A859, #004C8C)' }}>
                       {emp.photo_url ? <img src={emp.photo_url} className="h-full w-full object-cover" alt="" /> : (emp.full_name || 'S').split(' ').map((n) => n[0]).join('').slice(0,2)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-slate-900 text-base">{emp.full_name}</p>
+                      <div className="flex items-start justify-between">
+                        <p className="font-bold text-slate-900 text-base truncate">{emp.full_name}</p>
+                        
+                        {/* Dropdown Menu */}
+                        <div className="relative shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuId(activeMenuId === emp.id ? null : emp.id);
+                            }}
+                            className="p-1 rounded-full text-slate-400 hover:bg-slate-100"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </button>
+                          {activeMenuId === emp.id && (
+                            <div className="absolute right-0 mt-1 w-48 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-20 text-left">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProfile(emp);
+                                  setActiveMenuId(null);
+                                }}
+                                className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <Shield className="h-4 w-4 text-slate-400" /> Full Profile
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedCard(emp);
+                                  setActiveMenuId(null);
+                                }}
+                                className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <FileText className="h-4 w-4 text-slate-400" /> Preview ID Card
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditEmployee(emp);
+                                  setActiveMenuId(null);
+                                }}
+                                className="w-full px-4 py-2 text-sm text-[#00A859] hover:bg-slate-50 flex items-center gap-2 font-semibold"
+                              >
+                                <Edit3 className="h-4 w-4" /> Edit Employee
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  setActiveMenuId(null);
+                                  if (window.confirm(`Are you sure you want to delete ${emp.full_name}?`)) {
+                                    await supabase.from('employees').delete().eq('id', emp.id);
+                                    fetchEmployees();
+                                  }
+                                }}
+                                className="w-full px-4 py-2 text-sm text-rose-600 hover:bg-slate-50 flex items-center gap-2 font-semibold border-t border-slate-100"
+                              >
+                                <Trash2 className="h-4 w-4" /> Delete Member
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                       <p className="text-xs font-medium text-slate-500 mt-0.5 uppercase tracking-wider">{emp.job_title || emp.position || 'Care Specialist'}</p>
                       <span className={`inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${(emp.availability_status || 'available') === 'available' ? 'text-[#00A859] bg-[#00A859]/10 border-[#00A859]/20' : 'text-slate-500 bg-slate-100 border-slate-200'}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${(emp.availability_status || 'available') === 'available' ? 'bg-[#00A859]' : 'bg-slate-400'}`} />
@@ -356,16 +701,16 @@ export default function AIHR() {
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-2.5 text-[13px] bg-slate-50/50 p-3 rounded-xl border border-slate-100/60 mb-5">
-                    <div className="flex justify-between items-center"><span className="text-slate-500 font-medium flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5" /> Skills</span><span className="text-slate-700 font-bold">{(emp.service_skills || []).slice(0,2).join(', ') || '—'}</span></div>
-                    <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Contact</span><span className="text-slate-700 font-bold">{emp.phone || '—'}</span></div>
-                    <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Joined</span><span className="text-slate-700 font-bold">{emp.created_at ? new Date(emp.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—'}</span></div>
+                  <div className="space-y-2.5 text-[13px] mb-5">
+                    <div className="flex justify-between items-center"><span className="text-slate-400 font-medium">Skills</span><span className="text-slate-700 font-bold truncate max-w-[150px]">{(emp.service_skills || []).slice(0,2).join(', ') || '—'}</span></div>
+                    <div className="flex justify-between items-center"><span className="text-slate-400 font-medium">Contact</span><span className="text-slate-700 font-bold">{emp.phone || '—'}</span></div>
+                    <div className="flex justify-between items-center"><span className="text-slate-400 font-medium">joined</span><span className="text-slate-700 font-bold">{emp.created_at ? new Date(emp.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—'}</span></div>
                   </div>
                   <div className="flex gap-3 pt-4 border-t border-slate-100">
                     <button onClick={() => setSelectedCard(emp)} className="btn-secondary flex-1 py-2 shadow-none border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 hover:text-slate-700">
                       ID Card
                     </button>
-                    <button onClick={() => toggleAvailability(emp)} className="btn-primary flex-1 py-2 text-[13px]">
+                    <button onClick={() => toggleAvailability(emp)} className="btn-primary flex-1 py-2 text-[13px] flex items-center justify-center gap-1.5">
                       <Briefcase className="h-3.5 w-3.5" /> Assign
                     </button>
                   </div>
@@ -431,7 +776,7 @@ export default function AIHR() {
             </div>
           )}
 
-          {/* Directory sub-tab — Table view matching 99Care */}
+          {/* Directory sub-tab — Table view */}
           {hrSubTab === 'directory' && (
             <div className="premium-card overflow-hidden">
               <div className="p-5 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
@@ -541,8 +886,7 @@ export default function AIHR() {
           )}
         </>
       ) : activeTab === 'attendance' ? (
-        /* Attendance View – matching 99Care pattern */
-        /* Attendance View – matching 99Care pattern */
+        /* Attendance View */
         <div className="premium-card flex-1 flex flex-col">
           <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
             <div>
@@ -565,7 +909,7 @@ export default function AIHR() {
           </div>
         </div>
       ) : (
-        /* Payroll & Invoicing View – matching 99Care pattern */
+        /* Payroll & Invoicing View */
         <div className="grid lg:grid-cols-3 gap-6 flex-1">
           {/* Main Payroll List */}
           <div className="lg:col-span-2 flex flex-col gap-6">

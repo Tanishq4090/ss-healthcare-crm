@@ -118,7 +118,7 @@ export default function BlogDetailPage() {
             {moreArticles.map((relBlog) => (
               <Link key={relBlog.slug} to={`/blog/${relBlog.slug}`} className="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 hover:shadow-md transition-all flex gap-6 items-center">
                 <div className="w-24 h-24 flex-shrink-0 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-700 flex items-center justify-center">
-                  <span className="text-brand-blue font-bold text-lg opacity-50">99</span>
+                  <span className="text-brand-blue font-bold text-lg opacity-50">SS</span>
                 </div>
                 <div>
                   <div className="text-xs text-brand-blue font-bold uppercase tracking-wider mb-2">{relBlog.readTime}</div>

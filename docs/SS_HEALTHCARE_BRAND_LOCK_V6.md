@@ -37,4 +37,4 @@ supabase/migrations/009_brand_lock_ss_healthcare.sql
 - `/admin/billing`
 - `/staff-id/:token`
 
-No screen should show SS Health Care, SS Health Care, SS Health Care Voice AI, or old teal-only branding.
+No screen should show SS Health Care, SS Health Care, SS Health Care Callyzer Calls, or old teal-only branding.

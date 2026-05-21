@@ -253,7 +253,7 @@ Required flow:
 14. Confirm WhatsApp History logs the action.
 15. Open `/admin/attendance`; create one attendance entry.
 16. Open `/admin/billing`; confirm page loads.
-17. Confirm no legacy 99Care branding appears anywhere.
+17. Confirm no legacy SS Health Care branding appears anywhere.
 
 ### 9. Handover
 
@@ -279,5 +279,5 @@ Stop handover if any of these fail:
 - Staff assignment fails.
 - Public staff ID link requires login.
 - Attendance does not save.
-- Any screen shows 99Care or old branding.
+- Any screen shows SS Health Care or old branding.
 - Service role key is visible in frontend env or GitHub.

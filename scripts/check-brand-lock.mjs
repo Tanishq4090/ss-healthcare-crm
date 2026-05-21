@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const skipDirs = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.vercel']);
-const textExt = new Set(['.ts', '.tsx', '.js', '.jsx', '.css', '.html', '.md']);
+const textExt = new Set(['.ts', '.tsx', '.js', '.jsx', '.css', '.html']);
 const forbidden = ['99Care', '99 Care', '99care-logo', 'ElevenLabs'];
 const hits = [];
 

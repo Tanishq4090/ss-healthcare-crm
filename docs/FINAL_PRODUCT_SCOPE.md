@@ -19,7 +19,7 @@
 
 - Public website
 - AI agent calling
-- SS Health Care Voice AI outbound/inbound calling
+- SS Health Care Callyzer Calls outbound/inbound calling
 - Auto-adding every call directly to pipeline
 - Storing every recording automatically
 - Fully automated transcription guarantee before real audio validation

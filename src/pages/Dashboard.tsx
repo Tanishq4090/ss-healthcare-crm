@@ -70,11 +70,17 @@ export default function Dashboard() {
     const pendingCalls = calls.filter((c) => c.review_status === 'new').length;
     const reviewedCalls = calls.filter((c) => c.review_status === 'reviewed').length;
     const addedCalls = calls.filter((c) => c.review_status === 'added_to_pipeline').length;
-    const pipelineValue = leads.reduce((sum, l) => sum + Number(l.value || 0), 0);
     const activeClients = leads.filter((l) => ['active-client', 'closed-won'].includes(String(l.stage || ''))).length;
     const presentToday = attendance.filter((r) => r.status === 'present').length;
-    return { pendingCalls, reviewedCalls, addedCalls, pipelineValue, activeClients, presentToday };
-  }, [attendance, calls, leads]);
+    // KPI metrics
+    const activeLeads = leads.filter((l) => !['closed-lost'].includes(String(l.stage || 'new-lead'))).length;
+    const activeDeployments = employees.filter((e) => (e as any).status === 'deployed' || (e as any).current_client_id).length;
+    const platformMRR = leads
+      .filter((l) => ['active-client', 'closed-won'].includes(String(l.stage || '')))
+      .reduce((sum, l) => sum + Number(l.value || 0), 0);
+    const callyzerCalls = calls.length;
+    return { pendingCalls, reviewedCalls, addedCalls, activeClients, presentToday, activeLeads, activeDeployments, platformMRR, callyzerCalls };
+  }, [attendance, calls, leads, employees]);
 
   const pipelineData = useMemo(() =>
     CRM_STAGES.map((stage) => ({
@@ -87,11 +93,56 @@ export default function Dashboard() {
   const recentLeads = leads.slice(0, 6);
   const hasAnyError = Object.values(errors).some(Boolean);
 
+  const recentActivities = useMemo(() => {
+    const list: Array<{ id: string; type: string; title: string; desc: string; dateObj: Date; timeStr: string }> = [];
+    
+    // Add calls
+    calls.forEach((c) => {
+      const d = new Date(c.call_started_at || c.created_at);
+      list.push({
+        id: `call-${c.id}`,
+        type: 'call',
+        title: 'Callyzer Call Logged',
+        desc: `${c.caller_name || c.caller_number} · ${formatDuration(c.duration_seconds)}`,
+        dateObj: d,
+        timeStr: formatDateTime(c.call_started_at || c.created_at),
+      });
+    });
+
+    // Add leads
+    leads.forEach((l) => {
+      const d = new Date(l.created_at);
+      list.push({
+        id: `lead-${l.id}`,
+        type: 'Lead Stage Updated',
+        desc: `${l.client_name || 'Unnamed Lead'} · ${stageLabel[l.stage || 'new-lead'] || l.stage}`,
+        dateObj: d,
+        timeStr: formatDateTime(l.created_at),
+      });
+    });
+
+    // Add attendance
+    attendance.forEach((a) => {
+      const d = new Date(a.date + 'T09:00:00');
+      list.push({
+        id: `att-${a.id}`,
+        type: 'Attendance Marked',
+        desc: `${a.employee_name} · ${a.status === 'present' ? 'Present' : 'Absent'}`,
+        dateObj: d,
+        timeStr: a.date,
+      });
+    });
+
+    return list
+      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
+      .slice(0, 5);
+  }, [calls, leads, attendance]);
+
   const stats = [
-    { label: 'Pending Calls', value: metrics.pendingCalls, sub: 'Callyzer logs awaiting review', icon: PhoneCall, color: '#F59E0B' },
-    { label: 'Pipeline Leads', value: leads.length, sub: `${metrics.activeClients} active clients`, icon: TrendingUp, color: '#00A859' },
-    { label: 'Workers Present', value: `${metrics.presentToday}/${employees.length}`, sub: 'Manual attendance today', icon: Users, color: '#3B82F6' },
-    { label: 'Pipeline Value', value: formatINR(metrics.pipelineValue), sub: 'Live value from crm_leads', icon: WalletCards, color: '#004C8C' },
+    { label: 'Active Leads', value: metrics.activeLeads, sub: 'In CRM pipeline', icon: TrendingUp, color: '#00A859' },
+    { label: 'Active Deployments', value: metrics.activeDeployments, sub: 'Workers on assignment', icon: Users, color: '#3B82F6' },
+    { label: 'Platform MRR', value: formatINR(metrics.platformMRR), sub: 'Monthly recurring revenue', icon: WalletCards, color: '#004C8C' },
+    { label: 'Callyzer Calls', value: metrics.callyzerCalls, sub: 'Total call logs received', icon: PhoneCall, color: '#F59E0B' },
   ];
 
   return (
@@ -189,38 +240,54 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Call review queue */}
+        {/* Recent activity stream */}
         <div className="premium-card overflow-hidden flex flex-col">
           <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
-            <h2 className="text-base font-bold text-slate-900">Call Review Queue</h2>
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-[#00A859]/10 border border-[#00A859]/20">
-              <Activity className="h-4 w-4 text-[#00A859]" />
-            </div>
+            <h2 className="text-base font-bold text-slate-900">Recent Activity</h2>
+            <span className="status-pill status-pill-green text-[10px] font-bold py-0.5 px-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#00A859] animate-pulse"></span>
+              Live Stream
+            </span>
           </div>
-          <div className="p-6 flex-1 flex flex-col justify-center">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-5 flex items-center justify-between transition-colors hover:bg-amber-50">
-                <div>
-                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">New Inquiries</p>
-                  <p className="text-3xl font-extrabold text-amber-700 mt-1">{metrics.pendingCalls}</p>
+          <div className="p-6 flex-1 flex flex-col justify-start">
+            {recentActivities.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full min-h-[260px] text-center">
+                <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                  <Activity className="h-5 w-5 text-slate-300" />
                 </div>
-                <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center"><PhoneCall className="h-5 w-5 text-amber-600" /></div>
+                <p className="text-sm font-bold text-slate-600">No recent activity</p>
+                <p className="text-xs font-medium text-slate-400 mt-1 max-w-[200px]">Waiting for new events...</p>
               </div>
-              <div className="rounded-2xl border border-[#004C8C]/10 bg-[#004C8C]/5 p-5 flex items-center justify-between transition-colors hover:bg-[#004C8C]/10">
-                <div>
-                  <p className="text-xs font-bold text-[#004C8C] uppercase tracking-wider">Reviewed</p>
-                  <p className="text-3xl font-extrabold text-[#004C8C] mt-1">{metrics.reviewedCalls}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-[#004C8C]/10 flex items-center justify-center"><Users className="h-5 w-5 text-[#004C8C]" /></div>
+            ) : (
+              <div className="relative border-l border-slate-100 pl-6 space-y-5 text-left">
+                {recentActivities.map((act) => {
+                  let dotBg = 'bg-slate-400';
+                  if (act.type === 'call') dotBg = 'bg-[#F59E0B]';
+                  if (act.type === 'lead') dotBg = 'bg-[#00A859]';
+                  if (act.type === 'attendance') dotBg = 'bg-[#3B82F6]';
+
+                  return (
+                    <div key={act.id} className="relative group">
+                      {/* Timeline dot */}
+                      <span className="absolute -left-[30px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
+                        <span className={`h-2.5 w-2.5 rounded-full ${dotBg} transition-transform group-hover:scale-125`} />
+                      </span>
+                      <div>
+                        <p className="text-[13px] font-bold text-slate-900 group-hover:text-[#004C8C] transition-colors">
+                          {act.title}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                          {act.desc}
+                        </p>
+                        <span className="text-[10px] font-medium text-slate-400 block mt-1">
+                          {act.timeStr}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="rounded-2xl border border-[#00A859]/10 bg-[#00A859]/5 p-5 flex items-center justify-between transition-colors hover:bg-[#00A859]/10">
-                <div>
-                  <p className="text-xs font-bold text-[#00A859] uppercase tracking-wider">Converted</p>
-                  <p className="text-3xl font-extrabold text-[#00A859] mt-1">{metrics.addedCalls}</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-[#00A859]/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-[#00A859]" /></div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

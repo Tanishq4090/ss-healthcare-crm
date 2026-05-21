@@ -64,8 +64,8 @@ function normalizeCallyzerPayload(payload) {
   const caller = normalizePhone(pick(root, ['number', 'phone', 'callerNumber', 'customerNumber', 'customerPhone', 'from', 'mobileNumber']));
 
   return {
-    provider: 'callyzer',
-    provider_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id', 'uuid'], `${Date.now()}-${caller || 'unknown'}`)),
+    source: 'callyzer',
+    callyzer_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id', 'uuid'], `${Date.now()}-${caller || 'unknown'}`)),
     external_call_id: String(pick(root, ['id', 'call_id', 'callId', 'callLogId', 'conversation_id', 'uuid'], `${Date.now()}-${caller || 'unknown'}`)),
     caller_number: caller,
     employee_name: pick(root, ['employeeName', 'employee_name', 'emp_name', 'userName', 'agentName', 'staffName'], null),

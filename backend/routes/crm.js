@@ -124,8 +124,8 @@ const crmConfig = {
     }
   ],
   companyIntro: {
-    gujarati: "99 કેર હેલ્પીંગ હેન્ડ છેલ્લા પાંચ વર્ષથી સુરતમાં કામ કરી રહી છે...",
-    hindi: "99 केयर हेल्पिंग हैंड पिछले पांच वर्षों से सूरत में काम कर रहा है...",
+    gujarati: "એસ. એસ. હેલ્થ કેર હેલ્પીંગ હેન્ડ છેલ્લા પાંચ વર્ષથી સુરતમાં કામ કરી રહી છે...",
+    hindi: "एस. एस. हेल्थ केयर हेल्पिंग हैंड पिछले पांच वर्षों से सूरत में काम कर रहा है...",
     english: "SS Health Care Helping Hand has been working in Surat for the last five years..."
   },
   faqs: [

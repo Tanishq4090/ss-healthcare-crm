@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Bot, Briefcase, Calendar, CheckCircle2, ChevronDown, ChevronRight, CreditCard, FileText, IdCard, MessageCircle, Phone, PhoneCall, Plus, RefreshCw, Send, Star, UserCheck, X } from 'lucide-react';
+import { Bot, Briefcase, Calendar, CheckCircle2, ChevronDown, ChevronRight, CreditCard, FileText, IdCard, Mail, MessageCircle, Phone, PhoneCall, Plus, RefreshCw, Send, Star, Trash2, UserCheck, X } from 'lucide-react';
 import { IconFrame, PageShell, SectionHeader, StatusBadge, Surface } from '@/components/AppPrimitives';
 import StaffIDCard from '@/components/StaffIDCard';
 import type { StaffIDCardEmployee } from '@/components/StaffIDCard';
@@ -289,9 +289,37 @@ function LeadDetailsDrawer({
   onAssignStaff: () => void;
 }) {
   const [notes, setNotes] = useState(lead.notes || '');
-  const [customMessage, setCustomMessage] = useState('');
+  const [phone, setPhone] = useState(lead.phone || '');
+  const [email, setEmail] = useState(lead.email || '');
+  const [source, setSource] = useState(lead.source || 'Manual Add');
+  const [value, setValue] = useState(lead.value || 0);
+  const [priority, setPriority] = useState(lead.priority || 'Medium');
+  
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setNotes(lead.notes || '');
+    setPhone(lead.phone || '');
+    setEmail(lead.email || '');
+    setSource(lead.source || 'Manual Add');
+    setValue(lead.value || 0);
+    setPriority(lead.priority || 'Medium');
+  }, [lead]);
+
+  const updateField = async (fieldName: string, fieldValue: any) => {
+    try {
+      const { error: err } = await supabase
+        .from('crm_leads')
+        .update({ [fieldName]: fieldValue })
+        .eq('id', lead.id);
+      if (err) throw err;
+      onRefresh();
+    } catch (e) {
+      console.error(`Failed to update ${fieldName}:`, e);
+      setError(`Failed to save ${fieldName}`);
+    }
+  };
 
   const saveNotes = async () => {
     setSaving(true);
@@ -305,6 +333,29 @@ function LeadDetailsDrawer({
     onRefresh();
   };
 
+  const approveQuotation = async () => {
+    try {
+      await supabase.from('crm_leads').update({ stage: 'form-submitted' }).eq('id', lead.id);
+      onRefresh();
+    } catch (e) {
+      console.error(e);
+      setError('Failed to approve quotation');
+    }
+  };
+
+  const deleteLead = async () => {
+    if (!window.confirm(`Are you sure you want to permanently delete lead "${leadName(lead)}"?`)) return;
+    try {
+      const { error: err } = await supabase.from('crm_leads').delete().eq('id', lead.id);
+      if (err) throw err;
+      onClose();
+      onRefresh();
+    } catch (e) {
+      console.error(e);
+      setError('Failed to delete lead.');
+    }
+  };
+
   const sendMessage = async (templateName: string, content?: string) => {
     try {
       await openLoggedTemplateMessage(lead, templateName, content || templateText(templateName, lead), { source: 'lead_details_drawer' });
@@ -314,84 +365,390 @@ function LeadDetailsDrawer({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      e.preventDefault();
+      saveNotes();
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/45 backdrop-blur-sm">
-      <div className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-100 bg-white/95 px-6 py-5 backdrop-blur">
-          <div>
-            <p className="text-xs font-black uppercase tracking-widest text-teal-600">CRM Lead Details</p>
-            <h3 className="text-2xl font-black text-slate-950">{leadName(lead)}</h3>
-            <p className="mt-1 text-sm text-slate-500">{CRM_STAGE_LABELS[normalizeCrmStage(lead.stage)]} · {lead.service_type || 'General service inquiry'}</p>
+      <div className="h-full w-full max-w-md overflow-y-auto bg-white shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white/95 px-6 py-5 backdrop-blur shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-[#EC4899] text-white flex items-center justify-center font-bold text-lg">
+              {leadName(lead).charAt(0).toUpperCase()}
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">{leadName(lead)}</h3>
           </div>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="rounded-full p-2 hover:bg-slate-100 border border-slate-200 text-slate-500"><X className="h-4 w-4" /></button>
         </div>
 
-        <div className="space-y-5 p-6">
-          <Surface>
-            <SectionHeader title="Contact and Source" description="Operational contact details and intake origin for this lead." />
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Phone</p>
-                <p className="mt-1 text-sm font-bold text-slate-800">{lead.phone || 'Not captured'}</p>
+        {/* Content */}
+        <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+          {/* Pipeline Stage */}
+          <div className="space-y-2 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Pipeline Stage</label>
+            <select
+              value={normalizeCrmStage(lead.stage)}
+              onChange={(e) => updateField('stage', e.target.value)}
+              className="w-full text-sm font-semibold bg-white border border-slate-200 text-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer shadow-sm"
+            >
+              <optgroup label="— Pipeline —">
+                {CRM_PIPELINE_VIEW_STAGES.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="— Clients —">
+                {CRM_CLIENT_VIEW_STAGES.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
+          {/* Contact Details */}
+          <div className="space-y-2 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Contact Details</label>
+            <div className="border border-slate-100 rounded-2xl bg-slate-50/50 p-4 space-y-3">
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Phone</span>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  onBlur={() => updateField('phone', phone)}
+                  className="text-sm font-bold text-slate-800 text-right bg-transparent border-0 focus:ring-0 outline-none p-0 w-48 focus:border-b focus:border-slate-200"
+                  placeholder="Add phone"
+                />
               </div>
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Contact Person</p>
-                <p className="mt-1 text-sm font-bold text-slate-800">{leadContact(lead)}</p>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => updateField('email', email)}
+                  className="text-sm font-bold text-[#004C8C] text-right bg-transparent border-0 focus:ring-0 outline-none p-0 w-48 placeholder:italic placeholder:font-normal placeholder:text-slate-400 focus:border-b focus:border-slate-200"
+                  placeholder="Add email"
+                />
               </div>
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 md:col-span-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Source Tags</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {sourceBadges(lead).map((source) => (
-                    <StatusBadge key={source} className="border-teal-100 bg-teal-50 text-teal-700">{source}</StatusBadge>
-                  ))}
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Source</span>
+                <input
+                  type="text"
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                  onBlur={() => updateField('source', source)}
+                  className="text-sm font-bold text-slate-800 text-right bg-transparent border-0 focus:ring-0 outline-none p-0 w-48 focus:border-b focus:border-slate-200"
+                  placeholder="Add source"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Lead Value */}
+          <div className="space-y-2 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Lead Value</label>
+            <div className="border border-slate-100 rounded-2xl bg-slate-50/50 p-4 space-y-3">
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Monthly value</span>
+                <div className="flex items-center justify-end text-right">
+                  <span className="text-sm font-bold text-[#00A859]">₹</span>
+                  <input
+                    type="number"
+                    value={value}
+                    onChange={(e) => setValue(Number(e.target.value))}
+                    onBlur={() => updateField('value', value)}
+                    className="text-sm font-bold text-[#00A859] text-right bg-transparent border-0 focus:ring-0 outline-none p-0 w-24 focus:border-b focus:border-slate-200"
+                  />
+                  <span className="text-sm font-bold text-[#00A859]">/mo</span>
                 </div>
               </div>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Est. annual</span>
+                <span className="text-sm font-bold text-slate-800">₹{(value * 12).toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Priority</span>
+                <select
+                  value={priority}
+                  onChange={(e) => {
+                    setPriority(e.target.value);
+                    updateField('priority', e.target.value);
+                  }}
+                  className="text-sm font-bold text-slate-800 text-right bg-transparent border-0 focus:ring-0 outline-none p-0 cursor-pointer"
+                >
+                  <option value="Very High">Very High</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
             </div>
-          </Surface>
+          </div>
 
-          <Surface>
-            <SectionHeader title="Notes" description="Use notes for internal follow-up, staffing, deposit, or billing remarks." />
-            <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={5} className="field-control mt-5 w-full resize-none" placeholder="Internal notes..." />
-            <div className="mt-4 flex justify-end">
-              <button onClick={saveNotes} disabled={saving} className="btn-secondary">{saving ? 'Saving...' : 'Save Notes'}</button>
+          {/* Activity Timeline */}
+          <div className="space-y-4 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Activity Timeline</label>
+            <div className="relative pl-6 border-l border-slate-100 space-y-5">
+              <div className="relative">
+                <span className="absolute -left-[30px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                </span>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">
+                    {lead.source === 'call_lead' ? 'Lead created from Call' : 'Lead created manually'}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {lead.created_at ? new Date(lead.created_at).toLocaleString() : 'Just now'}
+                  </p>
+                </div>
+              </div>
+              
+              {lead.stage && lead.stage !== 'new-lead' && (
+                <div className="relative">
+                  <span className="absolute -left-[30px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-white">
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">
+                      Pipeline moved: New Inquiry → {CRM_STAGE_LABELS[normalizeCrmStage(lead.stage)]}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      {lead.created_at ? new Date(lead.created_at).toLocaleString() : 'Just now'}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-          </Surface>
+          </div>
 
-          <Surface>
-            <SectionHeader title="WhatsApp Templates" description="Phase 1 opens a prefilled wa.me message and logs the action in Supabase." action={<IconFrame icon={Send} tone="emerald" />} />
-            <div className="mt-5 grid grid-cols-2 gap-2">
-              {[
-                ['inquiry_received', 'Inquiry'],
-                ['quotation_sent', 'Quotation'],
-                ['form_submitted', 'Form'],
-                ['staff_assigned', 'Staff ID'],
-                ['deposit_pending', 'Deposit'],
-                ['monthly_billing', 'Billing'],
-              ].map(([key, label]) => (
-                <button key={key} onClick={() => sendMessage(key)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:border-teal-200 hover:text-teal-700">
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4">
-              <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500">Custom follow-up</label>
-              <textarea value={customMessage} onChange={(event) => setCustomMessage(event.target.value)} rows={4} className="field-control w-full resize-none" placeholder="Write a custom follow-up message..." />
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button onClick={() => sendMessage('general_follow_up', customMessage || templateText('general_follow_up', lead))} className="btn-primary">
-                <Send className="h-4 w-4" /> Send Custom Message
-              </button>
-              <button onClick={onShowHistory} className="btn-secondary">
-                <MessageCircle className="h-4 w-4" /> WhatsApp History
-              </button>
-              <button onClick={onAssignStaff} className="btn-secondary">
-                <IdCard className="h-4 w-4" /> Assign Staff
-              </button>
-            </div>
-          </Surface>
+          {/* Add Note */}
+          <div className="space-y-3 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Add Note</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={4}
+              className="w-full text-sm bg-white border border-slate-200 text-slate-700 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#00A859]/20 resize-none shadow-sm placeholder:text-slate-400"
+              placeholder="Write a note... (Ctrl+Enter to save)"
+            />
+            <button
+              onClick={saveNotes}
+              disabled={saving}
+              className="w-full py-2.5 bg-[#E8F8F0] border border-[#D1F2E1] text-[#00A859] rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#DDF5E9] transition"
+            >
+              + {saving ? 'Saving...' : 'Save Note'}
+            </button>
+          </div>
 
-          {error && <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
+          {/* Actions & Processing */}
+          <div className="space-y-3 text-left">
+            <label className="text-[11px] font-black uppercase tracking-wider text-slate-400">Actions & Processing</label>
+            <div className="space-y-2">
+              <button
+                onClick={onShowHistory}
+                className="w-full py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition shadow-sm"
+              >
+                <Bot className="h-4 w-4 text-slate-400" /> View AI Chat History
+              </button>
+              <button
+                onClick={() => sendMessage('quotation_sent')}
+                className="w-full py-2.5 bg-[#FFFDF5] border border-[#FFF3D1] text-amber-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#FFF9E5] transition"
+              >
+                <Send className="h-4 w-4" /> Send Quotation
+              </button>
+              <button
+                onClick={approveQuotation}
+                className="w-full py-2.5 bg-[#F5FBFF] border border-[#DCEFFF] text-[#004C8C] rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#EBF7FF] transition"
+              >
+                <CheckCircle2 className="h-4 w-4" /> Quotation Approved
+              </button>
+            </div>
+          </div>
+
+          {/* Delete Lead */}
+          <div className="pt-2">
+            <button
+              onClick={deleteLead}
+              className="w-full py-3 bg-[#FFF5F5] border border-[#FFE3E3] text-[#E53E3E] rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#FFF0F0] transition"
+            >
+              <Trash2 className="h-4 w-4" /> Delete Lead Permanently
+            </button>
+          </div>
+
+          {error && <p className="rounded-xl bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">{error}</p>}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AddLeadModal({
+  crmTab,
+  onClose,
+  onCreated,
+}: {
+  crmTab: 'pipeline' | 'clients';
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [stage, setStage] = useState(crmTab === 'pipeline' ? 'new-inquiry' : 'active-client');
+  const [value, setValue] = useState(0);
+  const [priority, setPriority] = useState('Medium');
+  const [source, setSource] = useState('Manual Add');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return setError('Please enter a name');
+    setSaving(true);
+    setError('');
+
+    try {
+      const { error: insertError } = await supabase.from('crm_leads').insert([
+        {
+          client_name: name,
+          phone,
+          email,
+          stage,
+          value,
+          priority,
+          source,
+        },
+      ]);
+
+      if (insertError) throw insertError;
+      onCreated();
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to create lead');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200 text-left">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">Create New Lead</h3>
+            <p className="mt-0.5 text-xs text-slate-500">Add a new record to your CRM database</p>
+          </div>
+          <button onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+        </div>
+
+        <form onSubmit={handleCreate} className="mt-4 space-y-4">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Client / Company Name *</label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              placeholder="e.g. Tanishq Aggarwal"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Phone</label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="+91 XXXXX XXXXX"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+                placeholder="client@email.com"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Pipeline Stage</label>
+              <select
+                value={stage}
+                onChange={(e) => setStage(e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 bg-white rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer"
+              >
+                <optgroup label="— Pipeline —">
+                  {CRM_PIPELINE_VIEW_STAGES.map((item) => (
+                    <option key={item.id} value={item.id}>{item.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="— Clients —">
+                  {CRM_CLIENT_VIEW_STAGES.map((item) => (
+                    <option key={item.id} value={item.id}>{item.label}</option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Priority</label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 bg-white rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20 cursor-pointer"
+              >
+                <option value="Very High">Very High</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Monthly Value (₹)</label>
+              <input
+                type="number"
+                value={value}
+                onChange={(e) => setValue(Number(e.target.value))}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Source</label>
+              <input
+                type="text"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className="w-full text-sm font-semibold border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#00A859]/20"
+              />
+            </div>
+          </div>
+
+          {error && <p className="text-xs font-semibold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg">{error}</p>}
+
+          <div className="pt-2 flex justify-end gap-3 border-t border-slate-100 mt-4">
+            <button type="button" onClick={onClose} className="btn-secondary px-5">Cancel</button>
+            <button type="submit" disabled={saving} className="btn-primary px-5">
+              {saving ? 'Creating...' : 'Create Lead'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
@@ -407,6 +764,7 @@ export default function AICRM() {
   const [assignmentLead, setAssignmentLead] = useState<Lead | null>(null);
   const [historyLead, setHistoryLead] = useState<Lead | null>(null);
   const [detailsLead, setDetailsLead] = useState<Lead | null>(null);
+  const [showAddLead, setShowAddLead] = useState(false);
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     CRM_PIPELINE_STAGES.forEach((s) => { init[s.id] = true; });
@@ -468,22 +826,29 @@ export default function AICRM() {
       {historyLead && <WhatsAppHistoryDrawer lead={historyLead} onClose={() => setHistoryLead(null)} />}
       {detailsLead && (
         <LeadDetailsDrawer
-          lead={detailsLead}
+          lead={leads.find((l) => l.id === detailsLead.id) || detailsLead}
           onClose={() => setDetailsLead(null)}
           onRefresh={fetchData}
           onShowHistory={() => setHistoryLead(detailsLead)}
           onAssignStaff={() => setAssignmentLead(detailsLead)}
         />
       )}
+      {showAddLead && (
+        <AddLeadModal
+          crmTab={crmTab === 'clients' ? 'clients' : 'pipeline'}
+          onClose={() => setShowAddLead(false)}
+          onCreated={fetchData}
+        />
+      )}
 
-      {/* Page header – exact 99Care match */}
+      {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI CRM Center</h1>
           <p className="text-slate-500 mt-1">Manage leads, pipelines, and WhatsApp communication workflows.</p>
         </div>
 
-        {/* Module Tabs – 99Care: Pipeline | Clients | AI Auto | Voice AI */}
+        {/* Module Tabs */}
         <div className="segmented-control shrink-0">
           {([['pipeline','Pipeline'],['clients','Clients'],['automations','AI Auto'],['call-leads','Call Leads']] as const).map(([key, label]) => (
             <button key={key} onClick={() => setCrmTab(key)} className={cn('segmented-item', crmTab === key && 'segmented-item-active')}>
@@ -503,7 +868,7 @@ export default function AICRM() {
             <button className="btn-secondary">
               Export CSV
             </button>
-            <button className="btn-primary">
+            <button onClick={() => setShowAddLead(true)} className="btn-primary">
               <Plus className="h-4 w-4" /> Add Lead
             </button>
           </div>
@@ -575,12 +940,19 @@ export default function AICRM() {
               </div>
             );
           })}
-          {crmTab === 'clients' && (
-            <div className="w-[220px] rounded-xl border-2 border-dashed border-slate-200 p-6 text-center text-sm text-slate-400 hover:border-slate-300 cursor-pointer transition-colors">
-              <Plus className="h-5 w-5 mx-auto mb-2 text-slate-300" />
-              + Create a new one
+          
+          {/* Dash Card for Creating Lead */}
+          <div
+            onClick={() => setShowAddLead(true)}
+            className="w-full max-w-[320px] rounded-2xl border-2 border-dashed border-slate-200/80 bg-white hover:border-[#00A859] hover:bg-slate-50/40 p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group mt-4 mx-4"
+          >
+            <div className="w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center group-hover:border-[#00A859] group-hover:bg-[#00A859]/5 transition-all">
+              <Plus className="h-4 w-4 text-slate-400 group-hover:text-[#00A859]" />
             </div>
-          )}
+            <span className="text-xs font-bold text-slate-500 group-hover:text-[#00A859] transition-all">
+              + Create a new one
+            </span>
+          </div>
         </div>
       )}
 

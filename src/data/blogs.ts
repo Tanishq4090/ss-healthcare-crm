@@ -22,7 +22,7 @@ export const blogs: BlogPost[] = [
     excerpt:
       'Home health care is becoming a more and more popular choice for patients and families across India. Here is why it may be the best option for you and your loved ones.',
     tags: ['Home Care', 'Health Tips', 'Senior Care'],
-    relatedSlugs: ['home-health-care-tips-for-seniors', 'reliable-home-health-care-99-care'],
+    relatedSlugs: ['home-health-care-tips-for-seniors', 'reliable-home-health-care-ss-healthcare'],
     content: [
       {
         paragraph:
@@ -55,7 +55,7 @@ export const blogs: BlogPost[] = [
     ],
   },
   {
-    slug: 'reliable-home-health-care-99-care',
+    slug: 'reliable-home-health-care-ss-healthcare',
     title: "Reliable Home Health Care by SS Health Care: Why It's the Best Choice for Your Loved Ones",
     date: 'June 10, 2025',
     author: 'SS Health Care Team',
@@ -106,7 +106,7 @@ export const blogs: BlogPost[] = [
     excerpt:
       'A newborn\'s arrival is thrilling and transformative. Here is how to fully prepare your home to ensure a safe, warm, and nurturing environment for your new baby.',
     tags: ['Maternity', 'Newborn Care', 'Parenting Tips'],
-    relatedSlugs: ['advantages-of-home-health-care', 'reliable-home-health-care-99-care'],
+    relatedSlugs: ['advantages-of-home-health-care', 'reliable-home-health-care-ss-healthcare'],
     content: [
       {
         paragraph:
@@ -153,7 +153,7 @@ export const blogs: BlogPost[] = [
     excerpt:
       'As our loved ones age, ensuring they receive the right care at home becomes essential. These five practical tips will help you provide effective, dignified care for elderly family members.',
     tags: ['Senior Care', 'Elderly', 'Home Care Tips'],
-    relatedSlugs: ['advantages-of-home-health-care', 'reliable-home-health-care-99-care'],
+    relatedSlugs: ['advantages-of-home-health-care', 'reliable-home-health-care-ss-healthcare'],
     content: [
       {
         paragraph:

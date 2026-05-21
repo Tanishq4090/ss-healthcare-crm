@@ -19,7 +19,7 @@ export default function Footer() {
             </p>
             <div className="flex gap-4">
               {/* Facebook */}
-              <a href="https://www.facebook.com/people/99-Care/61572902891369/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all">
+              <a href="https://www.facebook.com/people/SS-Health-Care/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-brand-blue hover:text-white hover:border-brand-blue transition-all">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
@@ -49,10 +49,10 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
             <div className="flex flex-col gap-4 text-sm">
-              <Link to="/about" className="text-gray-400 hover:text-white transition-colors w-w-fit">About Us</Link>
-              <Link to="/services" className="text-gray-400 hover:text-white transition-colors w-w-fit">Services</Link>
-              <Link to="/appointment" className="text-gray-400 hover:text-white transition-colors w-w-fit">Appointment</Link>
-              <Link to="/contact" className="text-gray-400 hover:text-white transition-colors w-w-fit">Contact Us</Link>
+              <Link to="/about" className="text-gray-400 hover:text-white transition-colors w-fit">About Us</Link>
+              <Link to="/services" className="text-gray-400 hover:text-white transition-colors w-fit">Services</Link>
+              <Link to="/appointment" className="text-gray-400 hover:text-white transition-colors w-fit">Appointment</Link>
+              <Link to="/contact" className="text-gray-400 hover:text-white transition-colors w-fit">Contact Us</Link>
             </div>
           </div>
 
@@ -82,7 +82,7 @@ export default function Footer() {
         {/* Divider & Bottom bar */}
         <div className="border-t border-gray-800 dark:border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs text-gray-500 font-medium tracking-wide">
-            © 2025 99 CARE — All Rights Reserved | Powered by 99FIX ALL FACILITIES & SERVICES
+            © 2026 SS Health Care — All Rights Reserved | Powered by SS Health Care Operations
           </p>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>

@@ -35,7 +35,7 @@ begin
     where body ilike ('%' || '99' || 'care' || '%') or body ilike ('%' || '99' || ' care' || '%');
   end if;
 
-  if exists (select 1 from information_schema.tables where table_schema='public' and table_name='template_message_logs') then
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='template_message_logs' and column_name='message_body') then
     update public.template_message_logs
     set message_body = replace(replace(replace(message_body, 'SS Health Care', 'SS Health Care'), 'SS Health Care', 'SS Health Care'), 'homecareservices.co.in', 'homecareservices.co.in')
     where message_body ilike ('%' || '99' || 'care' || '%') or message_body ilike ('%' || '99' || ' care' || '%');

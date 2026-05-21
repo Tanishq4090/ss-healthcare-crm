@@ -6,6 +6,7 @@ create extension if not exists pgcrypto;
 
 drop table if exists public.lead_staff_assignments cascade;
 drop table if exists public.whatsapp_messages cascade;
+drop table if exists public.template_message_logs cascade;
 
 -- -----------------------------------------------------------------------------
 -- 1) Service catalog extracted from SS Healthcare's public business website

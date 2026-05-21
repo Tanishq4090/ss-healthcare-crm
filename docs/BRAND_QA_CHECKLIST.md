@@ -11,4 +11,4 @@ Before the client demo, verify:
 - [ ] Staff ID card uses SS Health Care logo, colors, and wording.
 - [ ] Public staff ID page opens without login and uses SS branding.
 - [ ] WhatsApp staff-assigned message says SS Health Care.
-- [ ] No SS Health Care/SS Health Care/SS Health Care Voice AI copy remains.
+- [ ] No SS Health Care/SS Health Care/SS Health Care Callyzer Calls copy remains.

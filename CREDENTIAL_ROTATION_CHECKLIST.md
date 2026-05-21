@@ -34,11 +34,11 @@
 
 ---
 
-## Step 3: SS Health Care Voice AI Agent ID
-1. **Navigate to:** [SS Health Care Voice AI Conversational AI](https://SS Health Care Voice AI.io/app/conversational-ai)
+## Step 3: SS Health Care Callyzer Calls Agent ID
+1. **Navigate to:** [SS Health Care Callyzer Calls Conversational AI](https://SS Health Care Callyzer Calls.io/app/conversational-ai)
 2. **Sensitivity Note:** The "Agent ID" itself is less sensitive than an API key, but:
-   - Check if your **SS Health Care Voice AI API KEY** was also exposed anywhere.
-   - Regenerate the API key at [SS Health Care Voice AI API Settings](https://SS Health Care Voice AI.io/app/settings/api-keys).
+   - Check if your **SS Health Care Callyzer Calls API KEY** was also exposed anywhere.
+   - Regenerate the API key at [SS Health Care Callyzer Calls API Settings](https://SS Health Care Callyzer Calls.io/app/settings/api-keys).
    - If the agent was configured with sensitive system prompts or knowledge bases, consider creating a new agent and deprecating the exposed one.
 
 ---

@@ -235,7 +235,7 @@ export default function ContactPage() {
                     <motion.a 
                       whileHover={{ y: -3, scale: 1.1 }} 
                       transition={{ duration: 0.2 }} 
-                      href="https://www.facebook.com/people/99-Care/61572902891369/" 
+                      href="https://www.facebook.com/people/SS-Health-Care/" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-800 flex items-center justify-center transition-all hover:border-[#1877F2]/30 hover:bg-[#1877F2]/5"

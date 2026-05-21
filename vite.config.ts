@@ -25,8 +25,8 @@ export default defineConfig(({ mode }) => {
           scope: '/',
           start_url: '/',
           icons: [
-            { src: '/99care-favicon.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
-            { src: '/99care-favicon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
+            { src: '/logo.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: '/logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
           ],
           shortcuts: [
             { name: 'Open Dashboard', url: '/admin', description: 'Go to SS Health Care Admin OS dashboard' },
@@ -44,15 +44,15 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           icons: [
             {
-              src: 'https://99care.org/wp-content/uploads/2024/01/logo.png',
+              src: '/logo.png',
               sizes: '192x192',
-              type: 'image/svg+xml',
+              type: 'image/png',
               purpose: 'any maskable',
             },
             {
-              src: 'https://99care.org/wp-content/uploads/2024/01/logo.png',
+              src: '/logo.png',
               sizes: '512x512',
-              type: 'image/svg+xml',
+              type: 'image/png',
               purpose: 'any maskable',
             },
           ],
