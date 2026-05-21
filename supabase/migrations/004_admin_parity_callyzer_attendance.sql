@@ -62,6 +62,12 @@ create table if not exists public.manual_attendance (
   unique(employee_id, work_date)
 );
 
+-- Guard: if table pre-existed with different schema (e.g. from 007_ which uses
+-- attendance_date + total_hours), ensure the columns this view needs are present.
+alter table public.manual_attendance add column if not exists hours_worked numeric default 0;
+alter table public.manual_attendance add column if not exists work_date date;
+
+
 create index if not exists idx_manual_attendance_employee_date on public.manual_attendance(employee_id, work_date desc);
 create index if not exists idx_manual_attendance_work_date on public.manual_attendance(work_date desc);
 create index if not exists idx_manual_attendance_status on public.manual_attendance(status);
