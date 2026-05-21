@@ -910,89 +910,17 @@ export default function AIHR() {
         </div>
       ) : (
         /* Payroll & Invoicing View */
-        <div className="grid lg:grid-cols-3 gap-6 flex-1">
-          {/* Main Payroll List */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
-            <div className="bg-gradient-to-br from-[#004C8C] via-[#004C8C]/90 to-[#00A859]/80 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-              <h2 className="font-extrabold text-2xl tracking-tight relative z-10">Financial Execution Center</h2>
-              <p className="text-white/80 text-sm font-medium mt-1.5 relative z-10">Auto-calculate and pattern all invoices for active deployments.</p>
-              <div className="flex gap-3 mt-6 relative z-10">
-                <button onClick={() => setShowPayslipModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white/10 border border-white/20 hover:bg-white/20 backdrop-blur rounded-xl text-sm font-bold transition-all shadow-sm">
-                  <FileText className="h-4 w-4" /> Manual Payslip
-                </button>
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-[#004C8C] rounded-xl text-sm font-extrabold hover:bg-slate-50 transition-all shadow-md">
-                  <Send className="h-4 w-4" /> Generate & Dispatch All
-                </button>
-              </div>
+        <div className="flex-1 flex items-center justify-center py-20 px-4">
+          <div className="max-w-md w-full text-center">
+            <div className="w-24 h-24 bg-slate-50 border border-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Lock className="w-10 h-10 text-slate-300" />
             </div>
-            <div className="premium-card overflow-hidden flex-1">
-              <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
-                <h2 className="text-base font-bold text-slate-900">Current Billing Cycle</h2>
-                <span className="text-[11px] font-bold text-slate-500 border border-slate-200/60 px-3 py-1.5 rounded-md bg-white uppercase tracking-wider shadow-sm">Auto-calculating from active hours</span>
-              </div>
-              <div className="divide-y divide-slate-100/60">
-                {employees.filter(e => (e.availability_status || 'available') !== 'available').length === 0 ? (
-                  <div className="p-12 text-center text-sm font-medium text-slate-500">No active payroll entries found for this cycle. Assign workers to generate billing.</div>
-                ) : (
-                  employees.filter(e => (e.availability_status || 'available') !== 'available').map((emp) => (
-                    <div key={emp.id} className="p-5 flex items-center justify-between hover:bg-slate-50/80 transition-colors">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                          <Users className="w-5 h-5 text-slate-400" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-slate-900 text-base">{emp.full_name}</h4>
-                          <div className="flex items-center gap-3 text-[13px] font-medium text-slate-500 mt-1">
-                            <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md"><Clock className="w-3.5 h-3.5 text-slate-400" /> ₹{emp.daily_rate || 0}/day</span>
-                            <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md"><Briefcase className="w-3.5 h-3.5 text-slate-400" /> {emp.job_title || 'Assigned'}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-extrabold text-[#00A859] tracking-tight">₹{((emp.daily_rate || 0) * 26).toLocaleString()}</p>
-                        <p className="text-[10px] text-amber-600 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-md uppercase tracking-wider font-bold mt-1 inline-block">PENDING</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Action Panel */}
-          <div className="flex flex-col gap-6">
-            <div className="premium-card p-8 text-center group relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500"><Send className="w-48 h-48 -mt-12 -mr-12 text-[#00A859]" /></div>
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 relative z-10 shadow-sm border border-[#00A859]/20" style={{ background: 'linear-gradient(135deg, rgba(0,168,89,0.1), rgba(0,168,89,0.02))' }}>
-                <Send className="w-10 h-10 ml-1 text-[#00A859]" />
-              </div>
-              <h3 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight relative z-10">Run Automation</h3>
-              <p className="text-[13px] font-medium text-slate-500 mb-8 leading-relaxed relative z-10 max-w-[250px] mx-auto">
-                Clicking this will generate <strong>Worker Payslips</strong> and <strong>Client Monthly Bills</strong> based on verified attendance hours.
-              </p>
-              <button className="w-full py-4 px-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 relative z-10" style={{ background: 'linear-gradient(135deg, #00A859, #008f4c)' }}>
-                <FileText className="w-5 h-5" /> Dispatch All Documents
-              </button>
-            </div>
-
-            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 space-y-4">
-              <h3 className="font-semibold text-slate-900 flex items-center gap-2 mb-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Automation Checklist
-              </h3>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-slate-700">Attendance manually verified by HR</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-slate-700">Salary rates verified</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-slate-700">Client billing active</span>
-              </div>
-            </div>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Coming Soon</h2>
+            <p className="text-slate-500 mb-8 font-medium">The comprehensive Payroll module is currently locked and will be activated in a future phase according to your requirements.</p>
+            
+            <button type="button" disabled className="btn-secondary opacity-50 cursor-not-allowed mx-auto">
+              Module Locked
+            </button>
           </div>
         </div>
       )}
