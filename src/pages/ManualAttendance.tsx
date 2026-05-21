@@ -233,7 +233,7 @@ export default function ManualAttendance() {
         />
       )}
 
-      {/* Page header – 99Care pattern */}
+      {/* Page header – SS Health Care pattern */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">Manual Attendance</h1>

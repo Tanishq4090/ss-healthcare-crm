@@ -476,14 +476,14 @@ export default function AICRM() {
         />
       )}
 
-      {/* Page header – exact 99Care match */}
+      {/* Page header – exact SS Health Care match */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI CRM Center</h1>
           <p className="text-slate-500 mt-1">Manage leads, pipelines, and WhatsApp communication workflows.</p>
         </div>
 
-        {/* Module Tabs – 99Care: Pipeline | Clients | AI Auto | Voice AI */}
+        {/* Module Tabs – SS Health Care: Pipeline | Clients | AI Auto | Voice AI */}
         <div className="segmented-control shrink-0">
           {([['pipeline','Pipeline'],['clients','Clients'],['automations','AI Auto'],['call-leads','Call Leads']] as const).map(([key, label]) => (
             <button key={key} onClick={() => setCrmTab(key)} className={cn('segmented-item', crmTab === key && 'segmented-item-active')}>

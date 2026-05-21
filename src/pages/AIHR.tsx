@@ -431,7 +431,7 @@ export default function AIHR() {
             </div>
           )}
 
-          {/* Directory sub-tab — Table view matching 99Care */}
+          {/* Directory sub-tab — Table view matching SS Health Care */}
           {hrSubTab === 'directory' && (
             <div className="premium-card overflow-hidden">
               <div className="p-5 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
@@ -541,8 +541,8 @@ export default function AIHR() {
           )}
         </>
       ) : activeTab === 'attendance' ? (
-        /* Attendance View – matching 99Care pattern */
-        /* Attendance View – matching 99Care pattern */
+        /* Attendance View – matching SS Health Care pattern */
+        /* Attendance View – matching SS Health Care pattern */
         <div className="premium-card flex-1 flex flex-col">
           <div className="p-6 border-b border-slate-100/60 flex items-center justify-between bg-slate-50/30">
             <div>
@@ -565,7 +565,7 @@ export default function AIHR() {
           </div>
         </div>
       ) : (
-        /* Payroll & Invoicing View – matching 99Care pattern */
+        /* Payroll & Invoicing View – matching SS Health Care pattern */
         <div className="grid lg:grid-cols-3 gap-6 flex-1">
           {/* Main Payroll List */}
           <div className="lg:col-span-2 flex flex-col gap-6">
