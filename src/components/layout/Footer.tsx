@@ -82,7 +82,7 @@ export default function Footer() {
         {/* Divider & Bottom bar */}
         <div className="border-t border-gray-800 dark:border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs text-gray-500 font-medium tracking-wide">
-            © 2025 99 CARE — All Rights Reserved | Powered by 99FIX ALL FACILITIES & SERVICES
+            © 2025 SS Health Care — All Rights Reserved | Powered by 99FIX ALL FACILITIES & SERVICES
           </p>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
