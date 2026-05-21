@@ -219,6 +219,7 @@ values ('call-recordings', 'call-recordings', false)
 on conflict (id) do nothing;
 
 -- 8) RPC: convert call inquiry to CRM lead -------------------------------------
+drop function if exists public.add_call_inquiry_to_pipeline(uuid);
 create or replace function public.add_call_inquiry_to_pipeline(p_call_id uuid)
 returns uuid
 language plpgsql
