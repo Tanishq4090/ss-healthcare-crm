@@ -1,32 +1,106 @@
-# SS Health Care Phase 1 Live Handoff Pack
+# SS Health Care CRM
 
-This pack contains the execution prompt, partner runbook, smoke tests, environment templates, migration order, and client handover guide for making the SS Health Care Admin OS live as Phase 1.
+Internal CRM & Operations System for SS Health Care — built with React, Vite, TypeScript, Supabase, and TailwindCSS.
 
-## Files
+---
 
-- `PHASE1_LIVE_DEPLOYMENT_MASTER_PROMPT.md` — give this to your partner or coding agent.
-- `PARTNER_EXECUTION_RUNBOOK.md` — step-by-step operational instructions.
-- `SMOKE_TEST_PHASE1.md` — final production validation checklist.
-- `SUPABASE_MIGRATION_ORDER.md` — exact SQL migration sequence.
-- `CLIENT_HANDOVER_GUIDE.md` — short client-facing guide.
-- `ENV_TEMPLATES/` — backend and Vercel env templates.
-- `PHASE2_NOTES_CALLYZER_META.md` — future integration notes.
-- `scripts/` — backend smoke test scripts.
+## 🚀 Getting Started (Mac, Windows & Linux)
 
-## Phase 1 definition
+### 1. Clone the repo
 
-Live internal CRM OS:
-- admin login
-- dashboard
-- call leads
+```bash
+git clone https://github.com/Tanishq4090/ss-healthcare-crm.git
+cd ss-healthcare-crm
+```
+
+### 2. Set up environment variables
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in your Supabase credentials. The app **will not start** without these.
+
+> Ask the project owner for the actual `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` values.
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+> **Apple Silicon (M1/M2/M3)?** If you hit native module errors:
+> ```bash
+> npm install --legacy-peer-deps
+> ```
+
+### 4. Run the dev server
+
+```bash
+npm run dev
+```
+
+Open **http://localhost:5173** in your browser.
+
+### 5. Login
+
+| Field | Value |
+|-------|-------|
+| Username | `admin` |
+| Password | `password123` |
+
+---
+
+## 📜 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start local dev server (port 5173) |
+| `npm run dev:public` | Start public-facing site (port 5174) |
+| `npm run build` | Production build |
+| `npm run build:os` | Build internal admin OS |
+| `npm run build:public` | Build public patient-facing site |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview production build locally |
+
+---
+
+## 🗂 Phase 1 Features
+
+- Admin login & access control
+- Dashboard with analytics
+- Call leads management
 - CRM pipeline
-- staff assignment
-- staff ID card verification
+- Staff assignment
+- Staff ID card verification
 - WhatsApp prefilled/logged messages
-- HR
-- attendance
-- billing
-- access control
+- HR management
+- Attendance tracking
+- Billing
 - SS Health Care branding
 
-Callyzer and Meta WhatsApp API are Phase 2.
+> **Phase 2** (coming): Callyzer integration & Meta WhatsApp Business API
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** React 19, TypeScript, Vite 7, TailwindCSS 3
+- **Backend/DB:** Supabase (PostgreSQL + Auth + Storage)
+- **UI Components:** Radix UI, shadcn/ui
+- **Forms:** React Hook Form + Zod
+- **Charts:** Recharts
+- **Animations:** Framer Motion
+
+---
+
+## 🌐 Live Deployment
+
+Deployed on Vercel. Contact the project owner for the live URL.
+
+---
+
+## ⚙️ Environment Notes
+
+- `.env` is **gitignored** — never committed. Use `.env.example` as a template.
+- The `kimi-plugin-inspect-react` Vite plugin is Windows-only and is **automatically skipped** on macOS/Linux — no manual changes needed.

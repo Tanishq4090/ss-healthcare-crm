@@ -1,8 +1,18 @@
 import path from "path"
+import { createRequire } from "module"
 import react from "@vitejs/plugin-react"
 import { defineConfig, loadEnv } from "vite"
-import { inspectAttr } from 'kimi-plugin-inspect-react'
 import { VitePWA } from 'vite-plugin-pwa'
+
+// kimi-plugin-inspect-react is optional — gracefully skip on macOS/Linux
+const _require = createRequire(import.meta.url)
+let inspectPlugin: any = null
+try {
+  const { inspectAttr } = _require('kimi-plugin-inspect-react')
+  inspectPlugin = inspectAttr()
+} catch {
+  // Plugin not available on this platform — safe to skip
+}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -79,7 +89,7 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     plugins: [
-      inspectAttr(),
+      ...(inspectPlugin ? [inspectPlugin] : []),
       react(),
       VitePWA({
         registerType: 'autoUpdate',
