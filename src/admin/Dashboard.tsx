@@ -76,7 +76,7 @@ export default function Dashboard() {
                 const payload = log.payload || {};
                 const templateName = payload.templateName || payload.type || 'message';
                 const recipient = payload.leadName || payload.original_recipient || payload.phone || 'client';
-                let description = 'AI performed an automated WhatsApp action.';
+                let description = 'System performed an automated WhatsApp action.';
 
                 if (payload.pipelineStageUpdate) {
                     description = `Moved lead to "${payload.pipelineStageUpdate}".`;
@@ -91,7 +91,7 @@ export default function Dashboard() {
                 } else if (payload.templateName) {
                     description = `Sent ${payload.templateName} to ${recipient}.`;
                 } else if (payload.message) {
-                    description = `AI replied to ${recipient}: "${String(payload.message).slice(0, 60)}${String(payload.message).length > 60 ? '...' : ''}"`;
+                    description = `System replied to ${recipient}: "${String(payload.message).slice(0, 60)}${String(payload.message).length > 60 ? '...' : ''}"`;
                 } else if (log.error_message) {
                     description = `WhatsApp automation error: ${log.error_message}`;
                 }
@@ -219,7 +219,7 @@ export default function Dashboard() {
         { label: 'Active Leads', value: stats.activeLeads.value, trend: stats.activeLeads.trend, icon: <TrendingUp className="w-5 h-5 text-primary"/>, bg: 'bg-primary/10' },
         { label: 'Active Deployments', value: stats.activeWorkers.value, trend: stats.activeWorkers.trend, icon: <Users className="w-5 h-5 text-emerald-500"/>, bg: 'bg-emerald-50' },
         { label: 'Platform MRR', value: stats.totalMrr.value, trend: stats.totalMrr.trend, icon: <ArrowUpRight className="w-5 h-5 text-primary"/>, bg: 'bg-primary/10' },
-        { label: 'AI Voice Calls', value: stats.aiVoiceCalls.value, trend: stats.aiVoiceCalls.trend, icon: <Phone className="w-5 h-5 text-amber-500"/>, bg: 'bg-amber-50' },
+        { label: 'Voice Calls', value: stats.aiVoiceCalls.value, trend: stats.aiVoiceCalls.trend, icon: <Phone className="w-5 h-5 text-amber-500"/>, bg: 'bg-amber-50' },
     ];
 
     const formatActivityTime = (dateStr: string) => {
@@ -308,7 +308,7 @@ export default function Dashboard() {
 
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px] lg:h-auto">
                     <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="font-bold text-slate-900">Recent AI Activity</h2>
+                        <h2 className="font-bold text-slate-900">Recent Recent Activity</h2>
                         <span className="text-[10px] font-black tracking-widest uppercase text-primary bg-primary/10 px-2 py-1 rounded-md">Live Stream</span>
                     </div>
                     <div className="p-4 flex-1 overflow-auto">

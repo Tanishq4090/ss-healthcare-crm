@@ -572,7 +572,7 @@ export default function AIHR() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI HR &amp; Billing</h1>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">HR &amp; Billing</h1>
           <p className="text-slate-500 mt-1">Manage worker allocation, automated attendance, and payroll dispatch.</p>
         </div>
         <div className="flex items-center p-1 bg-slate-100 rounded-lg shrink-0">

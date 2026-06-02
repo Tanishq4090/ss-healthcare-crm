@@ -120,7 +120,7 @@ const buildAttentionNotification = (activity: any) => {
     switch (activity?.event_type) {
         case 'lead_created':
             return {
-                title: source === 'AI Phone Call' ? 'New Voice Lead' : 'New Lead Needs Review',
+                title: source === 'Phone Call' ? 'New Voice Lead' : 'New Lead Needs Review',
                 body: `${leadName} from ${source}${service ? ` for ${service}` : ''}.`,
             };
         case 'form_filled':
@@ -141,7 +141,7 @@ const buildAttentionNotification = (activity: any) => {
         case 'call_received':
             return {
                 title: 'Voice Call Needs Review',
-                body: `${leadName} completed an AI call${service ? ` about ${service}` : ''}.`,
+                body: `${leadName} completed a call${service ? ` about ${service}` : ''}.`,
             };
         case 'automation_error':
         case 'whatsapp_deposit_invoice_alert_failed':
@@ -399,7 +399,7 @@ export default function CRM() {
             const displayTime = isToday ? timeStr : `${dateStr}, ${timeStr}`;
 
             let title = 'Action Executed';
-            let desc = 'AI performed an automated action.';
+            let desc = 'System performed an automated action.';
             let icon = Bot;
 
             if (payload.pipelineStageUpdate) {
@@ -419,7 +419,7 @@ export default function CRM() {
                 desc = `Sent ${payload.templateName} to ${payload.original_recipient}.`;
                 icon = FileText;
             } else if (payload.message || payload.type === 'ai_response') {
-                title = 'AI Response Sent';
+                title = 'Response Sent';
                 desc = payload.message
                     ? `Replied: "${payload.message.substring(0, 40)}${payload.message.length > 40 ? '...' : ''}"`
                     : 'Sent automated response to customer.';
@@ -481,7 +481,7 @@ export default function CRM() {
             .slice(0, 20);
     }, [attentionEvents, deliveryLogs]);
 
-    // AI WhatsApp Agent State
+    // WhatsApp Messenger State
     const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
     const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
     const [quotationTargetLead, setQuotationTargetLead] = useState<any>(null);
@@ -718,7 +718,7 @@ export default function CRM() {
         drip: false
     });
 
-    // Voice AI State
+    // Voice Calls State
     const [calls, setCalls] = useState<any[]>([]);
     const [isLoadingVoice, setIsLoadingVoice] = useState(true);
     const [capturingCallId, setCapturingCallId] = useState<string | number | null>(null);
@@ -1062,7 +1062,7 @@ export default function CRM() {
 
             await upsertCallTranscriptStatus(callForTranscript, digits, 'GREETING_PROCESSING');
 
-            // Step 2: Send post_call_intake — template body + Flow prefill from Voice AI summary
+            // Step 2: Send post_call_intake — template body + Flow prefill from Voice Calls summary
             const intakePrefill = buildVoiceCallIntakePrefill(call);
             const requestBody = {
                 phone: digits,
@@ -1133,7 +1133,7 @@ export default function CRM() {
                     `Service: ${intakePrefill.service}`,
                     `Shift: ${intakePrefill.shiftType}`,
                     intakePrefill.startDateDisplay ? `Start date: ${intakePrefill.startDateDisplay}` : null,
-                    'Source: AI Phone Call (WhatsApp greeting)',
+                    'Source: Phone Call (WhatsApp greeting)',
                 ].filter(Boolean);
                 const priorNotes = linkedLead?.notes?.trim() || '';
                 const mergedNotes = priorNotes
@@ -1540,7 +1540,7 @@ export default function CRM() {
         }
     };
 
-    // AI WhatsApp Agent Logic
+    // WhatsApp Messenger Logic
     const generateWhatsappDraft = (
         leadName: string,
         action: string,
@@ -2266,7 +2266,7 @@ export default function CRM() {
 
     const handleDispatchMessage = async () => {
         setIsAgentModalOpen(false);
-        const toastId = toast.loading(`Dispatching AI Message to ${agentTargetLead?.name || 'Lead'}...`);
+        const toastId = toast.loading(`Dispatching WhatsApp Message to ${agentTargetLead?.name || 'Lead'}...`);
 
         try {
             let phoneDigits = '918000044090'; // Default to test number
@@ -2527,7 +2527,7 @@ export default function CRM() {
             if (data && data.length > 0) setAllWorkers(data.map(w => ({ ...w, name: w.full_name || '', role: w.job_title || '' })));
         });
 
-        // Enable real-time magic for AI Pipeline Automation
+        // Enable real-time magic for Pipeline Automation
         const subscription = supabase
             .channel('crm_leads_ai_updates')
             .on(
@@ -2542,7 +2542,7 @@ export default function CRM() {
                     // Merge the updated lead directly — preserves assigned_worker_name from DB
                     setLeads(prev => prev.map(lead => lead.id === newLead.id ? { ...lead, ...newLead } : lead));
 
-                    // Trigger a toast notification if the AI moved the lead
+                    // Trigger a toast notification if the System moved the lead
                     const oldLead = payload.old as any;
                     if (oldLead && newLead.pipeline_stage !== oldLead.pipeline_stage) {
                         toast.success(`🤖 AI Agent moved ${newLead.name} to "${newLead.pipeline_stage}"!`);
@@ -3246,7 +3246,7 @@ export default function CRM() {
                         name: call.capturedName || 'Voice Lead',
                         phone: leadPhone || null,
                         whatsapp_number: standardized || leadWhatsapp || null,
-                        source: opts?.duplicateOfId ? 'AI Phone Call (Returning)' : 'AI Phone Call',
+                        source: opts?.duplicateOfId ? 'Phone Call (Returning)' : 'Phone Call',
                         status: 'AI Handled',
                         pipeline_stage: NEW_LEAD_PIPELINE_STAGE,
                         estimated_value_monthly: Number(call.capturedValue) || 0,
@@ -3272,9 +3272,9 @@ export default function CRM() {
 
                 const activityMsg = opts?.duplicateOfId
                     ? 'Returning client — voice lead linked to existing client record'
-                    : 'Lead created from AI phone call';
+                    : 'Lead created from Phone Call';
                 await logActivity(newLead.id, 'lead_created', activityMsg, {
-                    source: 'AI Phone Call',
+                    source: 'Phone Call',
                     call_id: String(call.id),
                     ...(opts?.duplicateOfId ? { client_id: opts.duplicateOfId } : {}),
                 });
@@ -3303,7 +3303,7 @@ export default function CRM() {
     const captureCallAsLead = async (callId: string | number) => {
         const call = calls.find((c) => String(c.id) === String(callId));
         if (!call) {
-            toast.error('Call not found. Refresh Voice AI and try again.');
+            toast.error('Call not found. Refresh Voice Calls and try again.');
             return;
         }
         setCapturingCallId(callId);
@@ -3496,7 +3496,7 @@ export default function CRM() {
                         <Bot className="w-7 h-7 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans'] tracking-tight">AI CRM Center</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans'] tracking-tight">CRM Center</h1>
                         <p className="text-sm text-slate-500 font-medium font-bold">AI-Powered Management</p>
                     </div>
                 </div>
@@ -3569,13 +3569,13 @@ export default function CRM() {
                             onClick={() => setActiveTab('automations')}
                             className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'automations' ? 'bg-white text-primary shadow-lg scale-105' : 'text-slate-500 hover:text-slate-900'}`}
                         >
-                            AI Auto
+                            Automations
                         </button>
                         <button
                             onClick={() => setActiveTab('voice')}
                             className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'voice' ? 'bg-white text-primary shadow-lg scale-105' : 'text-slate-500 hover:text-slate-900'}`}
                         >
-                            Voice AI
+                            Voice Calls
                         </button>
                         <button
                             onClick={() => setActiveTab('trash')}
@@ -3904,7 +3904,7 @@ export default function CRM() {
                 </div>
             )}
             {activeTab === 'voice' && (
-                /* Voice AI Dashboard View */
+                /* Voice Calls Dashboard View */
                 <div className="flex-1 flex flex-col gap-6">
                     <div className="grid lg:grid-cols-4 gap-4">
                         <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800 shadow-sm">
@@ -4535,7 +4535,7 @@ export default function CRM() {
                                     <Bot className="w-5 h-5 text-[#1AA6A8]" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-900">AI WhatsApp Agent</h2>
+                                    <h2 className="text-lg font-bold text-slate-900">WhatsApp Messenger</h2>
                                     <p className="text-xs text-slate-500 font-medium tracking-wide">
                                         {agentTargetAction === 'staff' && selectedWorker
                                             ? `ASSIGNING: ${selectedWorker.name} → ${agentTargetLead.name}`
@@ -5379,7 +5379,7 @@ export default function CRM() {
                                     className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 group"
                                 >
                                     <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform text-primary" />
-                                    View AI Chat History
+                                    View Chat History
                                 </button>
 
                                 {(() => {
@@ -5556,7 +5556,7 @@ export default function CRM() {
                 </div>
             )}
 
-            {/* Returning Client Modal — portal so Voice AI tab overflow cannot hide it */}
+            {/* Returning Client Modal — portal so Voice Calls tab overflow cannot hide it */}
             {returningClientModal &&
                 createPortal(
                     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">

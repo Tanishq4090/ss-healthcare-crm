@@ -547,7 +547,7 @@ export default function WhatsAppOTPVerification({
             </div>
             <h2 className="otp-title" style={{ textAlign: "center" }}>Verified!</h2>
             <p className="otp-subtitle" style={{ textAlign: "center" }}>
-              Your WhatsApp number <strong>{countryCode} {phone}</strong> is now connected. Our AI assistant will reach out shortly.
+              Your WhatsApp number <strong>{countryCode} {phone}</strong> is now connected. Our assistant will reach out shortly.
             </p>
           </div>
         )}

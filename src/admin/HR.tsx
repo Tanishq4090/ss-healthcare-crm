@@ -100,7 +100,7 @@ export default function HR() {
         hours_worked: '8'
     });
 
-    // AI WhatsApp Agent State
+    // WhatsApp Messenger State
     const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
     const [agentTargetWorker, setAgentTargetWorker] = useState<any>(null);
     const [agentTargetAction, setAgentTargetAction] = useState<'staff' | 'custom'>('staff');
@@ -303,7 +303,7 @@ export default function HR() {
         }
     }, []);
 
-    // AI WhatsApp Agent Logic
+    // WhatsApp Messenger Logic
     const generateWhatsappDraft = (worker: any, lang: string) => {
         if (!worker) return '';
         const baseUrl = window.location.origin;
@@ -1649,7 +1649,7 @@ export default function HR() {
         <div className="p-4 sm:p-6 lg:p-8 h-full flex flex-col">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI HR & Billing</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">HR & Billing</h1>
                     <p className="text-slate-500 mt-1">Manage worker allocation, automated attendance, and payroll dispatch.</p>
                 </div>
 
@@ -2374,7 +2374,7 @@ export default function HR() {
                                         <Bot className="w-5 h-5 text-[#1AA6A8]" />
                                     </div>
                                     <div>
-                                        <h2 className="text-lg font-bold text-slate-900">AI WhatsApp Agent</h2>
+                                        <h2 className="text-lg font-bold text-slate-900">WhatsApp Messenger</h2>
                                         <p className="text-xs text-slate-500 font-medium tracking-wide">SHARING PROFILE: {agentTargetWorker.name}</p>
                                     </div>
                                 </div>

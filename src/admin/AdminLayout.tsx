@@ -39,7 +39,7 @@ const buildAttentionNotification = (activity: any) => {
     switch (activity?.event_type) {
         case 'lead_created':
             return {
-                title: source === 'AI Phone Call' ? 'New Voice Lead' : 'New Lead Needs Review',
+                title: source === 'Phone Call' ? 'New Voice Lead' : 'New Lead Needs Review',
                 body: `${leadName} from ${source}${service ? ` for ${service}` : ''}.`,
             };
         case 'form_filled':
@@ -49,7 +49,7 @@ const buildAttentionNotification = (activity: any) => {
         case 'quote_call_requested':
             return { title: 'Call Requested From Quote', body: `${leadName} tapped Schedule a call.${preview}` };
         case 'call_received':
-            return { title: 'Voice Call Needs Review', body: `${leadName} completed an AI call${service ? ` about ${service}` : ''}.` };
+            return { title: 'Voice Call Needs Review', body: `${leadName} completed a call${service ? ` about ${service}` : ''}.` };
         case 'automation_error':
         case 'whatsapp_deposit_invoice_alert_failed':
             return { title: 'Automation Needs Attention', body: activity.description || metadata.reason || 'An automated workflow failed.' };
@@ -354,7 +354,7 @@ export default function AdminLayout() {
                 pushGlobalAlert(
                     `call:${call.conversation_id || call.id}`,
                     'Voice Call Ended',
-                    `New AI call from ${call.phone_number || 'unknown number'} needs review.`,
+                    `New inbound call from ${call.phone_number || 'unknown number'} needs review.`,
                     { route: '/admin/crm' }
                 );
             })
@@ -388,9 +388,9 @@ export default function AdminLayout() {
     // Navigation items linked to their required module (null means always visible)
     const navigation = [
         { name: 'Dashboard',          href: '/admin',                    icon: LayoutDashboard, requiredModule: 'dashboard' as AccessModule },
-        { name: 'AI CRM',             href: '/admin/crm',                icon: Users,           requiredModule: 'crm' as AccessModule },
+        { name: 'CRM',             href: '/admin/crm',                icon: Users,           requiredModule: 'crm' as AccessModule },
         { name: 'Clients',            href: '/admin/clients',            icon: Users,           requiredModule: 'clients' as AccessModule },
-        { name: 'AI HR',              href: '/admin/hr',                 icon: UserCog,         requiredModule: 'hr' as AccessModule },
+        { name: 'HR',              href: '/admin/hr',                 icon: UserCog,         requiredModule: 'hr' as AccessModule },
         { name: 'Finance',            href: '/admin/billing',            icon: Landmark,        requiredModule: 'finance' as AccessModule },
     ];
 

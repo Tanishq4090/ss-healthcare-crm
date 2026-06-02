@@ -554,7 +554,7 @@ function LeadDetailsDrawer({
                 onClick={onShowHistory}
                 className="w-full py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition shadow-sm"
               >
-                <Bot className="h-4 w-4 text-slate-400" /> View AI Chat History
+                <Bot className="h-4 w-4 text-slate-400" /> View Chat History
               </button>
               <button
                 onClick={() => sendMessage('quotation_sent')}
@@ -844,13 +844,13 @@ export default function AICRM() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">AI CRM Center</h1>
+          <h1 className="text-2xl font-bold text-slate-900 font-['Plus_Jakarta_Sans']">CRM Center</h1>
           <p className="text-slate-500 mt-1">Manage leads, pipelines, and WhatsApp communication workflows.</p>
         </div>
 
         {/* Module Tabs */}
         <div className="segmented-control shrink-0">
-          {([['pipeline','Pipeline'],['clients','Clients'],['automations','AI Auto'],['call-leads','Call Leads']] as const).map(([key, label]) => (
+          {([['pipeline','Pipeline'],['clients','Clients'],['automations','Automations'],['call-leads','Call Leads']] as const).map(([key, label]) => (
             <button key={key} onClick={() => setCrmTab(key)} className={cn('segmented-item', crmTab === key && 'segmented-item-active')}>
               {label}
             </button>

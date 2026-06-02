@@ -216,7 +216,7 @@ export const SendQuotationModal: React.FC<SendQuotationModalProps> = ({ isOpen, 
                         </div>
                         <div>
                             <h2 className="text-lg font-semibold leading-tight text-white">Send quotation</h2>
-                            <p className="text-white/80 text-xs">AI WhatsApp agent — human-reviewed before dispatch</p>
+                            <p className="text-white/80 text-xs">WhatsApp Messenger — human-reviewed before dispatch</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="text-white/70 hover:text-white p-1 rounded-full hover:bg-white/10 transition">

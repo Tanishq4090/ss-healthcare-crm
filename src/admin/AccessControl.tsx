@@ -6,9 +6,9 @@ import { toast } from 'sonner';
 
 const MODULES: { id: AccessModule; label: string; desc: string }[] = [
     { id: 'dashboard', label: 'Main Dashboard', desc: 'Access to high-level analytics and business overview.' },
-    { id: 'crm', label: 'AI CRM Pipeline', desc: 'Allows access to the lead management Kanban board.' },
+    { id: 'crm', label: 'CRM Pipeline', desc: 'Allows access to the lead management Kanban board.' },
     { id: 'clients', label: 'Client Master', desc: 'Allows viewing and managing the Client Master spreadsheet.' },
-    { id: 'hr', label: 'AI HR & Workers', desc: 'Grants access to worker management, payroll, and compliance.' },
+    { id: 'hr', label: 'HR & Workers', desc: 'Grants access to worker management, payroll, and compliance.' },
     { id: 'finance', label: 'Finance & Billing', desc: 'Grants access to invoices and revenue tracking.' },
 ];
 

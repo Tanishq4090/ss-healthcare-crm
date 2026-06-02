@@ -117,7 +117,7 @@ export default function Billing() {
     const [isEditBillModalOpen, setIsEditBillModalOpen] = useState(false);
     const [editingBill, setEditingBill] = useState<any>(null);
 
-    // AI WhatsApp Agent State
+    // WhatsApp Messenger State
     const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
     const [agentTargetBill, setAgentTargetBill] = useState<any>(null);
     const [agentDraftLang, setAgentDraftLang] = useState<'English' | 'Hindi' | 'Hinglish'>('Hinglish');
@@ -400,7 +400,7 @@ export default function Billing() {
 
     const handleGenerateDepositInvoice = async (id: string, clientName: string) => {
         // This function is no longer used — deposit invoices are generated
-        // via the "Prepare Invoice" button which opens the AI WhatsApp Agent modal.
+        // via the "Prepare Invoice" button which opens the WhatsApp Messenger modal.
         // Keeping as a no-op to avoid breaking any lingering references.
         console.warn('[Billing] handleGenerateDepositInvoice called but is deprecated. Use openAgentModal instead.');
     };
@@ -551,7 +551,7 @@ export default function Billing() {
         }
     };
 
-    // AI WhatsApp Agent Logic
+    // WhatsApp Messenger Logic
     const generateWhatsappDraft = (bill: any, lang: string) => {
         if (!bill) return '';
         const link = `https://ss healthcare.org/pay/${bill.invoice_no || Math.floor(Math.random() * 1000) + 100}`;
@@ -1674,7 +1674,7 @@ export default function Billing() {
                                     <Bot className="w-5 h-5 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-900">AI WhatsApp Agent</h2>
+                                    <h2 className="text-lg font-bold text-slate-900">WhatsApp Messenger</h2>
                                     <p className="text-xs text-slate-500 font-medium tracking-wide">BILLING: {agentTargetBill.client}</p>
                                 </div>
                             </div>

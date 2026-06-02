@@ -22,9 +22,9 @@ import type { AccessModule } from '@/contexts/AuthContext';
 /* ── Navigation config ─────────────────────────────────────── */
 const navItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true, requiredModule: null },
-  { name: 'AI CRM', href: '/admin/crm', icon: Users, requiredModule: 'crm' as AccessModule },
+  { name: 'CRM', href: '/admin/crm', icon: Users, requiredModule: 'crm' as AccessModule },
   { name: 'Clients', href: '/admin/clients', icon: Users, requiredModule: 'clients' as AccessModule },
-  { name: 'AI HR', href: '/admin/hr', icon: Briefcase, requiredModule: 'hr' as AccessModule },
+  { name: 'HR', href: '/admin/hr', icon: Briefcase, requiredModule: 'hr' as AccessModule },
   { name: 'Finance', href: '/admin/billing', icon: Landmark, requiredModule: 'finance' as AccessModule },
 ];
 
