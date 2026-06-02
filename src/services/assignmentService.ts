@@ -47,10 +47,11 @@ function generateToken(): string {
 
 /** Constructs the public-facing ID card shareable URL. */
 export function buildShareableUrl(token: string): string {
+  // Always prefer the explicit production URL env var, so WhatsApp links
+  // are never localhost even when sent from a dev machine.
   const base =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : (import.meta.env.VITE_APP_URL ?? 'https://your-domain.com');
+    import.meta.env.VITE_APP_URL?.replace(/\/$/, '') ??
+    (typeof window !== 'undefined' ? window.location.origin : 'https://health-care-iota-red.vercel.app');
   return `${base}/id-card/${token}`;
 }
 
@@ -123,7 +124,14 @@ export async function assignWorkerToClient(
   clientUuid: string,
   notes?: string,
   depositPaid: number = 0,
-  skipWhatsApp: boolean = false
+  skipWhatsApp: boolean = false,
+  billingData?: {
+    startDate: string;
+    endDate?: string;
+    serviceType: 'one_day' | 'date_range';
+    hoursPerDay?: number;
+    totalBillAmount: number;
+  }
 ): Promise<AssignmentResult> {
 
   // ── Step 0: Ensure client exists in clients table (Convert from crm_leads if needed)
@@ -162,6 +170,12 @@ export async function assignWorkerToClient(
       assignment_status: 'active',
       notes:             notes?.trim() ?? null,
       deposit_paid:      depositPaid,
+      start_date:        billingData?.startDate || new Date().toISOString(),
+      end_date:          billingData?.endDate || (billingData?.serviceType === 'one_day' ? billingData?.startDate : null),
+      service_type:      billingData?.serviceType || 'one_day',
+      hours_per_day:     billingData?.hoursPerDay ?? 10,
+      total_bill_amount: billingData?.totalBillAmount || 0,
+      invoice_number:    `INV-${Date.now().toString().slice(-6)}`,
     })
     .select()
     .single();

@@ -120,12 +120,12 @@ export async function createEmployee(
         aadhaar_number: data.aadhaar_number?.trim() ?? null,
         address: data.address?.trim() ?? null,
         dob: data.dob ?? null,
-        preferred_payment_type: data.preferred_payment_type ?? 'monthly',
+        preferred_payment_type: data.preferred_payment_type ?? 'daily',
         services: data.services ?? [],
         hourly_rate: data.hourly_rate ?? 0,
         monthly_daily_rate: data.monthly_daily_rate ?? 0,
         short_term_daily_rate: data.short_term_daily_rate ?? 0,
-        shift_hours: data.shift_hours ?? null,
+        shift_hours: null,
         experience: data.experience?.trim() ?? null,
         gender: data.gender?.trim() ?? null,
         // Note: username intentionally omitted — no username field in form,
@@ -468,4 +468,3 @@ export async function getEmployeeDocuments(employeeId: string): Promise<any[]> {
     return [];
   }
 }
-
