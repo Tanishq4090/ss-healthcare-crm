@@ -1,6 +1,6 @@
 import { Navigate, Routes, Route } from 'react-router'
 import { useAuth } from './contexts/AuthContext'
-import Layout from './components/layout/Layout'
+// Layout removed
 import AdminLayout from './admin/AdminLayout'
 import Dashboard from './admin/Dashboard'
 import CRM from './admin/CRM'
@@ -11,15 +11,7 @@ import AccessControl from './admin/AccessControl'
 
 import LoginPage from './pages/LoginPage.tsx'
 import PublicStaffIDCard from './pages/PublicStaffIDCard.tsx'
-import HomePage from './pages/public/HomePage.tsx'
-import AboutPage from './pages/public/AboutPage.tsx'
-import ServicesPage from './pages/public/ServicesPage.tsx'
-import BlogPage from './pages/public/BlogPage.tsx'
-import ContactPage from './pages/public/ContactPage.tsx'
-import AppointmentPage from './pages/public/AppointmentPage.tsx'
-import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage.tsx'
-import TermsPage from './pages/public/TermsPage.tsx'
-
+// Public pages removed - CRM only
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
 
@@ -44,18 +36,8 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/staff-id/:token" element={<PublicStaffIDCard />} />
 
-      {/* Public Pages */}
-      <Route element={<Layout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/appointment" element={<AppointmentPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-      </Route>
-
+      {/* Redirect Root to Admin */}
+      <Route path="/" element={<Navigate to="/admin" replace />} />
       {/* Admin Pages */}
       <Route
         path="/admin"
@@ -85,7 +67,7 @@ export default function App() {
       <Route path="/finance" element={<Navigate to="/admin/billing" replace />} />
       <Route path="/access-control" element={<Navigate to="/admin/settings" replace />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   )
 }
