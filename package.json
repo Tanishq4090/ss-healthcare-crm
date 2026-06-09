@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:public": "cross-env VITE_APP_MODE=public vite --port 5174 --strictPort",
-    "dev:os": "cross-env VITE_APP_MODE=os vite --port 5173 --strictPort",
-    "build": "tsc -b && vite build",
-    "build:public": "node scripts/set-robots.mjs public && cross-env VITE_APP_MODE=public tsc -b && cross-env VITE_APP_MODE=public vite build",
-    "build:os": "node scripts/set-robots.mjs os && cross-env VITE_APP_MODE=os tsc -b && cross-env VITE_APP_MODE=os vite build",
-    "lint": "eslint .",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=2048 vite",
+    "dev:public": "cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=public vite --port 5174 --strictPort",
+    "dev:os": "cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=os vite --port 5173 --strictPort",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=2048 tsc -b && cross-env NODE_OPTIONS=--max-old-space-size=2048 vite build",
+    "build:public": "node scripts/set-robots.mjs public && cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=public tsc -b && cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=public vite build",
+    "build:os": "node scripts/set-robots.mjs os && cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=os tsc -b && cross-env NODE_OPTIONS=--max-old-space-size=2048 VITE_APP_MODE=os vite build",
+    "lint": "cross-env NODE_OPTIONS=--max-old-space-size=2048 eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
